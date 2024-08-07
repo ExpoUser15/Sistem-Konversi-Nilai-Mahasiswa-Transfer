@@ -7,7 +7,6 @@ const handlingCookie = (req, res, next) => {
         jwt.verify(token.token, process.env.SECRET_KEY, (err, decoded) => {
             if (err) {
                 if (err.name === "TokenExpiredError") {
-                    console.log(err.name);
                     res.clearCookie("token");
                     return req.data = {
                         status: "Expired",
@@ -22,7 +21,8 @@ const handlingCookie = (req, res, next) => {
 
             req.data = {
                 status: "Authenticated",
-                payload: {
+                data: {
+                    id: decoded.id,
                     username: decoded.username,
                     user: decoded.user
                 }

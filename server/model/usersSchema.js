@@ -7,7 +7,7 @@ const usersSchema = sequelize.define(
       id_pengguna: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        allowNull: false,
+        allowNull: true,
       },
       username: {
         type: DataTypes.STRING,
@@ -18,8 +18,8 @@ const usersSchema = sequelize.define(
         allowNull: false
       },
       user: {
-        type: DataTypes.STRING,
-        allowNull: false
+        type: DataTypes.ENUM,
+        values: ['Akademik', 'Kaprodi']
       }
     },
     {
