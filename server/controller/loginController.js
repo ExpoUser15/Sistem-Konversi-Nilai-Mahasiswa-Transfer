@@ -7,7 +7,7 @@ const { createLog } = require("../functions/logActivity");
 
 const loginController = (req, res) => {
     res.json({
-        payload: req.data,
+        auth: req.data,
     });
 }
 

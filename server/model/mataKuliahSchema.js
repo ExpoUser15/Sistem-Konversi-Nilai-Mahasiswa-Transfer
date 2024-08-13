@@ -1,25 +1,25 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
-const usersSchema = sequelize.define(
-    'tb_user',
+const mataKuliahSchema = sequelize.define(
+    'tb_course',
     {
-      id_pengguna: {
-        type: DataTypes.INTEGER,
+      id_mk: {
+        type: DataTypes.STRING,
         primaryKey: true,
-        allowNull: false,
+        allowNull: true,
       },
-      username: {
+      mata_kuliah: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      password: {
+      sks: {
         type: DataTypes.STRING,
         allowNull: false
       },
-      user: {
-        type: DataTypes.ENUM,
-        values: ['Akademik', 'Kaprodi']
+      semester: {
+        type: DataTypes.STRING,
+        allowNull: false
       }
     },
     {
@@ -27,4 +27,4 @@ const usersSchema = sequelize.define(
     }
 );
 
-module.exports = usersSchema;
+module.exports = mataKuliahSchema;

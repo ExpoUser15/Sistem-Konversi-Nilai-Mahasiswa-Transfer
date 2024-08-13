@@ -64,29 +64,10 @@ class Queries {
         }
     }
 
-    // Join
-    async findWithJoin(conditions = {}, includes = [], options = {}) {
+    async count(){
         try {
-            const results = await this.model.findAll({
-                where: conditions,
-                include: includes,
-                ...options
-            });
-            return results;
-        } catch (error) {
-            throw new Error(error.message);
-        }
-    }
-
-    // Limit
-    async findWithLimit(conditions = {}, limit = 10, options = {}) {
-        try {
-            const results = await this.model.findAll({
-                where: conditions,
-                limit: limit,
-                ...options
-            });
-            return results;
+            const result = await this.model.count();
+            return result;
         } catch (error) {
             throw new Error(error.message);
         }

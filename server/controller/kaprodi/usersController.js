@@ -1,4 +1,4 @@
-const { readLog, createLog } = require("../../functions/logActivity")
+const { createLog } = require("../../functions/logActivity")
 const logActivitySchema = require("../../model/logActivitySchema");
 const usersSchema = require("../../model/usersSchema");
 const Queries = require("../../queries/queries")
@@ -14,16 +14,14 @@ const usersController = async (req, res) => {
         data = req.data.data.id;
 
         await createLog(logSchema, {
-            ket: "Mengakses Halaman Users",
+            ket: "Mengakses halaman users",
             idUser: req.data.data.id
         });
 
         const usersData = await userQueries.findAll();
 
-        console.log(usersData)
-
         res.json({
-            payload: req.data,
+            auth: req.data.status,
             usersData
         });
     } catch (error) {
@@ -36,7 +34,7 @@ const usersController = async (req, res) => {
 
 const addUsersController = async (req, res) => {
     try {
-        const { username, password, user } = req.body;
+        const { id, username, password, user } = req.body;
 
         if (!username || !password || !user) {
             await createLog(logSchema, {
@@ -50,23 +48,34 @@ const addUsersController = async (req, res) => {
             });
         }
 
+        let userData = await userQueries.findOne(
+            { id_pengguna: id }
+        );
+
+        if (userData) {
+            return res.json({
+                status: "Error",
+                message: 'ID user sudah ada'
+            });
+        }
+
         bcrypt.hash(password, 10)
             .then(async hash => {
                 await userQueries.create({
-                    id_pengguna: "",
+                    id_pengguna: id,
                     username,
                     password: hash,
                     user
                 });
 
                 await createLog(logSchema, {
-                    ket: "Menambahkan user baru",
+                    ket: `Menambahkan user '${username}'`,
                     idUser: data
                 });
 
                 res.json({
                     status: "success",
-                    message: 'Berhasil menambahkan data.'
+                    message: 'Berhasil menambahkan user'
                 });
             })
             .catch(err => {
@@ -92,7 +101,7 @@ const deleteController = async (req, res) => {
         });
 
         await createLog(logSchema, {
-            ket: `Menghapus user ${user.dataValues.username}`,
+            ket: `Menghapus user '${user.dataValues.username}'`,
             idUser: data
         });
 
@@ -115,7 +124,7 @@ const deleteController = async (req, res) => {
 const updateController = async (req, res) => {
     try {
         const { id } = req.params;
-        const { username, password, user } = req.body;
+        const { id_pengguna, username, password, user } = req.body;
 
         if (!username || !user) {
             await createLog(logSchema, {
@@ -131,22 +140,21 @@ const updateController = async (req, res) => {
 
         bcrypt.hash(password, 10)
             .then(async hash => {
-
-                await userQueries.update({
-                    id_pengguna: id,
-                    username,
-                    password: hash,
-                    user
-                }, {
-                    id_pengguna: id
-                });
-
                 const userData = await userQueries.findOne({
                     id_pengguna: id
                 });
 
+                await userQueries.update({
+                    id_pengguna,
+                    username,
+                    password: hash,
+                    user
+                }, {
+                    id_pengguna
+                });
+
                 await createLog(logSchema, {
-                    ket: `Mengubah user ${userData.dataValues.username}`,
+                    ket: `Mengubah data user '${userData.dataValues.username}'`,
                     idUser: data
                 });
 
