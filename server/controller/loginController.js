@@ -5,10 +5,18 @@ const Queries = require("../queries/queries");
 const logActivitySchema = require("../model/logActivitySchema");
 const { createLog } = require("../functions/logActivity");
 
-const loginController = (req, res) => {
-    res.json({
-        auth: req.data,
-    });
+const loginController =  async(req, res) => {
+    try {
+        res.json({
+            auth: req.data,
+        });
+    } catch (error) {
+        console.log(err);
+        res.status(500).json({
+            message: "Server Error"
+        });
+    }
+    
 }
 
 const postLoginController = async (req, res) => {

@@ -1,6 +1,7 @@
 const sequelize = require("../../config/db");
 const generateId = require("../../functions/generateId");
 const { createLog } = require("../../functions/logActivity");
+const { upload } = require("../../middleware/fileHandler");
 const berkasSchema = require("../../model/berkasSchema");
 const logActivitySchema = require("../../model/logActivitySchema");
 const mahasiswaSchema = require("../../model/mahasiswaSchema");
@@ -41,9 +42,7 @@ const addMahasiswaController = async (req, res) => {
         const { nama, email, nim, pt_asal, fakultas, prodi, prodi_tujuan } = req.body;
         const { kk, ktp, ijazah, transkrip, surat_pindah } = req.files;
 
-        console.log(req.files)
-
-        if(!nama || !email || !nim || !pt_asal || !fakultas || !prodi || !prodi_tujuan){
+        if (!nama || !email || !nim || !pt_asal || !fakultas || !prodi || !prodi_tujuan) {
             await createLog(logSchema, {
                 ket: "Gagal menambahkan mahasiswa baru",
                 idUser: data
@@ -55,7 +54,7 @@ const addMahasiswaController = async (req, res) => {
             });
         }
 
-        if(!kk || !ktp || !ijazah || !transkrip || !surat_pindah){
+        if (!kk || !ktp || !ijazah || !transkrip || !surat_pindah) {
             await createLog(logSchema, {
                 ket: "Gagal menambahkan mahasiswa baru",
                 idUser: data
@@ -65,14 +64,25 @@ const addMahasiswaController = async (req, res) => {
                 status: "Error",
                 message: "Silahkan mengisikan form terlebih dahulu!"
             });
+        }
+
+        // console.log(req.files);
+
+        for(const key in req.files){
+            if(req.files[key][0].mimetype !== 'image/jpeg' && req.files[key][0].mimetype !== 'image/png'){
+                return res.json({
+                    status: 'Error',
+                    message: `Masukan gambar berupa PNG atau JPG/JPEG`
+                });
+            }
         }
 
         let mahasiswaId = await mahasiswaQueries.findAll();
         let idMahasiswa
 
-        if(mahasiswaId.length === 0){
-             idMahasiswa = generateId(0, 'MT');
-        }else{
+        if (mahasiswaId.length === 0) {
+            idMahasiswa = generateId(0, 'MT');
+        } else {
             mahasiswaId = Number(mahasiswaId[mahasiswaId.length - 1].id_mahasiswa.substring(2));
             idMahasiswa = generateId(mahasiswaId, 'MT');
         }
@@ -123,7 +133,7 @@ const deleteMahasiswaController = async (req, res) => {
     try {
         const id = req.params.id;
 
-        if(!id){
+        if (!id) {
             await createLog(logSchema, {
                 ket: "Gagal menghapus mahasiswa",
                 idUser: data
@@ -161,7 +171,7 @@ const updateMahasiswaController = async (req, res) => {
         const { id } = req.params;
         const { id_mahasiswa, nama, email, nim, pt_asal, fakultas, prodi, prodi_tujuan } = req.body;
 
-        if(!id){
+        if (!id) {
             await createLog(logSchema, {
                 ket: "Gagal mengubah mahasiswa baru",
                 idUser: data
@@ -173,7 +183,7 @@ const updateMahasiswaController = async (req, res) => {
             });
         }
 
-        if(!nama || !email || !nim || !pt_asal || !fakultas || !prodi || !prodi_tujuan){
+        if (!nama || !email || !nim || !pt_asal || !fakultas || !prodi || !prodi_tujuan) {
             await createLog(logSchema, {
                 ket: "Gagal mengubah mahasiswa baru",
                 idUser: data
@@ -188,7 +198,7 @@ const updateMahasiswaController = async (req, res) => {
         const data = await mahasiswaQueries.findAll();
         const validasi = data.some(item => id === item.id_mahasiswa);
 
-        if(!validasi){
+        if (!validasi) {
             await createLog(logSchema, {
                 ket: "Gagal mengubah mahasiswa baru",
                 idUser: data
@@ -209,13 +219,83 @@ const updateMahasiswaController = async (req, res) => {
             fakultas,
             prodi,
             prodi_tujuan,
-        },{
+        }, {
             id_mahasiswa: id
         });
-        
+
         return res.json({
             status: "Success",
             message: "Berhasil mengubah mahasiswa"
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            message: "Server Error"
+        });
+    }
+}
+
+const updateBerkasController = async (req, res) => {
+    try {
+        const { id, fileID } = req.params;
+        const files = req.files;
+
+        const keysName = Object.keys(files);
+
+        if(files[keysName[0]][0].mimetype !== 'image/jpeg' || files[keysName[0]][0].mimetype !== 'image/png'){
+            await createLog(logSchema, {
+                ket: "Gagal mengubah gambar",
+                idUser: data
+            });
+
+            return res.json({
+                status: "Error",
+                message: "Masukan gambar berupa PNG atau JPG/JPEG"
+            });
+        }
+
+        const berkas = {};
+        berkas[keysName[0]] = `${process.env.FILE_URL}${files[keysName[0]][0].filename}`;
+
+        if (!id || !fileID) {
+            await createLog(logSchema, {
+                ket: "Gagal mengubah gambar",
+                idUser: data
+            });
+
+            return res.json({
+                status: "Error",
+                message: "Terjadi Kesalahan"
+            });
+        }
+
+        const berkasData = await berkasQueries.findAll();
+        const validasi = berkasData.some(item => fileID === item.id_berkas);
+
+        if (!validasi) {
+            await createLog(logSchema, {
+                ket: "Gagal mengubah berkas",
+                idUser: data
+            });
+
+            return res.json({
+                status: "Error",
+                message: "Gagal: ID tidak ditemukan!"
+            });
+        }
+
+        await berkasQueries.update(berkas, {
+            id_berkas: fileID
+        });
+
+        await createLog(logSchema, {
+            ket: "Mengubah gambar",
+            idUser: data
+        });
+
+        return res.json({
+            status: "Success",
+            message: "Berhasil mengubah gambar"
         });
     } catch (error) {
         console.log(error);
@@ -229,5 +309,6 @@ module.exports = {
     mahasiswaController,
     addMahasiswaController,
     deleteMahasiswaController,
-    updateMahasiswaController
+    updateMahasiswaController,
+    updateBerkasController
 }

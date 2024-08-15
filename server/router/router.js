@@ -3,33 +3,39 @@ const { loginController, postLoginController } = require('../controller/loginCon
 const handlingCookie = require('../middleware/handlingCookie');
 const { usersController, addUsersController, deleteController, updateController } = require('../controller/kaprodi/usersController');
 const logController = require('../controller/kaprodi/logController');
-const { addMahasiswaController, mahasiswaController, deleteMahasiswaController, updateMahasiswaController } = require('../controller/akademik/mahasiswaController');
-const { mataKuliahController, addMataKuliahController, deleteMataKuliahController, updateMataKuliahController, addKonversiController } = require('../controller/kaprodi/mataKuliahController');
+const { addMahasiswaController, mahasiswaController, deleteMahasiswaController, updateMahasiswaController, updateBerkasController } = require('../controller/akademik/mahasiswaController');
+const { mataKuliahController, addMataKuliahController, deleteMataKuliahController, updateMataKuliahController } = require('../controller/kaprodi/mataKuliahController');
 const { validateUserKaprodi, validateUserAkademik } = require('../middleware/validateUsers');
 const { notFound } = require('../controller/notFound');
-const upload = require('../middleware/fileHandler');
-const berkasUpload = require('../middleware/fileHandler');
+const {berkasUpload} = require('../middleware/fileHandler');
 const fileController = require('../controller/fileResponse/filleController');
-// const { addKonversiController } = require('../controller/kaprodi/konversiController');
+const { konversiController, addKonversiController, updateKonversiController, deleteKonversiController } = require('../controller/kaprodi/konversiController');
+const logoutController = require('../controller/logoutController');
+const handleDuplicateData = require('../middleware/handleDuplicateData');
 
 const router = express.Router();
 
 router.get('/login', handlingCookie, loginController);
+router.post('/logout', logoutController);
 
 // kaprodi router
 router.get('/users', handlingCookie, validateUserKaprodi, usersController);
 router.get('/log', handlingCookie, validateUserKaprodi, logController);
 router.get('/matakuliah', handlingCookie, validateUserKaprodi, mataKuliahController);
+router.get('/konversi', handlingCookie, validateUserKaprodi, konversiController);
 
 router.post('/auth', postLoginController);
 router.post('/users/add', addUsersController);
 router.post('/matakuliah/add', addMataKuliahController);
+router.post('/konversi/add/:id', handleDuplicateData, addKonversiController);
 
 router.delete('/users/delete/:id', deleteController);
 router.delete('/matakuliah/delete/:id', deleteMataKuliahController);
+router.delete('/konversi/delete/:id', deleteKonversiController);
 
 router.put('/users/update/:id', updateController);
 router.put('/matakuliah/update/:id', updateMataKuliahController);
+router.put('/konversi/update/:id', updateKonversiController);
 
 // akademik router
 router.get('/mahasiswa', handlingCookie, validateUserAkademik, mahasiswaController);
@@ -40,11 +46,17 @@ router.delete('/mahasiswa/delete/:id', deleteMahasiswaController);
 
 router.put('/mahasiswa/update/:id', updateMahasiswaController);
 
+router.patch('/mahasiswa/update/:id/berkas/:fileID', berkasUpload, updateBerkasController);
+
 // file router
 router.get('/file/:filename', handlingCookie, fileController);
 
 
 // routes not found
 router.get('*', notFound);
+router.post('*', notFound);
+router.put('*', notFound);
+router.delete('*', notFound);
+router.patch('*', notFound);
 
 module.exports = router;

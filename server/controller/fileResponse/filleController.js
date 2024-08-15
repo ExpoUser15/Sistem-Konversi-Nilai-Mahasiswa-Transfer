@@ -5,8 +5,6 @@ const fileController =  (req, res) => {
     const split = filename.split('-')[0];
     const filePath = path.join(process.cwd(), `tmp/${split}`, filename);
 
-    console.log(filePath);
-
     res.sendFile(filePath, (err) => {
         if (err) {
             console.log('File not found:', err);
