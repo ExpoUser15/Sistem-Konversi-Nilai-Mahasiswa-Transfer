@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 15, 2024 at 06:18 PM
+-- Generation Time: Aug 17, 2024 at 05:13 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -34,8 +34,7 @@ CREATE TABLE `tb_conversions` (
   `nilai_asal` varchar(5) NOT NULL,
   `id_mk` varchar(10) NOT NULL,
   `sks_tujuan` varchar(5) NOT NULL,
-  `nilai_tujuan` int(5) NOT NULL,
-  `file` varchar(255) NOT NULL,
+  `nilai_tujuan` varchar(15) NOT NULL,
   `id_mahasiswa` varchar(255) NOT NULL,
   `tanggal` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -44,19 +43,10 @@ CREATE TABLE `tb_conversions` (
 -- Dumping data for table `tb_conversions`
 --
 
-INSERT INTO `tb_conversions` (`id_konversi`, `mk_asal`, `sks_asal`, `nilai_asal`, `id_mk`, `sks_tujuan`, `nilai_tujuan`, `file`, `id_mahasiswa`, `tanggal`) VALUES
-('K00000001', 'Matematika', '3', 'B', 'MK005', '3', 0, '', 'MT001', '2024-07-16'),
-('K00000002', 'Manajemen Berkas', '3', 'B', 'MK001', '3', 0, '', 'MT001', '2024-07-16'),
-('K00000003', 'Matematika', '3', 'B', 'MK005', '3', 0, '', 'MT001', '2024-07-16'),
-('K00000004', 'Manajemen Berkas', '3', 'B', 'MK001', '3', 0, '', 'MT001', '2024-07-16'),
-('K00000005', 'Matematika', '3', 'B', 'MK005', '3', 0, '', 'MT001', '2024-07-16'),
-('K00000006', 'Manajemen Berkas', '3', 'B', 'MK001', '3', 0, '', 'MT001', '2024-07-16'),
-('K00000007', 'Matematika', '3', 'B', 'MK005', '3', 0, '', 'MT001', '2024-07-16'),
-('K00000008', 'Manajemen Berkas', '3', 'B', 'MK001', '3', 0, '', 'MT001', '2024-07-16'),
-('K00000009', 'Matematika', '3', 'B', 'MK005', '3', 0, '', 'MT001', '2024-07-16'),
-('K00000010', 'Manajemen Berkas', '3', 'B', 'MK001', '3', 0, '', 'MT001', '2024-07-16'),
-('K00000011', 'Matematika', '3', 'B', 'MK005', '3', 0, '', 'MT001', '2024-07-16'),
-('K00000012', 'Manajemen Berkas', '3', 'B', 'MK001', '3', 0, '', 'MT001', '2024-07-16');
+INSERT INTO `tb_conversions` (`id_konversi`, `mk_asal`, `sks_asal`, `nilai_asal`, `id_mk`, `sks_tujuan`, `nilai_tujuan`, `id_mahasiswa`, `tanggal`) VALUES
+('K00000001', 'Matematika Logika', '3', 'A', 'MK006', '3', 'A', 'MT001', '2024-07-17'),
+('K00000002', 'Pengantar Sistem dan Teknologi Informasi', '3', 'A', 'MK003', '3', 'A', 'MT001', '2024-07-17'),
+('K00000003', 'Matematika Logika', '3', 'A', 'MK006', '3', 'A', 'MT002', '2024-07-17');
 
 -- --------------------------------------------------------
 
@@ -132,12 +122,16 @@ CREATE TABLE `tb_log_activities` (
 INSERT INTO `tb_log_activities` (`id_aktivitas`, `keterangan`, `tanggal`, `id_pengguna`) VALUES
 ('00006bd9-4b0c-4261-b6a6-76c8b285fad1', 'Menambahkan mahasiswa baru', '2024-07-13 14:51:31', 0),
 ('003377b0-5863-44cd-95a0-e4d18f743d28', 'Mengakses halaman mahasiswa', '2024-07-14 16:57:31', 0),
+('01847837-de6f-4d37-a16e-e7478fa7dd2d', 'Mengakses halaman konversi', '2024-07-17 23:19:45', 1),
 ('01ae21fd-54d6-4a20-8de6-9afb58b482b8', 'Mengakses halaman mahasiswa', '2024-07-11 18:39:19', 0),
 ('01d894a9-3ab5-4027-930c-8dae1acf5945', 'Mengakses halaman mata kuliah', '2024-07-10 22:28:54', 1),
+('02316739-d538-4490-9c9f-cc3164f6fe6e', 'Berhasil menghapus hasil konversi', '2024-07-16 17:31:08', 0),
 ('02537a7b-e2a1-47f3-8e9b-067c2e70680c', 'Mengakses halaman log aktvitas', '2024-07-10 22:05:48', 1),
+('02a0e0e1-6049-4106-bacd-4eaad5361ef7', 'Mengakses halaman konversi', '2024-07-17 23:50:47', 1),
 ('04875220-fc5e-48e1-b7b7-54b591beabe5', 'Mengakses halaman mahasiswa', '2024-07-14 16:58:07', 0),
 ('05409c74-b2a7-4769-b916-f674052e55f3', 'Menambahkan mahasiswa baru', '2024-07-14 16:33:42', 0),
 ('06a391b1-d276-483c-b2f8-ea701ebca6a8', 'Menambahkan mahasiswa baru', '2024-07-13 02:35:52', 0),
+('06ede4fb-af73-46d7-9c68-96f643896d2b', 'Mengakses halaman konversi', '2024-07-17 23:04:39', 1),
 ('0b2a8587-f913-4d0d-8988-c8c113cd02fe', 'Menambahkan mahasiswa baru', '2024-07-13 14:30:39', 0),
 ('0bc0f89b-cda4-4d3a-b337-158cb216747b', 'Berhasil menyimpan hasil konversi', '2024-07-15 00:58:05', 1),
 ('0c1b6755-3677-4e98-abc1-cb9d4c0bb58a', 'Mengakses halaman mahasiswa', '2024-07-13 02:35:46', 0),
@@ -152,11 +146,13 @@ INSERT INTO `tb_log_activities` (`id_aktivitas`, `keterangan`, `tanggal`, `id_pe
 ('13163782-9c33-46b5-9019-2a12add9bc07', 'Mengakses halaman mahasiswa', '2024-07-13 02:36:34', 0),
 ('13539233-61e9-4dc7-910d-772532725f24', 'Mengakses halaman mahasiswa', '2024-07-13 13:58:30', 0),
 ('1527ab36-30a6-476b-ad2d-92a90d24997f', 'Mengakses halaman konversi', '2024-07-15 01:15:07', 1),
+('172d4ecf-2419-420f-b6bd-51c3892eeee5', 'Mengakses halaman konversi', '2024-07-17 23:53:39', 1),
 ('191d4be8-49f3-4efd-b697-fa679e4162a7', 'Mengakses halaman mahasiswa', '2024-07-13 13:57:26', 0),
 ('1ae7716d-92bb-45c2-824c-7e459a932910', 'Mengakses halaman mahasiswa', '2024-07-13 14:34:15', 0),
 ('1b811ac3-3d0b-4a6a-9826-54fbe643a3fd', 'Berhasil melakukan login', '2024-07-11 13:26:34', 1),
 ('2043be3e-ba11-4362-831b-dd40332a46df', 'Mengakses halaman konversi', '2024-07-15 00:19:18', 1),
 ('23cf6999-73ce-4b72-a12f-058c5144c4d9', 'Berhasil menghapus hasil konversi', '2024-07-15 00:59:56', 0),
+('2504824d-3c90-4f89-80fd-577761f9bd00', 'Berhasil mengubah hasil konversi', '2024-07-17 23:09:45', 0),
 ('2711a7cc-d21d-42d8-8757-f4228510b6fa', 'Menambahkan mahasiswa baru', '2024-07-13 14:49:17', 0),
 ('29885117-9b49-47df-b153-88c222173752', 'Mengakses halaman mata kuliah', '2024-07-10 22:21:21', 1),
 ('29ab422c-9c71-4b1c-bfd1-d145077728f4', 'Mengakses halaman konversi', '2024-07-15 00:26:58', 1),
@@ -167,33 +163,45 @@ INSERT INTO `tb_log_activities` (`id_aktivitas`, `keterangan`, `tanggal`, `id_pe
 ('2d908682-19d1-4225-ac49-00a1d48f2b57', 'Mengakses halaman users', '2024-07-10 22:34:47', 1),
 ('2e10a094-070e-4b81-8d74-fb5bfee9f7e4', 'Gagal mengubah mahasiswa baru', '2024-07-13 13:57:30', 0),
 ('2e258b4b-c311-4656-bedf-aa40e75417a3', 'Mengakses halaman users', '2024-07-10 22:37:17', 1),
+('2fd1d4e8-ace5-4f5a-923a-25419139611a', 'Mengakses halaman konversi', '2024-07-17 22:46:49', 1),
 ('30f04b66-b731-4bc0-9dce-901c1278e368', 'Gagal menambahkan mata kuliah \'Pengantar Sistem dan Teknologi Informasi\'', '2024-07-10 22:10:21', 1),
 ('3150cfbd-a9bf-4841-9fdc-b03c798c20cb', 'Berhasil logout', '2024-07-14 18:01:31', 1),
+('35544cc3-3410-4c2b-a512-0654d2ef5735', 'Mengakses halaman konversi', '2024-07-17 14:03:22', 1),
 ('35a986e1-de14-45b4-9c28-86e5fdfd7495', 'Menambahkan mahasiswa baru', '2024-07-14 16:58:11', 0),
+('361ae743-f688-49f7-b9b6-d8289f596ac8', 'Mengakses halaman konversi', '2024-07-17 23:45:02', 1),
 ('3928747d-a329-4a95-8e3b-8a3f4db9a19d', 'Mengubah mata kuliah \'Kalkulus\'', '2024-07-10 22:17:19', 1),
 ('3bc7a5e1-6584-4a97-b609-7634ab673beb', 'Berhasil melakukan login', '2024-07-14 17:42:35', 0),
 ('3d548c21-8819-4555-9f33-a9d44acda16f', 'Mengakses halaman log aktvitas', '2024-07-11 12:49:10', 1),
 ('3da73e3f-0a7e-45ac-ba2d-4d48aa5640b5', 'Berhasil melakukan login', '2024-07-14 23:07:36', 1),
 ('3de7146a-cc80-4384-b0ae-7849514593de', 'Mengakses halaman mata kuliah', '2024-07-10 22:27:21', 1),
+('3e0a0bcd-5c9d-4226-9dba-6dba0eead25c', 'Mengakses halaman konversi', '2024-07-17 23:44:35', 1),
 ('3ec5069b-c7b5-4489-b7b2-3e19466539dc', 'Mengakses halaman mahasiswa', '2024-07-13 14:50:47', 0),
 ('3f98bf26-d194-4708-bea3-ea795d4882fa', 'Mengakses halaman konversi', '2024-07-14 23:29:08', 1),
 ('41f8799f-6d81-4f4f-b8b3-5426433ef264', 'Berhasil melakukan login', '2024-07-13 00:48:48', 0),
+('43fa3d88-1ce9-4e18-adfa-5c57c21e3af5', 'Mengakses halaman konversi', '2024-07-17 12:58:35', 1),
 ('4428857e-84de-4fb9-ba9f-0b631e58c6b6', 'Mengakses halaman konversi', '2024-07-15 01:20:48', 1),
+('465767ec-5e28-409e-8fdf-f3008e40b133', 'Berhasil mengubah hasil konversi', '2024-07-16 17:06:44', 0),
 ('46786c4f-928e-46c6-b46a-91dc01da5175', 'Menghapus mata kuliah \'Pengantar Sistem dan Teknologi Informasi\'', '2024-07-10 22:10:49', 1),
 ('46e36936-0353-4ac6-91f7-24e73b38b0c5', 'Mengakses halaman mahasiswa', '2024-07-14 16:38:30', 0),
 ('46e43cc9-ebb4-440d-bf5d-0fe6886e1090', 'Mengakses halaman mahasiswa', '2024-07-13 14:47:03', 0),
+('47a94a9f-cba9-4716-9e96-9ccebc8d5600', 'Berhasil mengubah hasil konversi', '2024-07-17 23:26:23', 0),
 ('48ebad2b-d18f-4541-b10a-6013f7992ed2', 'Berhasil mengubah hasil konversi', '2024-07-15 00:59:02', 0),
 ('49e9c24d-fb5b-47f9-8ff8-c99387950cff', 'Mengakses halaman konversi', '2024-07-15 00:19:30', 1),
+('4c578c2a-f1cc-4e7a-976b-4f6646d6cd41', 'Berhasil mengubah hasil konversi', '2024-07-16 17:04:59', 0),
 ('4cbb4403-6506-4080-b891-4141cce8f04e', 'Mengakses halaman mahasiswa', '2024-07-13 14:45:21', 0),
 ('4f8413fd-9541-4f93-b5df-751132482f32', 'Mengakses halaman mahasiswa', '2024-07-13 01:20:39', 0),
 ('4fbe7f07-43ec-465a-b926-589f9f486a83', 'Mengakses halaman mahasiswa', '2024-07-13 01:21:10', 0),
 ('51f129d6-dc73-4aa4-8a15-8ebafb98d2b9', 'Mengubah gambar', '2024-07-14 16:34:06', 0),
+('51faae6f-b7be-4aca-818e-1a31675f0d9a', 'Mengakses halaman konversi', '2024-07-17 23:46:28', 1),
+('5209c93a-15d0-4d23-bc4c-fa324a4e4639', 'Mengakses halaman konversi', '2024-07-17 23:09:33', 1),
 ('533f6565-fefb-467a-9b88-05168a48ff1e', 'Mengakses halaman mahasiswa', '2024-07-13 14:32:35', 0),
 ('55181f58-0ea2-4244-a772-c5583a490dda', 'Mengubah gambar', '2024-07-13 19:17:07', 0),
 ('551c2829-f4bd-422d-88ea-beae28a8e737', 'Gagal menambahkan mahasiswa baru', '2024-07-11 18:43:21', 0),
 ('566f934e-4797-400a-9f71-f4240c11a15b', 'Gagal mengubah hasil konversi', '2024-07-15 00:52:00', 0),
 ('57b205f8-3aa7-4745-a23f-2322a7cd3473', 'Mengakses halaman mahasiswa', '2024-07-13 14:49:08', 0),
+('57bf39f5-7792-45f6-8b73-053f0a0992ae', 'Mengakses halaman konversi', '2024-07-17 23:22:13', 1),
 ('58d38cdc-e2f5-403b-bf15-1d1ab147cd90', 'Mengubah mata kuliah \'Statistik\'', '2024-07-10 22:21:35', 1),
+('58f24cd6-5c69-4c5d-9adc-5339f0b681e6', 'Mengakses halaman konversi', '2024-07-17 23:05:11', 1),
 ('5a0dfef1-b429-4440-90ea-053ba4e861f0', 'Gagal menambahkan konversi baru', '2024-07-15 01:15:12', 1),
 ('5a4963b7-fef0-4658-955c-e8fad0d10fca', 'Mengakses halaman konversi', '2024-07-15 00:26:36', 1),
 ('5b23d5a0-4c55-4f6a-90fb-39792a7ae4f6', 'Menambahkan mahasiswa baru', '2024-07-13 14:50:51', 0),
@@ -205,6 +213,7 @@ INSERT INTO `tb_log_activities` (`id_aktivitas`, `keterangan`, `tanggal`, `id_pe
 ('61fa541b-74b2-4024-9cb2-3221acb562fc', 'Gagal menghapus: mata kuliah tidak ada.', '2024-07-10 21:28:28', 1),
 ('62e16752-3c0f-4e09-8771-2b844e077e98', 'Berhasil melakukan login', '2024-07-10 21:59:22', 1),
 ('63192adc-6d5d-4f39-8588-7ef043215ff0', 'Mengakses halaman mata kuliah', '2024-07-10 22:34:32', 1),
+('63ab08b7-715d-472a-b174-2283d41bd584', 'Mengakses halaman konversi', '2024-07-17 23:47:39', 1),
 ('63d33acb-20de-49ce-ae1d-66cc8ea75e41', 'Mengakses halaman konversi', '2024-07-16 01:10:10', 1),
 ('63f095fb-8eb5-48cd-a360-90e3e676345d', 'Mengakses halaman konversi', '2024-07-15 00:52:38', 1),
 ('64170b51-d47f-430f-b9be-c1fac409f07e', 'Menghapus mahasiswa', '2024-07-13 14:31:19', 0),
@@ -224,6 +233,7 @@ INSERT INTO `tb_log_activities` (`id_aktivitas`, `keterangan`, `tanggal`, `id_pe
 ('74cb21d5-97f5-4ada-b88d-bfb6d1eb7888', 'Mengakses halaman mahasiswa', '2024-07-13 14:29:54', 0),
 ('750863a9-519e-4ac6-a4f3-bbb88bf4140d', 'Mengakses halaman users', '2024-07-10 22:41:41', 1),
 ('758a4cd7-7dc5-457c-bb29-55d5bb35cf5c', 'Berhasil melakukan login', '2024-07-13 13:07:47', 0),
+('798a4e94-b3f9-45ca-abbb-489331b61545', 'Mengakses halaman konversi', '2024-07-17 23:49:25', 1),
 ('7a0af5e9-1fbe-403c-9e60-5f9903cd40f1', 'Berhasil melakukan login', '2024-07-14 18:00:11', 1),
 ('7b616d88-ef1a-4c5f-b085-325c88af12a5', 'Berhasil mengubah hasil konversi', '2024-07-15 00:52:31', 0),
 ('7ccab3ca-ba95-4da9-8bec-92821a9626dc', 'Berhasil menyimpan hasil konversi', '2024-07-16 00:43:12', 1),
@@ -234,26 +244,31 @@ INSERT INTO `tb_log_activities` (`id_aktivitas`, `keterangan`, `tanggal`, `id_pe
 ('80baafe7-b846-45eb-a6be-d225b11d9e5c', 'Berhasil menyimpan hasil konversi', '2024-07-15 00:27:01', 1),
 ('8100d0cc-e757-41e9-8deb-910a699a8373', 'Menambahkan mahasiswa baru', '2024-07-14 16:44:08', 0),
 ('82970021-0315-4a05-bdd2-ba4463f2519c', 'Mengakses halaman konversi', '2024-07-15 00:15:56', 1),
+('83cffbfa-1122-475d-8fd1-9c001911991c', 'Mengakses halaman konversi', '2024-07-18 00:07:43', 1),
 ('83ebe3ec-b695-4452-8c0b-4cac77a66581', 'Menambahkan mata kuliah \'Pengantar Sistem dan Teknologi Informasi\'', '2024-07-10 22:10:54', 1),
 ('84bf5b5f-4ca9-4537-966d-a00eceb135b3', 'Mengakses halaman mata kuliah', '2024-07-10 22:11:30', 1),
 ('898393ab-bfd0-4178-abd0-5f345e6b3805', 'Mengakses halaman log aktvitas', '2024-07-11 12:44:14', 1),
 ('89f8962f-728d-432b-929d-06dad3f3751c', 'Mengakses halaman mata kuliah', '2024-07-10 22:34:22', 1),
 ('8a2958f7-4736-4b41-ba08-a19a0b6b6263', 'Berhasil melakukan login', '2024-07-14 17:45:44', 1),
+('8cab167f-7b5f-4143-b5b5-9e2918e550cb', 'Berhasil melakukan login', '2024-07-17 22:46:42', 1),
 ('8cb715e3-358f-4ece-a5a0-d38d08cdd4d9', 'Berhasil melakukan login', '2024-07-10 21:54:52', 1),
 ('8cbd34de-b01c-4c3c-99cd-35ac33b4f3e1', 'Berhasil menyimpan hasil konversi', '2024-07-15 00:16:29', 1),
 ('8dc364df-55a8-4a2d-bef5-6583e5a59fd0', 'Mengakses halaman mahasiswa', '2024-07-13 02:21:19', 0),
 ('8efb90f4-1d2a-4d8f-890c-3449ec4fe141', 'Berhasil menyimpan hasil konversi', '2024-07-15 01:21:55', 1),
 ('8f348cf5-7d19-4f51-9e67-cc8fa8b01632', 'Mengakses halaman mahasiswa', '2024-07-13 00:49:07', 0),
 ('9179352a-1ce0-4d69-9fe7-dbc7d86c8c44', 'Mengakses halaman mahasiswa', '2024-07-14 17:05:30', 0),
+('93e63e6f-610e-497c-bb63-d7cf1c9deb68', 'Berhasil mengubah hasil konversi', '2024-07-17 23:50:52', 0),
 ('945b44f7-0033-490d-adbb-458fadc30ac3', 'Berhasil melakukan login', '2024-07-14 16:33:26', 0),
 ('95baa1f8-e09e-45df-a6fd-87c0382e63b1', 'Mengakses halaman log aktvitas', '2024-07-10 21:13:06', 1),
 ('961bbd01-ff6f-4fbd-abeb-9e4fcead9a5c', 'Mengakses halaman mata kuliah', '2024-07-10 22:30:23', 1),
 ('9678de60-2f1f-4e75-8a1f-5f96cfb2c7d1', 'Mengakses halaman mahasiswa', '2024-07-13 14:51:37', 0),
+('97610355-3eb8-477a-a10a-e3fbb8d97f57', 'Mengakses halaman konversi', '2024-07-17 23:58:29', 1),
 ('98f98551-0f97-4a3f-aed7-50b37a484cd4', 'Mengakses halaman log aktvitas', '2024-07-10 21:29:10', 1),
 ('99969125-aafe-4949-99fd-43563618e63d', 'Berhasil melakukan login', '2024-07-14 17:50:21', 1),
 ('9a66fe5e-90fc-4a7f-9898-fdae745f7634', 'Mengubah mata kuliah data \'Matematika Diskrit\'', '2024-07-10 22:29:46', 1),
 ('9acbcc78-dcec-44c9-b9c9-3bc38fef2cf5', 'Berhasil melakukan login', '2024-07-10 21:49:14', 1),
 ('9cf5678f-682f-42c1-8220-89c459b29386', 'Mengakses halaman mahasiswa', '2024-07-13 13:07:52', 0),
+('a07c3a36-7193-4c28-b6ee-7dd9efd11e50', 'Berhasil menyimpan hasil konversi', '2024-07-17 23:04:54', 1),
 ('a0fb8994-03e7-4311-8306-c163d8e4e7e8', 'Mengakses halaman mahasiswa', '2024-07-13 01:21:31', 0),
 ('a1404866-38bd-47b3-96a5-b3d8a3ae9592', 'Mengakses halaman mahasiswa', '2024-07-13 01:22:48', 0),
 ('a162737f-f0dc-4a68-9e0f-29eaee9c8f59', 'Berhasil melakukan login', '2024-07-14 17:45:26', 0),
@@ -264,6 +279,8 @@ INSERT INTO `tb_log_activities` (`id_aktivitas`, `keterangan`, `tanggal`, `id_pe
 ('a9a10b2f-13fd-468b-9d98-05e82d75d054', 'Gagal menambahkan mata kuliah \'Pengantar Sistem dan Teknologi Informasi\'', '2024-07-10 22:07:30', 1),
 ('aac3c1d5-8599-4502-b30b-d9c764c3d8ef', 'Mengakses halaman konversi', '2024-07-16 00:43:06', 1),
 ('abed9664-3dc5-42c0-b3c0-bea4209a607d', 'Mengakses halaman mahasiswa', '2024-07-13 02:39:27', 0),
+('ad27131a-6d1f-4b6e-9c1c-25ff5986748e', 'Berhasil menghapus hasil konversi', '2024-07-17 23:56:26', 0),
+('b2df2d18-b352-491a-bde1-1dda24c45a8b', 'Gagal mengubah hasil konversi', '2024-07-16 17:03:58', 0),
 ('b6fe71fb-e019-46a1-b335-ebb09d959e8a', 'Berhasil melakukan login', '2024-07-13 02:12:47', 0),
 ('b72da898-132f-4fa4-b444-a0ac809d5a8c', 'Mengakses halaman mahasiswa', '2024-07-14 16:38:44', 0),
 ('ba3b52ca-0b03-4355-a17d-1d21b56ee7a1', 'Berhasil melakukan login', '2024-07-16 00:34:33', 1),
@@ -281,6 +298,7 @@ INSERT INTO `tb_log_activities` (`id_aktivitas`, `keterangan`, `tanggal`, `id_pe
 ('c9223dd0-3761-4e7a-81b3-53693610d231', 'Menambahkan mahasiswa baru', '2024-07-13 14:30:52', 0),
 ('c9cb1e9b-3d2e-4261-9158-13970c029783', 'Berhasil melakukan login', '2024-07-10 22:01:12', 1),
 ('cb092b41-7192-4922-aaa1-df1da1ad61f3', 'Gagal mengubah berkas', '2024-07-13 19:13:30', 0),
+('ccd7e056-18d0-4ed8-a46c-06b337c2e932', 'Mengakses halaman konversi', '2024-07-17 14:23:04', 1),
 ('cd23c224-b9f0-4faf-a16e-956557b87862', 'Berhasil melakukan login', '2024-07-14 18:01:26', 1),
 ('d2d34add-4cfc-4220-a506-4a20d50d5bf7', 'Berhasil menyimpan hasil konversi', '2024-07-15 00:19:22', 1),
 ('d2dd842e-81ee-4fef-9131-d246162435ff', 'Berhasil menyimpan hasil konversi', '2024-07-15 00:27:23', 1),
@@ -289,7 +307,10 @@ INSERT INTO `tb_log_activities` (`id_aktivitas`, `keterangan`, `tanggal`, `id_pe
 ('d602a8db-75cb-4a09-bec7-afcf45e9f0d9', 'Menambahkan mahasiswa baru', '2024-07-14 17:05:36', 0),
 ('d63c982e-ea55-4622-ab39-7498a416f897', 'Mengakses halaman log aktvitas', '2024-07-10 22:42:28', 1),
 ('d7c02ca6-19f1-4267-803f-8bcabbd97d43', 'Menambahkan mahasiswa baru', '2024-07-13 02:39:32', 0),
+('d8b6336b-4233-462b-bf1a-a428aa8828ec', 'Berhasil menyimpan hasil konversi', '2024-07-17 14:23:10', 1),
 ('da2e70e8-6118-4be8-8137-eda9597b3006', 'Berhasil mengubah hasil konversi', '2024-07-15 00:48:50', 1),
+('daa79ea6-ec96-43ba-baa1-5cb4a525e770', 'Mengakses halaman konversi', '2024-07-17 23:05:57', 1),
+('dc7df76c-3518-4b65-9ed7-b7952b9b9131', 'Berhasil mengubah hasil konversi', '2024-07-17 23:25:28', 0),
 ('dcfeb1f5-c478-4845-aef3-8162a1064ae0', 'Gagal mengubah gambar', '2024-07-14 16:39:24', 0),
 ('de549d61-0fac-48f9-8d84-3162ab22c3a5', 'Mengakses halaman mahasiswa', '2024-07-14 17:04:34', 0),
 ('dfa4f20d-5930-497c-ba43-b0c08d895d4e', 'Gagal menambahkan mata kuliah \'Pengantar Sistem dan Teknologi Informasi\'', '2024-07-10 21:12:29', 1),
@@ -302,6 +323,7 @@ INSERT INTO `tb_log_activities` (`id_aktivitas`, `keterangan`, `tanggal`, `id_pe
 ('ed9d3ef1-d843-4e06-918a-6fcd85752513', 'Mengakses halaman mahasiswa', '2024-07-14 16:39:21', 0),
 ('f1081b06-a063-48a9-9558-9bc4dcee5a3e', 'Mengakses halaman mahasiswa', '2024-07-13 14:34:28', 0),
 ('f1ff9f13-78ee-4d66-af9c-8b466e615689', 'Gagal menghapus: mata kuliah tidak ada.', '2024-07-10 22:05:38', 1),
+('f41e1c2e-5df9-490e-829a-d5e7558c2f73', 'Berhasil mengubah hasil konversi', '2024-07-18 00:08:38', 0),
 ('f537dfbc-c91f-448a-b504-33e88baf6e56', 'Menambahkan mahasiswa baru', '2024-07-13 14:31:39', 0),
 ('f6c6b0e6-4f3e-4a89-85ee-fc35b5a3671c', 'Menambahkan mata kuliah \'Statistik\'', '2024-07-10 22:12:38', 1),
 ('f808d6f2-4701-4cec-b5db-eee7ae2fa432', 'Mengakses halaman mata kuliah', '2024-07-10 21:12:00', 1),
@@ -311,6 +333,7 @@ INSERT INTO `tb_log_activities` (`id_aktivitas`, `keterangan`, `tanggal`, `id_pe
 ('fab43636-195b-483a-a206-b3a6e748f1d5', 'Mengakses halaman konversi', '2024-07-15 00:18:25', 1),
 ('fbf3626b-8026-440d-bee5-7e6b6743e58c', 'Gagal mengubah mahasiswa baru', '2024-07-13 14:16:57', 0),
 ('fc126460-2ad8-4e8f-9b0a-5c8db057b75e', 'Menambahkan mahasiswa baru', '2024-07-13 13:08:14', 0),
+('fcec6d98-5729-4486-b87e-42066df9184a', 'Berhasil melakukan login', '2024-07-17 12:58:05', 1),
 ('fdd0fbc1-f41c-494c-9f9d-b38ab244ca26', 'Menambahkan mahasiswa baru', '2024-07-14 16:57:35', 0),
 ('fe04ca94-45c5-44e6-8e7f-bf1e17317dde', 'Mengakses halaman mahasiswa', '2024-07-13 13:08:26', 0),
 ('ff29b82d-dd3f-42ea-90da-9d3333818408', 'Mengubah gambar', '2024-07-13 19:14:32', 0);
@@ -327,6 +350,7 @@ CREATE TABLE `tb_recapitulations` (
   `total_hasil_konversi` varchar(25) NOT NULL,
   `total_sks` varchar(35) NOT NULL,
   `semester` varchar(5) NOT NULL,
+  `report` varchar(255) NOT NULL,
   `id_mahasiswa` varchar(255) NOT NULL,
   `tanggal` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -335,9 +359,9 @@ CREATE TABLE `tb_recapitulations` (
 -- Dumping data for table `tb_recapitulations`
 --
 
-INSERT INTO `tb_recapitulations` (`id_recap`, `sisa_mk`, `total_hasil_konversi`, `total_sks`, `semester`, `id_mahasiswa`, `tanggal`) VALUES
-('Recap00000001', '2', '5 MK', '15 SKS', '3', 'MT001', '2024-07-16'),
-('Recap00000002', '2', '6 MK', '18 SKS', '3', 'MT001', '2024-07-16');
+INSERT INTO `tb_recapitulations` (`id_recap`, `sisa_mk`, `total_hasil_konversi`, `total_sks`, `semester`, `report`, `id_mahasiswa`, `tanggal`) VALUES
+('Recap00000004', '1 MK', '2 MK', '6 SKS', '3', 'http://localhost:3000/file/report/[object Promise]', 'MT001', '2024-07-18'),
+('Recap00000005', '2 MK', '1 MK', '3 SKS', '2', 'http://localhost:3000/file/report/[object Promise]', 'MT002', '2024-07-17');
 
 -- --------------------------------------------------------
 
