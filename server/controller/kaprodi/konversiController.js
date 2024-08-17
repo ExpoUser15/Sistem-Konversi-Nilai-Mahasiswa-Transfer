@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const generateId = require("../../functions/generateId");
 const { createLog } = require("../../functions/logActivity");
 const recap = require("../../functions/recap");
@@ -6,6 +7,7 @@ const logActivitySchema = require("../../model/logActivitySchema");
 const recapSchema = require("../../model/recapSchema");
 const Queries = require("../../queries/queries");
 const { getCurrentFormattedDate } = require("../../utils/time");
+const generatePDF = require("../../utils/generateReport");
 
 const konveriQueries = new Queries(konversiSchema);
 const recapQueries = new Queries(recapSchema);
@@ -128,6 +130,8 @@ const addKonversiController = async (req, res) => {
             tanggal
         });
 
+        generatePDF(id);
+
         await createLog(logSchema, {
             ket: "Berhasil menyimpan hasil konversi",
             idUser: data
@@ -147,8 +151,9 @@ const addKonversiController = async (req, res) => {
 
 const updateKonversiController = async (req, res) => {
     try {
-        const { mk_asal, sks_asal, nilai_asal, id_mk, sks_tujuan, nilai_tujuan } = req.body;
-        const { id } = req.params;
+        const { mk_asal, sks_asal, nilai_asal, id_mk, sks_tujuan, nilai_tujuan } = req.body.data;
+        const { semester } = req.body;
+        const { id, idkonversi } = req.params;
 
         if (!mk_asal || !sks_asal || !nilai_asal || !id_mk || !sks_tujuan || !nilai_tujuan) {
             await createLog(logSchema, {
@@ -163,7 +168,7 @@ const updateKonversiController = async (req, res) => {
         }
 
         const data = await konveriQueries.findAll();
-        const validasi = data.some(item => id === item.id_konversi);
+        const validasi = data.some(item => idkonversi === item.id_konversi && id === item.id_mahasiswa);
 
         if (!validasi) {
             await createLog(logSchema, {
@@ -185,6 +190,27 @@ const updateKonversiController = async (req, res) => {
             sks_tujuan,
             nilai_tujuan,
             id_mahasiswa: id,
+        }, {
+            [Op.and]: [
+                { id_mahasiswa: id },
+                { id_konversi: idkonversi }
+            ]
+        });
+
+        const { remainingMK, totalSKS, totalMK } = await recap(id);
+
+        const tanggal = getCurrentFormattedDate().formatDate2;
+        const recapData =  await recapQueries.findOne({ id_mahasiswa: id })
+
+        await recapQueries.update({
+            id_recap: recapData.id_recap,
+            sisa_mk: remainingMK,
+            total_hasil_konversi: totalMK,
+            total_sks: totalSKS,
+            semester: !semester ? recapData.semester : semester,
+            report: process.env.FILE_URL + "report/" + generatePDF(id),
+            id_mahasiswa: id,
+            tanggal
         }, {
             id_mahasiswa: id
         });
@@ -208,10 +234,10 @@ const updateKonversiController = async (req, res) => {
 
 const deleteKonversiController = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { id, idkonversi } = req.params;
 
         const data = await konveriQueries.findAll();
-        const validasi = data.some(item => id === item.id_konversi);
+        const validasi = data.some(item => id === item.id_mahasiswa && idkonversi === item.id_konversi);
 
         if (!validasi) {
             await createLog(logSchema, {
@@ -226,6 +252,27 @@ const deleteKonversiController = async (req, res) => {
         }
 
         await konveriQueries.delete({
+            [Op.and]: [
+                { id_mahasiswa: id },
+                { id_konversi: idkonversi }
+            ]
+        });
+
+        const { remainingMK, totalSKS, totalMK } = await recap(id);
+
+        const tanggal = getCurrentFormattedDate().formatDate2;
+        const recapData =  await recapQueries.findOne({ id_mahasiswa: id })
+
+        await recapQueries.update({
+            id_recap: recapData.id_recap,
+            sisa_mk: remainingMK,
+            total_hasil_konversi: totalMK,
+            total_sks: totalSKS,
+            semester: recapData.semester,
+            report: process.env.FILE_URL + "report/" + generatePDF(id),
+            id_mahasiswa: id,
+            tanggal
+        }, {
             id_mahasiswa: id
         });
 

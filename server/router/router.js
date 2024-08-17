@@ -31,11 +31,11 @@ router.post('/konversi/add/:id', handleDuplicateData, addKonversiController);
 
 router.delete('/users/delete/:id', deleteController);
 router.delete('/matakuliah/delete/:id', deleteMataKuliahController);
-router.delete('/konversi/delete/:id', deleteKonversiController);
+router.delete('/konversi/delete/:id/:idkonversi', deleteKonversiController);
 
 router.put('/users/update/:id', updateController);
 router.put('/matakuliah/update/:id', updateMataKuliahController);
-router.put('/konversi/update/:id', updateKonversiController);
+router.put('/konversi/update/:id/:idkonversi', updateKonversiController);
 
 // akademik router
 router.get('/mahasiswa', handlingCookie, validateUserAkademik, mahasiswaController);
@@ -50,6 +50,7 @@ router.patch('/mahasiswa/update/:id/berkas/:fileID', berkasUpload, updateBerkasC
 
 // file router
 router.get('/file/:filename', handlingCookie, fileController);
+router.get('/file/report/:filename', handlingCookie, fileController);
 
 
 // routes not found

@@ -24,7 +24,11 @@ const recapSchema = sequelize.define(
       },
       semester: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true
+      },
+      report: {
+        type: DataTypes.STRING,
+        allowNull: true
       },
       id_mahasiswa: {
         type: DataTypes.STRING,

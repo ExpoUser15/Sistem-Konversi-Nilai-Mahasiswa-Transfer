@@ -33,10 +33,6 @@ const konversiSchema = sequelize.define(
         type: DataTypes.STRING,
         allowNull: false
       }, 
-      file: {
-        type: DataTypes.STRING,
-        allowNull: true
-      }, 
       id_mahasiswa: {
         type: DataTypes.STRING,
         allowNull: false

@@ -30,7 +30,7 @@ async function recap(id) {
 
     const totalSKS = data.reduce((accumulator, student) => accumulator + Number(student.sks), 0);
 
-    result.remainingMK = countQuery.length;
+    result.remainingMK = `${countQuery.length} MK`;
     result.totalSKS = `${String(totalSKS)} SKS`;
     result.totalMK = `${data.length} MK`;
 

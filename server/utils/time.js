@@ -8,12 +8,14 @@ function getCurrentTime() {
 
 function getCurrentFormattedDate(now = new Date()) {
     const day = String(now.getDate()).padStart(2, '0');
-    const monthNames = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
-    const month = monthNames[now.getMonth()];
+    const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    const month = monthNames[now.getMonth()].substring(0, 3);
+    const completeMonth = monthNames[now.getMonth()];
     const year = now.getFullYear();
     return {
         formatDate: `${day} ${month} ${year}`,
-        formatDate2: `${year}-${String(now.getMonth()).padStart(2, 0)}-${day}`
+        formatDate2: `${year}-${String(now.getMonth()).padStart(2, 0)}-${day}`,
+        formatDate3: `${day} ${completeMonth} ${year}`
     };
 }
 
