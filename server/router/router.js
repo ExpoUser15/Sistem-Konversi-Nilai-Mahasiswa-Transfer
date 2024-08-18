@@ -9,7 +9,7 @@ const { validateUserKaprodi, validateUserAkademik } = require('../middleware/val
 const { notFound } = require('../controller/notFound');
 const {berkasUpload} = require('../middleware/fileHandler');
 const fileController = require('../controller/fileResponse/filleController');
-const { konversiController, addKonversiController, updateKonversiController, deleteKonversiController } = require('../controller/kaprodi/konversiController');
+const { konversiController, addKonversiController, updateKonversiController, deleteKonversiController, deletePreviewController } = require('../controller/kaprodi/konversiController');
 const logoutController = require('../controller/logoutController');
 const handleDuplicateData = require('../middleware/handleDuplicateData');
 
@@ -32,6 +32,7 @@ router.post('/konversi/add/:id', handleDuplicateData, addKonversiController);
 router.delete('/users/delete/:id', deleteController);
 router.delete('/matakuliah/delete/:id', deleteMataKuliahController);
 router.delete('/konversi/delete/:id/:idkonversi', deleteKonversiController);
+router.delete('/konversi/riwayat/delete/:id/', deletePreviewController);
 
 router.put('/users/update/:id', updateController);
 router.put('/matakuliah/update/:id', updateMataKuliahController);

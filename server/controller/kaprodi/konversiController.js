@@ -8,10 +8,12 @@ const recapSchema = require("../../model/recapSchema");
 const Queries = require("../../queries/queries");
 const { getCurrentFormattedDate } = require("../../utils/time");
 const generatePDF = require("../../utils/generateReport");
+const mahasiswaSchema = require("../../model/mahasiswaSchema");
 
 const konveriQueries = new Queries(konversiSchema);
 const recapQueries = new Queries(recapSchema);
 const logSchema = new Queries(logActivitySchema);
+const mahasiswaQueries = new Queries(mahasiswaSchema);
 
 let data;
 
@@ -54,6 +56,31 @@ const addKonversiController = async (req, res) => {
 
         const { hasil, semester } = req.body;
         const { id } = req.params;
+
+        if(!id){
+            await createLog(logSchema, {
+                ket: "Gagal menambahkan konversi baru",
+                idUser: data
+            });
+
+            return res.json({
+                status: "Error",
+                message: "Terjadi kesalahan"
+            });
+        }
+
+        const exists = await mahasiswaQueries.findOne({ id_mahasiswa: id });
+        if(!exists){
+            await createLog(logSchema, {
+                ket: "Gagal menambahkan konversi baru",
+                idUser: data
+            });
+
+            return res.json({
+                status: "Error",
+                message: "Mahasiswa tidak ditemukan"
+            });
+        }
 
         let error;
 
@@ -126,11 +153,16 @@ const addKonversiController = async (req, res) => {
             total_hasil_konversi: totalMK,
             total_sks: totalSKS,
             semester,
+            report: process.env.FILE_URL + "report/" + await generatePDF(id),
             id_mahasiswa: id,
             tanggal
         });
 
-        generatePDF(id);
+        await mahasiswaQueries.update({
+            status: 'Converted'
+        },{
+            id_mahasiswa: id
+        })
 
         await createLog(logSchema, {
             ket: "Berhasil menyimpan hasil konversi",
@@ -208,7 +240,7 @@ const updateKonversiController = async (req, res) => {
             total_hasil_konversi: totalMK,
             total_sks: totalSKS,
             semester: !semester ? recapData.semester : semester,
-            report: process.env.FILE_URL + "report/" + generatePDF(id),
+            report: process.env.FILE_URL + "report/" + await generatePDF(id),
             id_mahasiswa: id,
             tanggal
         }, {
@@ -293,9 +325,57 @@ const deleteKonversiController = async (req, res) => {
     }
 }
 
+const deletePreviewController =  async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if(!id){
+            await createLog(logSchema, {
+                ket: "Gagal menghapus preview konversi",
+                idUser: data
+            });
+
+            return res.json({
+                status: "Error",
+                message: "Terjadi kesalahan!"
+            });
+        }
+
+        await konveriQueries.delete({
+            id_mahasiswa: id
+        });
+
+        await recapQueries.delete({
+            id_mahasiswa: id
+        });
+
+        await mahasiswaQueries.update({
+            status: "Pending"
+        }, {
+            id_mahasiswa: id
+        });
+
+        await createLog(logSchema, {
+            ket: "Berhasil menghapus riwayat hasil konversi",
+            idUser: data
+        });
+
+        res.json({
+            status: "success",
+            message: "Berhasil menghapus riwayat hasil konversi"
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            message: "Server Error"
+        });
+    }
+}
+
 module.exports = {
     konversiController,
     addKonversiController,
     updateKonversiController,
-    deleteKonversiController
+    deleteKonversiController,
+    deletePreviewController
 }

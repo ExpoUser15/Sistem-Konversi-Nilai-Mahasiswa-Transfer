@@ -99,7 +99,8 @@ const addMahasiswaController = async (req, res) => {
             fakultas,
             prodi,
             prodi_tujuan,
-            tanggal
+            tanggal,
+            status: "Pending"
         });
 
         await berkasQueries.create({

@@ -41,6 +41,11 @@ const mahasiswaSchema = sequelize.define(
         type: DataTypes.STRING,
         allowNull: false
       }, 
+      status: {
+        type: DataTypes.ENUM,
+        values: ["Pending", "Converted"],
+        allowNull: true
+      }
     },
     {
         timestamps: false
