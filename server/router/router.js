@@ -39,7 +39,8 @@ router.put('/matakuliah/update/:id', updateMataKuliahController);
 router.put('/konversi/update/:id/:idkonversi', updateKonversiController);
 
 // akademik router
-router.get('/mahasiswa', handlingCookie, validateUserAkademik, mahasiswaController);
+router.get('/mahasiswa',  mahasiswaController);
+// handlingCookie, validateUserAkademik,
 
 router.post('/mahasiswa/add', berkasUpload, addMahasiswaController);
 

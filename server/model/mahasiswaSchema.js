@@ -15,7 +15,7 @@ const mahasiswaSchema = sequelize.define(
       },
       nim: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true
       },
       email: {
         type: DataTypes.STRING,

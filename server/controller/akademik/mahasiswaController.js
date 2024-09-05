@@ -18,15 +18,15 @@ const mahasiswaController = async (req, res) => {
     try {
         const mahasiswaData = await sequelize.query("SELECT * FROM tb_students JOIN tb_files ON tb_files.id_mahasiswa = tb_students.id_mahasiswa");
 
-        data = req.data.data.id;
+        // data = req.data.data.id;
 
-        await createLog(logSchema, {
-            ket: "Mengakses halaman mahasiswa",
-            idUser: req.data.data.id
-        });
+        // await createLog(logSchema, {
+        //     ket: "Mengakses halaman mahasiswa",
+        //     idUser: req.data.data.id
+        // });
 
         res.json({
-            auth: req.data.status,
+            // auth: req.data.status,
             mahasiswaData,
         });
     } catch (error) {
@@ -42,37 +42,35 @@ const addMahasiswaController = async (req, res) => {
         const { nama, email, nim, pt_asal, fakultas, prodi, prodi_tujuan } = req.body;
         const { kk, ktp, ijazah, transkrip, surat_pindah } = req.files;
 
-        if (!nama || !email || !nim || !pt_asal || !fakultas || !prodi || !prodi_tujuan) {
-            await createLog(logSchema, {
-                ket: "Gagal menambahkan mahasiswa baru",
-                idUser: data
-            });
+        if (!nama || !email || !pt_asal || !fakultas || !prodi || !prodi_tujuan) {
+            // await createLog(logSchema, {
+            //     ket: "Gagal menambahkan mahasiswa baru",
+            //     idUser: data
+            // });
 
-            return res.json({
-                status: "Error",
+            return res.status(422).json({
+                status: "Warning",
                 message: "Silahkan mengisikan form terlebih dahulu!"
             });
         }
 
         if (!kk || !ktp || !ijazah || !transkrip || !surat_pindah) {
-            await createLog(logSchema, {
-                ket: "Gagal menambahkan mahasiswa baru",
-                idUser: data
-            });
+            // await createLog(logSchema, {
+            //     ket: "Gagal menambahkan mahasiswa baru",
+            //     idUser: data
+            // });
 
-            return res.json({
-                status: "Error",
+            return res.status(422).json({
+                status: "Warning",
                 message: "Silahkan mengisikan form terlebih dahulu!"
             });
         }
 
-        // console.log(req.files);
-
         for(const key in req.files){
             if(req.files[key][0].mimetype !== 'image/jpeg' && req.files[key][0].mimetype !== 'image/png'){
-                return res.json({
+                return res.status(422).json({
                     status: 'Error',
-                    message: `Masukan gambar berupa PNG atau JPG/JPEG`
+                    message: `Masukan gambar berupa PNG atau JPG/JPEG`,
                 });
             }
         }
@@ -93,7 +91,7 @@ const addMahasiswaController = async (req, res) => {
         await mahasiswaQueries.create({
             id_mahasiswa: idMahasiswa,
             nama,
-            nim,
+            nim: !nim ? '-' : nim,
             email,
             pt_asal,
             fakultas,
@@ -113,19 +111,22 @@ const addMahasiswaController = async (req, res) => {
             id_mahasiswa: idMahasiswa
         });
 
-        await createLog(logSchema, {
-            ket: "Menambahkan mahasiswa baru",
-            idUser: data
-        });
+        // await createLog(logSchema, {
+        //     ket: "Menambahkan mahasiswa baru",
+        //     idUser: data
+        // });
+
+        const mahasiswaData = await sequelize.query("SELECT * FROM tb_students JOIN tb_files ON tb_files.id_mahasiswa = tb_students.id_mahasiswa");
 
         res.json({
-            status: "success",
-            message: "Berhasil menambahkan mahasiswa baru"
+            status: "Success",
+            message: "Berhasil menambahkan mahasiswa baru",
+            mahasiswaData
         });
     } catch (error) {
         console.log(error);
         res.status(500).json({
-            message: "Server Error"
+            message: "Internal Server Error"
         });
     }
 }
@@ -135,29 +136,32 @@ const deleteMahasiswaController = async (req, res) => {
         const id = req.params.id;
 
         if (!id) {
-            await createLog(logSchema, {
-                ket: "Gagal menghapus mahasiswa",
-                idUser: data
-            });
+            // await createLog(logSchema, {
+            //     ket: "Gagal menghapus mahasiswa",
+            //     idUser: data
+            // });
 
-            return res.json({
+            return res.status(422).json({
                 status: "Error",
                 message: "Gagal menghapus mahasiswa"
             });
         }
 
-        mahasiswaQueries.delete({
+        await mahasiswaQueries.delete({
             id_mahasiswa: id
         });
 
-        await createLog(logSchema, {
-            ket: "Menghapus mahasiswa",
-            idUser: data
-        });
+        // await createLog(logSchema, {
+        //     ket: "Menghapus mahasiswa",
+        //     idUser: data
+        // });
+
+        const mahasiswaData = await sequelize.query("SELECT * FROM tb_students JOIN tb_files ON tb_files.id_mahasiswa = tb_students.id_mahasiswa");
 
         return res.json({
             status: "Success",
-            message: "Berhasil menghapus mahasiswa"
+            message: "Berhasil menghapus mahasiswa",
+            mahasiswaData
         });
     } catch (error) {
         console.log(error);
@@ -170,28 +174,29 @@ const deleteMahasiswaController = async (req, res) => {
 const updateMahasiswaController = async (req, res) => {
     try {
         const { id } = req.params;
-        const { id_mahasiswa, nama, email, nim, pt_asal, fakultas, prodi, prodi_tujuan } = req.body;
+        const { nama, email, nim, pt_asal, fakultas, prodi, prodi_tujuan } = req.body;
+        console.log(req.body)
 
         if (!id) {
-            await createLog(logSchema, {
-                ket: "Gagal mengubah mahasiswa baru",
-                idUser: data
-            });
+            // await createLog(logSchema, {
+            //     ket: "Gagal mengubah mahasiswa baru",
+            //     idUser: data
+            // });
 
-            return res.json({
+            return res.status(422).json({
                 status: "Error",
                 message: "Terjadi Kesalahan"
             });
         }
 
-        if (!nama || !email || !nim || !pt_asal || !fakultas || !prodi || !prodi_tujuan) {
-            await createLog(logSchema, {
-                ket: "Gagal mengubah mahasiswa baru",
-                idUser: data
-            });
+        if (!nama || !email || !pt_asal || !fakultas || !prodi || !prodi_tujuan) {
+            // await createLog(logSchema, {
+            //     ket: "Gagal mengubah mahasiswa baru",
+            //     idUser: data
+            // });
 
-            return res.json({
-                status: "Error",
+            return res.status(422).json({
+                status: "Warning",
                 message: "Silahkan mengisikan form terlebih dahulu!"
             });
         }
@@ -200,19 +205,19 @@ const updateMahasiswaController = async (req, res) => {
         const validasi = data.some(item => id === item.id_mahasiswa);
 
         if (!validasi) {
-            await createLog(logSchema, {
-                ket: "Gagal mengubah mahasiswa baru",
-                idUser: data
-            });
+            // await createLog(logSchema, {
+            //     ket: "Gagal mengubah mahasiswa baru",
+            //     idUser: data
+            // });
 
-            return res.json({
+            return res.status(422).json({
                 status: "Error",
                 message: "ID tidak ditemukan!"
             });
         }
 
         await mahasiswaQueries.update({
-            id_mahasiswa,
+            id_mahasiswa: id,
             nama,
             email,
             nim,
@@ -224,9 +229,12 @@ const updateMahasiswaController = async (req, res) => {
             id_mahasiswa: id
         });
 
+        const mahasiswaData = await sequelize.query("SELECT * FROM tb_students JOIN tb_files ON tb_files.id_mahasiswa = tb_students.id_mahasiswa");
+
         return res.json({
             status: "Success",
-            message: "Berhasil mengubah mahasiswa"
+            message: "Berhasil mengubah data mahasiswa",
+            mahasiswaData
         });
     } catch (error) {
         console.log(error);
@@ -239,32 +247,48 @@ const updateMahasiswaController = async (req, res) => {
 const updateBerkasController = async (req, res) => {
     try {
         const { id, fileID } = req.params;
-        const files = req.files;
+        const { ktp, kk, ijazah, surat_pindah, transkrip } = req.files;
 
-        const keysName = Object.keys(files);
+        console.log(req.files);
 
-        if(files[keysName[0]][0].mimetype !== 'image/jpeg' || files[keysName[0]][0].mimetype !== 'image/png'){
-            await createLog(logSchema, {
-                ket: "Gagal mengubah gambar",
-                idUser: data
+        if(!ktp && !kk && !ijazah && !surat_pindah && !transkrip){
+            // await createLog(logSchema, {
+            //     ket: "Gagal mengubah gambar",
+            //     idUser: data
+            // });
+
+            return res.status(422).json({
+                status: "Warning",
+                message: "Silahkan masukan gambar terlebih dahulu!"
             });
+        }
+        
+        const keysName = Object.keys(req.files);
 
-            return res.json({
-                status: "Error",
+        if(req.files[keysName[0]][0].mimetype !== 'image/jpeg' && req.files[keysName[0]][0].mimetype !== 'image/png'){
+            // await createLog(logSchema, {
+            //     ket: "Gagal mengubah gambar",
+            //     idUser: data
+            // });
+
+            return res.status(422).json({
+                status: "Warning",
                 message: "Masukan gambar berupa PNG atau JPG/JPEG"
             });
         }
 
         const berkas = {};
-        berkas[keysName[0]] = `${process.env.FILE_URL}${files[keysName[0]][0].filename}`;
+        berkas[keysName[0] === 'transkrip' ? 'transkrip_nilai' : keysName[0]] = `${process.env.FILE_URL}${req.files[keysName[0]][0].filename}`;
+
+        console.log('Berkas: ', berkas)
 
         if (!id || !fileID) {
-            await createLog(logSchema, {
-                ket: "Gagal mengubah gambar",
-                idUser: data
-            });
+            // await createLog(logSchema, {
+            //     ket: "Gagal mengubah gambar",
+            //     idUser: data
+            // });
 
-            return res.json({
+            return res.status(422).json({
                 status: "Error",
                 message: "Terjadi Kesalahan"
             });
@@ -274,10 +298,10 @@ const updateBerkasController = async (req, res) => {
         const validasi = berkasData.some(item => fileID === item.id_berkas);
 
         if (!validasi) {
-            await createLog(logSchema, {
-                ket: "Gagal mengubah berkas",
-                idUser: data
-            });
+            // await createLog(logSchema, {
+            //     ket: "Gagal mengubah berkas",
+            //     idUser: data
+            // });
 
             return res.json({
                 status: "Error",
@@ -289,14 +313,17 @@ const updateBerkasController = async (req, res) => {
             id_berkas: fileID
         });
 
-        await createLog(logSchema, {
-            ket: "Mengubah gambar",
-            idUser: data
-        });
+        // await createLog(logSchema, {
+        //     ket: "Mengubah gambar",
+        //     idUser: data
+        // });
+
+        const mahasiswaData = await sequelize.query("SELECT * FROM tb_students JOIN tb_files ON tb_files.id_mahasiswa = tb_students.id_mahasiswa");
 
         return res.json({
             status: "Success",
-            message: "Berhasil mengubah gambar"
+            message: "Berhasil mengubah gambar",
+            mahasiswaData
         });
     } catch (error) {
         console.log(error);
