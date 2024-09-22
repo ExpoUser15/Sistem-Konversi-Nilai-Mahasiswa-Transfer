@@ -12,7 +12,15 @@ const fileController =  (req, res) => {
             }
         });
     }
-
+    if(req.path.includes('doc')){
+        const filePath = path.join(process.cwd(), `tmp/test`, filename);
+        return res.sendFile(filePath, (err) => {
+            if (err) {
+                console.log('File not found:', err);
+                res.status(404).send('File not found');
+            }
+        });
+    }
     const filePath = path.join(process.cwd(), `tmp/${split}`, filename);
 
     res.sendFile(filePath, (err) => {

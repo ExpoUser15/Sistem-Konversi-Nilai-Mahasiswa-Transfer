@@ -1,28 +1,19 @@
-const { Op } = require("sequelize");
+const { Op, QueryTypes } = require("sequelize");
 const { createLog } = require("../../functions/logActivity");
 const logActivitySchema = require("../../model/logActivitySchema");
 const mataKuliahSchema = require("../../model/mataKuliahSchema");
 const Queries = require("../../queries/queries");
+const generateId = require("../../functions/generateId");
+const sequelize = require("../../config/db");
 
 const mkQueries = new Queries(mataKuliahSchema);
-const logSchema = new Queries(logActivitySchema);
-
-let data;
 
 const mataKuliahController = async (req, res) => {
     try {
         const mkData = await mkQueries.findAll();
 
-        data = req.data.data.id;
-
-        await createLog(logSchema, {
-            ket: "Mengakses halaman mata kuliah",
-            idUser: req.data.data.id
-        });
-
         res.json({
-            auth: req.data.status,
-            mkData
+            data: mkData
         });
     } catch (error) {
         console.log(error);
@@ -37,32 +28,38 @@ const addMataKuliahController = async (req, res) => {
         const { id_mk, mata_kuliah, sks, semester } = req.body;
 
         if (!id_mk || !mata_kuliah || !sks || !semester) {
-            await createLog(logSchema, {
-                ket: "Gagal menambahkan mata kuliah baru",
-                idUser: data
-            });
 
-            return res.json({
+            return res.status(422).json({
                 status: "Error",
                 message: "Silahkan mengisikan form terlebih dahulu!"
             });
         }
 
+        let idUser;
+
+        if (!id_mk) {
+            let userId = await mkQueries.findAll();
+            userId = Number(userId[userId.length - 1].id_mk.substring(2));
+            if (userId.length === 0) {
+                idUser = generateId(0, 'SI');
+            } else {
+                idUser = generateId(userId, 'SI');
+            }
+        }
+
        await mkQueries.create({
-            id_mk,
+            id_mk: !id_mk ? idUser : id_mk,
             mata_kuliah,
             sks,
             semester
         });
 
-        await createLog(logSchema, {
-            ket: `Menambahkan mata kuliah '${mata_kuliah}'`,
-            idUser: data
-        });
+        const mkData = await mkQueries.findAll();
 
         res.json({
-            status: "success",
-            message: `Berhasil menambahkan mata kuliah '${mata_kuliah}'`
+            status: "Success",
+            message: `Berhasil menambahkan mata kuliah '${mata_kuliah}'`,
+            data: mkData
         });
     } catch (error) {
         console.log(error);
@@ -81,10 +78,6 @@ const deleteMataKuliahController = async (req, res) => {
         });
 
         if(!mk){
-            await createLog(logSchema, {
-                ket: `Gagal menghapus: mata kuliah tidak ada.`,
-                idUser: data
-            });
 
             return res.json({
                 status: "Error",
@@ -96,14 +89,12 @@ const deleteMataKuliahController = async (req, res) => {
             id_mk: id
         });
 
-        await createLog(logSchema, {
-            ket: `Menghapus mata kuliah '${mk.dataValues.mata_kuliah}'`,
-            idUser: data
-        });
+        const mkData = await mkQueries.findAll();
 
         res.json({
-            status: "success",
-            message: `Berhasil menghapus mata kuliah '${mk.dataValues.mata_kuliah}'`
+            status: "Success",
+            message: `Berhasil menghapus mata kuliah '${mk.dataValues.mata_kuliah}'`,
+            data: mkData
         });
     } catch (error) {
         console.log(error);
@@ -118,39 +109,18 @@ const updateMataKuliahController = async (req, res) => {
         const { id } = req.params;
         const { id_mk, mata_kuliah, sks, semester } = req.body;
 
+        let data = await mkQueries.findAll();
+
         if (!id_mk || !mata_kuliah || !sks || !semester) {
-            await createLog(logSchema, {
-                ket: "Gagal mengubah data mata kuliah",
-                idUser: data
-            });
-
             return res.json({
                 status: "Error",
-                message: "Silahkan mengisikan form terlebih dahulu!"
-            });
-        }
-
-        let mkData = await mkQueries.findOne({ 
-            [Op.or]: [
-                { id_mk },
-                { mata_kuliah }
-            ]
-        });
-
-        if(mkData){
-            await createLog(logSchema, {
-                ket: `Gagal menambahkan mata kuliah '${mata_kuliah}'`,
-                idUser: data
-            });
-
-            return res.json({
-                status: "Error",
-                message: 'ID atau nama Mata kuliah sudah ada'
+                message: "Silahkan mengisikan form terlebih dahulu!",
+                data
             });
         }
 
        await mkQueries.update({
-            id_mk,
+            id_mk: Number(id_mk),
             mata_kuliah,
             sks,
             semester
@@ -158,14 +128,39 @@ const updateMataKuliahController = async (req, res) => {
             id_mk: id
         });
 
-        await createLog(logSchema, {
-            ket: `Mengubah mata kuliah data '${mata_kuliah}'`,
-            idUser: data
-        });
-
+        data = await mkQueries.findAll();
+       
         res.json({
-            status: "success",
-            message: `Berhasil mengubah`
+            status: "Success",
+            message: `Berhasil mengubah mata kuliah`,
+            data
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 'Error',
+            message: "Server Error"
+        });
+    }
+}
+
+const searchingMK = async (req, res) => {
+    try {
+        const { search } = req.body;
+
+        const mkData = await sequelize.query(
+            "SELECT * FROM tb_courses WHERE id_mk LIKE :search OR mata_kuliah LIKE :search ORDER BY semester ASC",
+            {
+                type: QueryTypes.SELECT,
+                replacements: { search: `%${search}%` }
+            }
+        );
+
+        console.log(mkData);
+
+        return res.json({
+            search: true,
+            data: mkData
         });
     } catch (error) {
         console.log(error);
@@ -175,30 +170,10 @@ const updateMataKuliahController = async (req, res) => {
     }
 }
 
-const addKonversiController = (req, res) => {
-    try {
-        // Memastikan req.files dan req.body telah diinisialisasi
-        console.log('Files:', req.files);
-        console.log('Body:', req.body);
-
-        // Memeriksa apakah req.data ada sebelum mengakses status
-        const authStatus = req.data ? req.data.status : null;
-
-        res.json({
-            auth: authStatus || "Status not available"
-        });
-    } catch (error) {
-        console.error('Error in konversiController:', error);
-        res.status(500).json({
-            message: "Server Error"
-        });
-    }
-};
-
 module.exports = {
     mataKuliahController,
     addMataKuliahController,
     deleteMataKuliahController,
     updateMataKuliahController,
-    addKonversiController
+    searchingMK
 }

@@ -18,8 +18,12 @@ const recapSchema = sequelize.define(
         type: DataTypes.STRING,
         allowNull: false,
       },
-      total_sks: {
-        type: DataTypes.STRING,
+      total_sks_asal: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+      },
+      total_sks_tujuan: {
+        type: DataTypes.INTEGER,
         allowNull: false
       },
       semester: {

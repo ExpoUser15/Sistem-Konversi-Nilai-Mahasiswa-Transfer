@@ -15,7 +15,7 @@ const logController = async (req, res) => {
     
         res.json({
             auth: req.data.status,
-            log,
+            data: log,
         });
     } catch (error) {
         console.log(error);

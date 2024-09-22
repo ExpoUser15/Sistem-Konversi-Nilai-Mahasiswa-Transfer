@@ -10,10 +10,9 @@ require('jspdf-autotable');
 
 require("dotenv").config();
 
-const queries = new Queries(recapSchema);
 const queriesStudents = new Queries(mahasiswaSchema);
 
-async function generatePDF(id) {
+async function generatePDF(id, sks_asal, sks_tujuan) {
     const doc = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
@@ -26,7 +25,7 @@ async function generatePDF(id) {
 
     const mahasiswa = await queriesStudents.findOne({
         id_mahasiswa: id
-    })
+    });
 
     // Header
     doc.text("PERGURUAN TINGGI ASAL", 15, 25);
@@ -44,24 +43,26 @@ async function generatePDF(id) {
         replacements: { id }
     });
 
-    const { dataValues } = await queries.findOne({
-        id_mahasiswa: "MT001"
+    let dataValues = await sequelize.query('SELECT * FROM tb_recapitulations WHERE id_mahasiswa = :id', {
+        replacements: { id },
+        type: QueryTypes.SELECT
     });
+    dataValues = dataValues[0];
 
     let no = 1;
 
     const hasil = query2.map(item => [
         no++,
-        item.id_mk,            
-        item.mk_asal,        
-        item.sks_asal,         
-        item.nilai_asal,      
-        item.mata_kuliah,            
-        item.sks_tujuan,     
-        item.nilai_tujuan      
+        item.id_mk,
+        item.mk_asal,
+        item.sks_asal,
+        item.nilai_asal,
+        item.mata_kuliah,
+        item.sks_tujuan,
+        item.nilai_tujuan
     ]);
 
-    hasil.push(["", "", "Total SKS", "70", "","Total SKS", "70"]);
+    hasil.push(["", "", "Total SKS", String(sks_asal), "", "Total SKS", String(sks_tujuan)]);
 
     doc.autoTable({
         startY: 50,
@@ -79,7 +80,7 @@ async function generatePDF(id) {
             { content: "Nilai", styles: { halign: 'center' } }
         ]],
         body: hasil,
-        theme: 'plain', 
+        theme: 'plain',
         styles: {
             cellPadding: 2,
             fontSize: 8,
@@ -116,7 +117,7 @@ async function generatePDF(id) {
     doc.text("4. Semester yang ditetapkan pada PT Tujuan", 15, finalY + 15);
 
     doc.setFontSize(10);
-    doc.text(`: ${dataValues.total_hasil_konversi}/${dataValues.total_sks}`, 105, finalY + 5);
+    doc.text(`: ${dataValues.total_hasil_konversi}/${dataValues.total_sks_tujuan} SKS`, 105, finalY + 5);
     doc.text(`: ${dataValues.sisa_mk}`, 105, finalY + 10);
     doc.text(`: ${dataValues.semester}`, 105, finalY + 15);
 

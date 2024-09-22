@@ -14,7 +14,7 @@ const mataKuliahSchema = sequelize.define(
         allowNull: false,
       },
       sks: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
         allowNull: false
       },
       semester: {

@@ -23,4 +23,23 @@ const berkasUpload = upload.fields([
     { name: 'surat_pindah', maxCount: 1 },
 ]);
 
-module.exports = {berkasUpload, upload};
+const storage2 = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, `tmp/${file.fieldname}`);
+    },
+    filename: function (req, file, cb) {
+        const tipe = file.originalname.split('.');
+        const uniqueSuffix = file.fieldname + '-' + Date.now() + '.' + tipe[tipe.length - 1];
+        cb(null, uniqueSuffix)
+    },
+});
+
+const uploadDoc = multer({
+    storage: storage2,
+});
+
+const docUpload = uploadDoc.fields([
+    { name: 'form', maxCount: 1 },
+]);
+
+module.exports = {berkasUpload, docUpload};

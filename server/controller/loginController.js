@@ -23,6 +23,13 @@ const postLoginController = async (req, res) => {
     try {
         const { username, password } = req.body;
 
+        if(!username || !password){
+            return res.status(422).json({
+                status: "Warning",
+                message: "Silahkan masukan Username atau Password terlebih dahulu!"
+            });
+        }
+
         const userQueries = new Queries(usersSchema);
 
         const logSchema = new Queries(logActivitySchema);
@@ -30,12 +37,8 @@ const postLoginController = async (req, res) => {
         const data = await userQueries.findOne({ username });
 
         if (!data) {
-            createLog(logSchema, { 
-                ket: `Login Gagal: Username atau password salah`,
-                idUser: dataValues.id_pengguna
-            });
-            return res.json({
-                status: "Error",
+            return res.status(422).json({
+                status: "Warning",
                 message: "Username atau Password Salah!"
             });
         }
@@ -45,12 +48,8 @@ const postLoginController = async (req, res) => {
         bcrypt.compare(password, dataValues.password)
             .then(async result => {
                 if (!result) {
-                    createLog(logSchema, { 
-                        ket: `Login Gagal: Username atau password salah`,
-                        idUser: dataValues.id_pengguna
-                    });
-                    return res.json({
-                        status: "Error",
+                    return res.status(422).json({
+                        status: "Warning",
                         message: "Username atau Password Salah!"
                     })
                 }
@@ -69,7 +68,8 @@ const postLoginController = async (req, res) => {
                 });
 
                 res.json({
-                    status: "success",
+                    status: "Success",
+                    user: dataValues.user, 
                 });
             })
             .catch(err => {

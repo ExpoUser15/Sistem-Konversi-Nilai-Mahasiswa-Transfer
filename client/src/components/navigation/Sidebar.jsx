@@ -1,11 +1,17 @@
 import { ChevronsRight, ChevronsLeft, LogOut } from "lucide-react"
 import { useContext, createContext, useState, useEffect, useRef } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { ModeContext } from "../../context/ModeContext";
+import { useDispatch } from "react-redux";
+import { fetchData } from "../../redux/thunks/loginApiThunks";
+import { logout } from "../../redux/slices/loginSlice";
+import Cookies from "js-cookie";
 
 const SidebarContext = createContext()
 
 export default function Sidebar({ children }) {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [expanded, setExpanded] = useState(true);
   const { theme } = useContext(ModeContext);
   const imgRef = useRef();
@@ -13,6 +19,13 @@ export default function Sidebar({ children }) {
   useEffect(() => {
     imgRef.current.src = localStorage.theme !== 'dark' ? "/logo dan prodi.png" : "/logo dan prodi dark mode.png";
   }, [theme]);
+
+  const handleLogout = (e) => {
+    dispatch(fetchData({ endpoint: 'logout' }));
+    Cookies.remove('token');
+    dispatch(logout(true));
+    navigate('/login');
+  }
 
   return (
     <aside className="h-screen">
@@ -38,16 +51,17 @@ export default function Sidebar({ children }) {
           <ul className="flex-1 px-3">{children}</ul>
         </SidebarContext.Provider>
 
-        <div className="border-t flex items-center ms-5 py-5">
-          <LogOut />
+        <div className="border-t flex items-center cursor-pointer hover:bg-indigo-50 dark:hover:bg-[#232323]">
           <div
+            onClick={(e) => { handleLogout(e); }}
             className={`
-              flex justify-between items-center
-              overflow-hidden transition-all ${expanded ? "w-52 ml-3" : "w-0"}
-          `}
+            flex items-center py-5 ms-5 gap-3 duration-150
+            overflow-hidden transition-all ${expanded ? "w-52 ml-3" : "w-0"}
+            `}
           >
+            <LogOut />
             <div className="">
-              <Link className="font-medium text-darkgray no-underline dark:text-slate-200" to={"/logout"}>Logout</Link>
+              <a className="font-medium text-darkgray no-underline dark:text-slate-200 ">Logout</a>
             </div>
           </div>
         </div>

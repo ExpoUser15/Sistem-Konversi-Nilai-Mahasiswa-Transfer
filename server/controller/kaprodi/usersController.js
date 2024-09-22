@@ -1,3 +1,6 @@
+const { QueryTypes } = require("sequelize");
+const sequelize = require("../../config/db");
+const generateId = require("../../functions/generateId");
 const { createLog } = require("../../functions/logActivity")
 const logActivitySchema = require("../../model/logActivitySchema");
 const usersSchema = require("../../model/usersSchema");
@@ -7,22 +10,13 @@ const bcrypt = require('bcrypt');
 const logSchema = new Queries(logActivitySchema);
 const userQueries = new Queries(usersSchema);
 
-let data;
-
 const usersController = async (req, res) => {
     try {
-        data = req.data.data.id;
-
-        await createLog(logSchema, {
-            ket: "Mengakses halaman users",
-            idUser: req.data.data.id
-        });
-
         const usersData = await userQueries.findAll();
 
         res.json({
             auth: req.data.status,
-            usersData
+            data: usersData
         });
     } catch (error) {
         console.log(error);
@@ -37,45 +31,57 @@ const addUsersController = async (req, res) => {
         const { id, username, password, user } = req.body;
 
         if (!username || !password || !user) {
-            await createLog(logSchema, {
-                ket: "Gagal menambahkan user baru",
-                idUser: data
-            });
+            const users = await userQueries.findAll();
 
             return res.json({
-                status: "Error",
-                message: "Silahkan mengisikan form terlebih dahulu!"
+                status: "Warning",
+                message: "Silahkan mengisikan form terlebih dahulu!",
+                data: users
             });
         }
 
-        let userData = await userQueries.findOne(
-            { id_pengguna: id }
-        );
 
-        if (userData) {
-            return res.json({
-                status: "Error",
-                message: 'ID user sudah ada'
-            });
+
+        if (id) {
+            let userData = await userQueries.findOne(
+                { id_pengguna: id }
+            );
+            if (userData) {
+                return res.json({
+                    status: "Error",
+                    message: 'ID user sudah ada'
+                });
+            }
+        }
+
+        let idUser;
+
+        if (!id) {
+            let userId = await userQueries.findAll();
+            if (userId.length === 0) {
+                idUser = generateId(0, 'K');
+            } else {
+                userId = Number(userId[userId.length - 1].id_pengguna.substring(1));
+                idUser = generateId(userId, 'K');
+            }
         }
 
         bcrypt.hash(password, 10)
             .then(async hash => {
+                const idPengguna = !id ? idUser : id;
                 await userQueries.create({
-                    id_pengguna: id,
+                    id_pengguna: idPengguna,
                     username,
                     password: hash,
                     user
                 });
 
-                await createLog(logSchema, {
-                    ket: `Menambahkan user '${username}'`,
-                    idUser: data
-                });
+                const users = await userQueries.findAll();
 
                 res.json({
-                    status: "success",
-                    message: 'Berhasil menambahkan user'
+                    status: "Success",
+                    message: 'Berhasil menambahkan user',
+                    data: users
                 });
             })
             .catch(err => {
@@ -96,22 +102,16 @@ const deleteController = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const user = await userQueries.findOne({
-            id_pengguna: id
-        });
-
-        await createLog(logSchema, {
-            ket: `Menghapus user '${user.dataValues.username}'`,
-            idUser: data
-        });
-
         await userQueries.delete({
             id_pengguna: id
         });
 
+        const user = await userQueries.findAll();
+
         res.json({
-            status: "success",
-            message: "Berhasil menghapus"
+            status: "Success",
+            message: "Berhasil menghapus user",
+            data: user
         });
     } catch (error) {
         console.log(error);
@@ -123,27 +123,38 @@ const deleteController = async (req, res) => {
 
 const updateController = async (req, res) => {
     try {
-        const { id } = req.params;
         const { id_pengguna, username, password, user } = req.body;
 
-        if (!username || !user) {
-            await createLog(logSchema, {
-                ket: `Gagal mengubah`,
-                idUser: data
-            });
+        if (!username || !user || !id_pengguna) {
+            const userData = await userQueries.findAll();
 
             return res.json({
-                status: "success",
-                message: "Silahkan mengisikan form terlebih dahulu!"
+                status: "Warning",
+                message: "Silahkan mengisikan form terlebih dahulu!",
+                data: userData
+            });
+        }
+
+        if (!password) {
+            await userQueries.update({
+                id_pengguna,
+                username,
+                user
+            }, {
+                id_pengguna
+            });
+
+            const userData = await userQueries.findAll();
+
+            return res.json({
+                status: "Success",
+                message: "Berhasil mengubah user",
+                data: userData
             });
         }
 
         bcrypt.hash(password, 10)
             .then(async hash => {
-                const userData = await userQueries.findOne({
-                    id_pengguna: id
-                });
-
                 await userQueries.update({
                     id_pengguna,
                     username,
@@ -153,14 +164,12 @@ const updateController = async (req, res) => {
                     id_pengguna
                 });
 
-                await createLog(logSchema, {
-                    ket: `Mengubah data user '${userData.dataValues.username}'`,
-                    idUser: data
-                });
+                const userData = await userQueries.findAll();
 
                 res.json({
-                    status: "success",
-                    message: "Berhasil mengubah"
+                    status: "Success",
+                    message: "Berhasil mengubah",
+                    data: userData
                 });
             })
             .catch(err => {
@@ -177,9 +186,34 @@ const updateController = async (req, res) => {
     }
 }
 
+const searchingUsers = async (req, res) => {
+    try {
+        const { search } = req.body;
+
+        const users = await sequelize.query(
+            "SELECT * FROM tb_users WHERE id_pengguna LIKE :search OR username LIKE :search OR user LIKE :search ORDER BY username ASC",
+            {
+                type: QueryTypes.SELECT,
+                replacements: { search: `%${search}%` }
+            }
+        );
+
+        return res.json({
+            search: true,
+            data: users
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            message: "Server Error"
+        });
+    }
+}
+
 module.exports = {
     usersController,
     addUsersController,
     deleteController,
-    updateController
+    updateController,
+    searchingUsers
 }

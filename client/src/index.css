@@ -11,7 +11,12 @@ body {
   border-width: 0;
 }
 
-/* From Uiverse.io by satyamchaudharydev */ 
+* {
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
+
 .loading {
   --speed-of-animation: 0.9s;
   --gap: 6px;

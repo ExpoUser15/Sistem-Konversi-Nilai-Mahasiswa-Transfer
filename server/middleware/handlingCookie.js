@@ -25,7 +25,8 @@ const handlingCookie = (req, res, next) => {
                     data: {
                         id: decoded.id,
                         username: decoded.username,
-                        user: decoded.user
+                        user: decoded.user,
+                        token: token.token
                     }
                 };
             });

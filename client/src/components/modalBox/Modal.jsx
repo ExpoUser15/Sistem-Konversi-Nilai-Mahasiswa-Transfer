@@ -23,7 +23,7 @@ function Modal({ children, open, className }) {
     )
 }
 
-const ModalBerkas = (({ src, open, onClose, file, nama, setSpesifikBerkas, onClick }) => {
+const ModalBerkas = (({ src, open, onClose, file, nama, setSpesifikBerkas, onClick, review }) => {
     const [berkas, setBerkas] = useState('');
     const [index, setIndex] = useState(0);
 
@@ -52,13 +52,13 @@ const ModalBerkas = (({ src, open, onClose, file, nama, setSpesifikBerkas, onCli
     };
 
     const handleEditFile = async (e) => {
-        if(typeof file === 'object'){
-            return setSpesifikBerkas({ [file[index].toLowerCase()]: await useCompressedImage(e) });
+        if (typeof file === 'object') {
+            return setSpesifikBerkas({ [file[index].toLowerCase()]: e.target.files[0] });
         }
         const splitKey = file.toLowerCase().split(' ');
-        const str = splitKey.join('_'); 
+        const str = splitKey.join('_');
         const key = file === 'Transkrip Nilai' ? splitKey[0] : str;
-        setSpesifikBerkas({ [key]: await useCompressedImage(e) });
+        setSpesifikBerkas({ [key]: e.target.files[0] });
     }
 
     useEffect(() => {
@@ -93,12 +93,19 @@ const ModalBerkas = (({ src, open, onClose, file, nama, setSpesifikBerkas, onCli
                     <></>
                 )
             }
-            <div className='px-2 mt-5'>
-                <Input type={"file"} label={'Edit File Ini'} onChange={handleEditFile} />
-                <div className='flex justify-end'>
-                    <Button text={'Edit'} onClick={onClick}></Button>
-                </div>
-            </div>
+            {
+                review ? (
+                    <></>
+                ) : (
+                    <div className='px-2 mt-5'>
+                        <Input type={"file"} label={'Edit File Ini'} onChange={handleEditFile} />
+                        <div className='flex justify-end'>
+                            <Button text={'Edit'} onClick={onClick}></Button>
+                        </div>
+                    </div>
+                )
+            }
+
         </>
     );
 });
@@ -118,7 +125,7 @@ function ModalCustom({ onClose, action, title, children, formClass, onClick }) {
                     <form className={`${formClass} text-sm-3`}>
                         {children}
                         {
-                            action ? <Button text={"Simpan"} className={"mt-2 ms-auto w-full col-span-2 flex justify-center"} onClick={onClick}/> : ""
+                            action ? <Button text={"Simpan"} className={"mt-2 ms-auto w-full col-span-2 flex justify-center"} onClick={onClick} /> : ""
                         }
                     </form>
                 </div>

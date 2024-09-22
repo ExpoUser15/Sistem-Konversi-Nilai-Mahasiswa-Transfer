@@ -7,11 +7,10 @@ const apiSlice = createSlice({
     data: [],
     loading: false,
     error: null,
-    message: null,
-    status: null,
+    message: '',
+    status: '',
     action: false
   },
-  reducers: {},
   extraReducers: (builder) => {
     // Handle GET request
     builder
@@ -19,16 +18,19 @@ const apiSlice = createSlice({
         state.action = false;
         state.loading = true;
         state.error = null;
+        state.status = null;
         state.message = null;
+        state.data = [];
       })
       .addCase(fetchData.fulfilled, (state, action) => {
-        const data = action.payload.mahasiswaData;
+        const data = action.payload.data;
+        state.data = data;
         state.loading = false;
-        state.data = data.length > 0 ? data[0] : [[]];
       })
       .addCase(fetchData.rejected, (state, action) => {
         state.loading = false;
-        state.message = action.payload;
+        state.message = action.payload.message;
+            state.status = action.payload.status;
         state.error = true;
       })
 
@@ -38,14 +40,19 @@ const apiSlice = createSlice({
         state.loading = true;
         state.error = null;
         state.message = null;
+        state.data = [];
       })
       .addCase(postData.fulfilled, (state, action) => {
-        state.action = true;
         state.loading = false;
-        state.message = action.payload.message;
-        state.status = action.payload.status;
-        const data = action.payload.mahasiswaData;
-        state.data = data?.length > 0 ? data[0] : [[]];
+        const data = action.payload.data;
+        
+        if(!action.payload.search){
+            state.action = true;
+            state.message = action.payload.message;
+            state.status = action.payload.status;
+        }
+        console.log(data);
+        state.data = data;
       })
       .addCase(postData.rejected, (state, action) => {
         state.action = true;
@@ -53,10 +60,13 @@ const apiSlice = createSlice({
         state.message = action.payload.message;
         state.status = action.payload.status;
         state.error = true;
+        const data = action.payload.data;
+        state.data = data;
       })
 
       // Handle PUT request
       .addCase(updateData.pending, (state) => {
+        state.data = [];
         state.action = false;
         state.loading = true;
         state.error = null;
@@ -67,8 +77,9 @@ const apiSlice = createSlice({
         state.loading = false;
         state.message = action.payload.message;
         state.status = action.payload.status;
-        const data = action.payload.mahasiswaData;
-        state.data = data?.length > 0 ? data[0] : [[]];
+        const data = action.payload.data;
+        console.log(data);
+        state.data = data;
       })
       .addCase(updateData.rejected, (state, action) => {
         state.action = true;
@@ -76,10 +87,13 @@ const apiSlice = createSlice({
         state.message = action.payload.message;
         state.status = action.payload.status;
         state.error = true;
+        const data = action.payload.data;
+        state.data = data;
       })
 
       // Handle patch request
       .addCase(patchData.pending, (state) => {
+        state.data = [];
         state.action = false;
         state.loading = true;
         state.error = null;
@@ -90,8 +104,8 @@ const apiSlice = createSlice({
         state.loading = false;
         state.message = action.payload.message;
         state.status = action.payload.status;
-        const data = action.payload.mahasiswaData;
-        state.data = data?.length > 0 ? data[0] : [[]];
+        const data = action.payload.data;
+        state.data = data;
       })
       .addCase(patchData.rejected, (state, action) => {
         state.action = true;
@@ -99,6 +113,8 @@ const apiSlice = createSlice({
         state.message = action.payload.message;
         state.status = action.payload.status;
         state.error = true;
+        const data = action.payload.data;
+        state.data = data;
       })
 
       // Handle DELETE request
@@ -113,8 +129,8 @@ const apiSlice = createSlice({
         state.loading = false;
         state.message = action.payload.message;
         state.status = action.payload.status;
-        const data = action.payload.mahasiswaData;
-        state.data = data.length > 0 ? data[0] : [[]];
+        const data = action.payload.data;
+        state.data = data;
       })
       .addCase(deleteData.rejected, (state, action) => {
         state.action = true;
@@ -122,9 +138,12 @@ const apiSlice = createSlice({
         state.message = action.payload.message;
         state.status = action.payload.status;
         state.error = true;
+        const data = action.payload.data;
+        state.data = data;
       });
   },
 });
 
+export const { orderBy} = apiSlice.actions;
 export default apiSlice.reducer;
 

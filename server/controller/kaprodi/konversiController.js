@@ -9,28 +9,32 @@ const Queries = require("../../queries/queries");
 const { getCurrentFormattedDate } = require("../../utils/time");
 const generatePDF = require("../../utils/generateReport");
 const mahasiswaSchema = require("../../model/mahasiswaSchema");
+const sequelize = require("../../config/db");
+const document = require("../../utils/generateDoc");
+const laporanSchema = require("../../model/laporanSchema");
 
 const konveriQueries = new Queries(konversiSchema);
 const recapQueries = new Queries(recapSchema);
 const logSchema = new Queries(logActivitySchema);
+const documentQueries = new Queries(laporanSchema);
 const mahasiswaQueries = new Queries(mahasiswaSchema);
 
-let data;
+let dataId;
 
 const konversiController = async (req, res) => {
     try {
-        data = req.data.data.id;
+        dataId = req.data.data.id;
 
         await createLog(logSchema, {
             ket: "Mengakses halaman konversi",
             idUser: req.data.data.id
         });
 
-        const konversiData = await konveriQueries.findAll();
+        const data = await sequelize.query("SELECT * FROM tb_recapitulations JOIN tb_students ON tb_students.id_mahasiswa = tb_recapitulations.id_mahasiswa");
 
         res.json({
             auth: req.data,
-            konversiData
+            data: data[0]
         });
     } catch (error) {
         console.log(error);
@@ -43,39 +47,25 @@ const konversiController = async (req, res) => {
 const addKonversiController = async (req, res) => {
     try {
         if (req.error) {
-            await createLog(logSchema, {
-                ket: "Gagal menyimpan hasil konversi",
-                idUser: data
-            });
-
-            return res.json({
+            return res.status(422).json({
                 status: "Error",
                 message: "Terjadi duplikasi data!"
             });
         }
 
-        const { hasil, semester } = req.body;
+        const { data, semester } = req.body;
         const { id } = req.params;
 
-        if(!id){
-            await createLog(logSchema, {
-                ket: "Gagal menambahkan konversi baru",
-                idUser: data
-            });
-
-            return res.json({
+        if (!id) {
+            return res.status(422).json({
                 status: "Error",
                 message: "Terjadi kesalahan"
             });
         }
 
         const exists = await mahasiswaQueries.findOne({ id_mahasiswa: id });
-        if(!exists){
-            await createLog(logSchema, {
-                ket: "Gagal menambahkan konversi baru",
-                idUser: data
-            });
 
+        if (!exists) {
             return res.json({
                 status: "Error",
                 message: "Mahasiswa tidak ditemukan"
@@ -84,9 +74,9 @@ const addKonversiController = async (req, res) => {
 
         let error;
 
-        for (var i = 0; i < hasil.length; i++) {
-            const { mk_asal, sks_asal, nilai_asal, id_mk, sks_tujuan, nilai_tujuan } = hasil[i];
-            if (!mk_asal || !sks_asal || !nilai_asal || !id_mk || !sks_tujuan || !nilai_tujuan) {
+        for (var i = 0; i < data.length; i++) {
+            const { mata_kuliah_asal, sks_asal, nilai_asal, mata_kuliah_tujuan, sks_tujuan, nilai_tujuan } = data[i];
+            if (!mata_kuliah_asal || !sks_asal || !nilai_asal || !mata_kuliah_tujuan || !sks_tujuan || !nilai_tujuan) {
                 error = true;
                 break;
             }
@@ -94,22 +84,27 @@ const addKonversiController = async (req, res) => {
         }
 
         if (error) {
-            await createLog(logSchema, {
-                ket: "Gagal menambahkan konversi baru",
-                idUser: data
-            });
-
-            return res.json({
+            return res.status(422).json({
                 status: "Error",
                 message: "Data tidak lengkap. Silahkan cek terlebih dahulu!"
             });
         }
 
-        for (var i = 0; i < hasil.length; i++) {
-            const { mk_asal, sks_asal, nilai_asal, id_mk, sks_tujuan, nilai_tujuan } = hasil[i];
+        let konversiDat = await konveriQueries.findAll({
+            id_mahasiswa: id
+        });
 
-            let konversiId = await konveriQueries.findAll();
+        if (konversiDat.length !== 0) {
+            await konveriQueries.delete({
+                id_mahasiswa: id
+            });
+        }
+
+        for (var i = 0; i < data.length; i++) {
+            const { mata_kuliah_asal, sks_asal, nilai_asal, mata_kuliah_tujuan, sks_tujuan, nilai_tujuan } = data[i];
+
             let idKonversi;
+            let konversiId = await konveriQueries.findAll();
 
             if (konversiId.length === 0) {
                 idKonversi = generateId(0, 'K');
@@ -122,10 +117,10 @@ const addKonversiController = async (req, res) => {
 
             await konveriQueries.create({
                 id_konversi: idKonversi,
-                mk_asal,
+                mk_asal: mata_kuliah_asal,
                 sks_asal,
                 nilai_asal,
-                id_mk,
+                id_mk: mata_kuliah_tujuan,
                 sks_tujuan,
                 nilai_tujuan,
                 id_mahasiswa: id,
@@ -133,9 +128,21 @@ const addKonversiController = async (req, res) => {
             });
         }
 
-        const { remainingMK, totalSKS, totalMK } = await recap(id);
+        const recapQ = await recapQueries.findAll({
+            id_mahasiswa: id
+        });
 
-        let recapId = await recapQueries.findAll();
+        if (recapQ.id_mahasiswa === id) {
+            await recapQueries.delete({
+                id_mahasiswa: id
+            });
+        }
+
+        const { remainingMK, totalSKSAsal, totalSKSTujuan, totalMK } = await recap(id);
+
+        let recapId = await sequelize.query("SELECT * FROM tb_recapitulations");
+        recapId = recapId[0];
+
         let idRecap;
 
         if (recapId.length === 0) {
@@ -151,31 +158,58 @@ const addKonversiController = async (req, res) => {
             id_recap: idRecap,
             sisa_mk: remainingMK,
             total_hasil_konversi: totalMK,
-            total_sks: totalSKS,
+            total_sks_asal: totalSKSAsal,
+            total_sks_tujuan: totalSKSTujuan,
             semester,
-            report: process.env.FILE_URL + "report/" + await generatePDF(id),
             id_mahasiswa: id,
             tanggal
         });
 
-        await mahasiswaQueries.update({
-            status: 'Converted'
-        },{
-            id_mahasiswa: id
-        })
+        const pdf = process.env.FILE_URL + "report/" + await generatePDF(id, totalSKSAsal, totalSKSTujuan);
+        const doc = process.env.FILE_URL + "doc/" + await document(id);
+        console.log(doc);
 
-        await createLog(logSchema, {
-            ket: "Berhasil menyimpan hasil konversi",
-            idUser: data
+        await recapQueries.update({
+            report: pdf
+        }, {
+            id_mahasiswa: id
         });
 
+        await mahasiswaQueries.update({
+            status: 'Converted'
+        }, {
+            id_mahasiswa: id
+        });
+
+        let idDoc = await sequelize.query("SELECT * FROM tb_documents");
+        idDoc = idDoc[0];
+
+        let docID;
+
+        if (idDoc.length === 0) {
+            docID = generateId(0, 'Doc');
+        } else {
+            idDoc = Number(idDoc[idDoc.length - 1].id_dokumen.substring(5));
+            docID = generateId(idDoc, 'Doc');
+        }
+
+        await documentQueries.create({
+            id_dokumen: docID,
+            dokumen: doc,
+            id_mahasiswa: id
+        });
+
+        const dataKonversi = await sequelize.query("SELECT * FROM tb_recapitulations JOIN tb_students ON tb_students.id_mahasiswa = tb_recapitulations.id_mahasiswa");
+
         res.json({
-            status: "success",
-            message: "Berhasil menyimpan hasil konversi"
+            status: "Success",
+            message: "Berhasil menyimpan hasil konversi",
+            data: dataKonversi[0]
         });
     } catch (error) {
         console.log(error);
         res.status(500).json({
+            status: 'Error',
             message: "Server Error"
         });
     }
@@ -190,7 +224,7 @@ const updateKonversiController = async (req, res) => {
         if (!mk_asal || !sks_asal || !nilai_asal || !id_mk || !sks_tujuan || !nilai_tujuan) {
             await createLog(logSchema, {
                 ket: "Gagal mengubah hasil konversi",
-                idUser: data
+                idUser: dataId
             });
 
             return res.json({
@@ -203,10 +237,6 @@ const updateKonversiController = async (req, res) => {
         const validasi = data.some(item => idkonversi === item.id_konversi && id === item.id_mahasiswa);
 
         if (!validasi) {
-            await createLog(logSchema, {
-                ket: "Gagal mengubah hasil konversi",
-                idUser: data
-            });
 
             return res.json({
                 status: "Error",
@@ -232,7 +262,7 @@ const updateKonversiController = async (req, res) => {
         const { remainingMK, totalSKS, totalMK } = await recap(id);
 
         const tanggal = getCurrentFormattedDate().formatDate2;
-        const recapData =  await recapQueries.findOne({ id_mahasiswa: id })
+        const recapData = await recapQueries.findOne({ id_mahasiswa: id })
 
         await recapQueries.update({
             id_recap: recapData.id_recap,
@@ -247,13 +277,8 @@ const updateKonversiController = async (req, res) => {
             id_mahasiswa: id
         });
 
-        await createLog(logSchema, {
-            ket: "Berhasil mengubah hasil konversi",
-            idUser: data
-        });
-
         res.json({
-            status: "success",
+            status: "Success",
             message: "Berhasil mengubah hasil konversi"
         });
     } catch (error) {
@@ -269,53 +294,38 @@ const deleteKonversiController = async (req, res) => {
         const { id, idkonversi } = req.params;
 
         const data = await konveriQueries.findAll();
-        const validasi = data.some(item => id === item.id_mahasiswa && idkonversi === item.id_konversi);
+        const validasi = data.some(item => id === item.id_mahasiswa);
+
+        let dataKonversi = await sequelize.query("SELECT * FROM tb_recapitulations JOIN tb_students ON tb_students.id_mahasiswa = tb_recapitulations.id_mahasiswa");
 
         if (!validasi) {
-            await createLog(logSchema, {
-                ket: "Gagal menghapus hasil konversi",
-                idUser: data
-            });
-
             return res.json({
                 status: "Error",
-                message: "ID tidak ditemukan!"
+                message: "ID tidak ditemukan!",
+                data: dataKonversi[0]
             });
         }
 
         await konveriQueries.delete({
-            [Op.and]: [
-                { id_mahasiswa: id },
-                { id_konversi: idkonversi }
-            ]
+            id_mahasiswa: id
         });
 
-        const { remainingMK, totalSKS, totalMK } = await recap(id);
+        await recapQueries.delete({
+            id_mahasiswa: id
+        });
 
-        const tanggal = getCurrentFormattedDate().formatDate2;
-        const recapData =  await recapQueries.findOne({ id_mahasiswa: id })
-
-        await recapQueries.update({
-            id_recap: recapData.id_recap,
-            sisa_mk: remainingMK,
-            total_hasil_konversi: totalMK,
-            total_sks: totalSKS,
-            semester: recapData.semester,
-            report: process.env.FILE_URL + "report/" + generatePDF(id),
-            id_mahasiswa: id,
-            tanggal
+        await mahasiswaQueries.update({
+            status: 'Pending'
         }, {
             id_mahasiswa: id
         });
 
-        await createLog(logSchema, {
-            ket: "Berhasil menghapus hasil konversi",
-            idUser: data
-        });
+        dataKonversi = await sequelize.query("SELECT * FROM tb_recapitulations JOIN tb_students ON tb_students.id_mahasiswa = tb_recapitulations.id_mahasiswa");
 
         res.json({
-            status: "success",
-            message: "Berhasil menghapus hasil konversi"
+            status: "Success",
+            message: "Berhasil menghapus hasil konversi",
+            data: dataKonversi[0]
         });
     } catch (error) {
         console.log(error);
@@ -325,14 +335,14 @@ const deleteKonversiController = async (req, res) => {
     }
 }
 
-const deletePreviewController =  async (req, res) => {
+const deletePreviewController = async (req, res) => {
     try {
         const { id } = req.params;
 
-        if(!id){
+        if (!id) {
             await createLog(logSchema, {
                 ket: "Gagal menghapus preview konversi",
-                idUser: data
+                idUser: dataId
             });
 
             return res.json({
@@ -357,7 +367,7 @@ const deletePreviewController =  async (req, res) => {
 
         await createLog(logSchema, {
             ket: "Berhasil menghapus riwayat hasil konversi",
-            idUser: data
+            idUser: dataId
         });
 
         res.json({
