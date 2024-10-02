@@ -1,16 +1,6 @@
-import { useDispatch, useSelector } from "react-redux";
 import Divcontainer from "../../components/Divcontainer";
-import { logout } from "../../redux/slices/loginSlice";
-import { useEffect } from "react";
 
 const Login = () => {
-  // const dispatch = useDispatch();
-  // const l = useSelector(state => state.loginData.logOut);
-
-  // useEffect(() => {
-  //   dispatch(logout(false));
-  //   console.log(l);
-  // }, [dispatch]);
 
   return (
     <div className="w-full h-screen bg-white overflow-hidden flex flex-row items-center justify-center box-border leading-[normal] tracking-[normal] lg:box-border">

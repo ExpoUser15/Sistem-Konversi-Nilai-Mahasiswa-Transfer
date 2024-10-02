@@ -25,8 +25,7 @@ const konversiSlice = createSlice({
         },
         deleteKonversi: (state, action) => {
             const index = action.payload.index;
-            state.data = state.data.filter.splice(index, 1); // Filter berdasarkan index
-            console.log("Deleted data: ", state.data);
+            state.data.splice(index, 1); 
         },
         insertMK: (state, action) => {
             const data = action.payload;

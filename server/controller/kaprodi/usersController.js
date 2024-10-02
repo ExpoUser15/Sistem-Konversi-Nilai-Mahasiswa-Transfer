@@ -7,7 +7,6 @@ const usersSchema = require("../../model/usersSchema");
 const Queries = require("../../queries/queries")
 const bcrypt = require('bcrypt');
 
-const logSchema = new Queries(logActivitySchema);
 const userQueries = new Queries(usersSchema);
 
 const usersController = async (req, res) => {
@@ -39,8 +38,6 @@ const addUsersController = async (req, res) => {
                 data: users
             });
         }
-
-
 
         if (id) {
             let userData = await userQueries.findOne(
@@ -124,6 +121,8 @@ const deleteController = async (req, res) => {
 const updateController = async (req, res) => {
     try {
         const { id_pengguna, username, password, user } = req.body;
+        console.log(req.body);
+        const { id } = req.params;
 
         if (!username || !user || !id_pengguna) {
             const userData = await userQueries.findAll();
@@ -141,7 +140,7 @@ const updateController = async (req, res) => {
                 username,
                 user
             }, {
-                id_pengguna
+                id_pengguna: id
             });
 
             const userData = await userQueries.findAll();
@@ -161,7 +160,7 @@ const updateController = async (req, res) => {
                     password: hash,
                     user
                 }, {
-                    id_pengguna
+                    id_pengguna: id
                 });
 
                 const userData = await userQueries.findAll();

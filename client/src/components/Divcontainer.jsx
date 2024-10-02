@@ -45,12 +45,12 @@ const Divcontainer = ({ className = "" }) => {
 
   return (
     <>
-      {/* <Notification
+      <Notification
         text={message}
         status={auth}
         state={action}
         notifRef={notifRef}
-      /> */}
+      />
       <div
         className={`w-[350px] shadow-[0px_30px_30px_-20px_rgba(133,_189,_215,_0.88)] rounded-21xl [background:linear-gradient(0deg,_#fff,_#f4f7fb)] border-white border-[5px] border-solid box-border overflow-hidden shrink-0 flex flex-col items-start justify-start pt-4 pb-[68px] pl-5 pr-2.5 gap-[39px] max-w-full z-[1] text-center text-11xl text-steelblue font-roboto mq450:gap-[19px] mq450:pt-5 mq450:pb-11 mq450:box-border ${className}`}
       >

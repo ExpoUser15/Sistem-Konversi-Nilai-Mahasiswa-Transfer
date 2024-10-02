@@ -194,12 +194,12 @@ const PreviewNilaiSection = ({ data }) => {
     const handleDelete = (index) => {
         dispatch(deleteKonversi({ index }));
     }
-
+    
     return (
         <>
             {
                 data.map((item, index) => (
-                    <div className='mb-5 flex flex-col justify-center' style={{ borderBottom: "1px solid #CCCCCC" }} key={item.id}>
+                    <div className='mb-5 flex flex-col justify-center' style={{ borderBottom: "1px solid #CCCCCC" }} key={item.dataAsal}>
                         <Form className='grid grid-cols-2 gap-5 p-1' label={["", ""]} data={[item.dataAsal, item.dataTujuan]} width={"[85%]"} onChange={handleChange} dataIndex={index} />
                         <div className='flex gap-1 justify-end items-center mt-5 pe-5'>
                             <ActionButton text={"Hapus"} onClick={() => { handleDelete(index) }} >

@@ -94,6 +94,7 @@ function Pengguna() {
                 ...selectedProperties,
                 ...value
             }
+
             dispatch(updateData({ endpoint: `users/update/${user.id_pengguna}`, data: updatedData }));
             setIsModalEdit(false);
             setValue({});
@@ -172,7 +173,7 @@ function Pengguna() {
             </Modal>
             <Modal className={"w-fit"} open={isModalEdit}>
                 <Modal.ModalCustom onClose={() => { closeModal('edit') }} title={"Edit Users"} formClass={'grid grid-cols-2 gap-x-6'} action={true} onClick={(e) => { handleAction(e, 'edit'); }}>
-                    <Input.TextInput label={"ID Pengguna (Optional)"} width={"full"} value={user.id_pengguna} type={'text'} onChange={(e) => { handleInputValue(e, 'id', 'edit') }} />
+                    <Input.TextInput label={"ID Pengguna (Optional)"} width={"full"} value={user.id_pengguna} type={'text'} onChange={(e) => { handleInputValue(e, 'id_pengguna', 'edit') }} />
                     <Input.TextInput label={"Username"} width={"full"} type={'text'} value={user.username} onChange={(e) => { handleInputValue(e, 'username', 'edit') }} />
                     <Input.TextInput label={"Password (Optional)"} width={"full"} type={'text'} onChange={(e) => { handleInputValue(e, 'password', 'edit') }} />
                     <Input.SelectInput label={"Role"} selected={user.user} width={"full"} value={['Akademik', 'Kaprodi']} onChange={(e) => { handleInputValue(e, 'user', 'edit') }} />

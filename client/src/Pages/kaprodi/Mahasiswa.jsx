@@ -198,7 +198,7 @@ function Mahasiswa() {
                                         </div>
                                         <div
                                             className="cursor-pointer"
-                                            onClick={() => { openModal('detail', students[index]); setDataMahasiswa(students[index]); }}
+                                            onClick={() => { openModal('detail', item); setDataMahasiswa(item); }}
                                         >
                                             <ActionButton text={"Lihat Detail"}>
                                                 <Eye className='cursor-pointer' />
@@ -212,10 +212,10 @@ function Mahasiswa() {
                                         <div
                                             className='flex'
                                         >
-                                            <ActionButton text={"Edit"} onClick={() => openModal('edit', students[index])}>
+                                            <ActionButton text={"Edit"} onClick={() => openModal('edit', item)}>
                                                 <Edit className='cursor-pointer' />
                                             </ActionButton>
-                                            <ActionButton text={"Hapus"} onClick={() => { openModal('hapus', students[index]); }}>
+                                            <ActionButton text={"Hapus"} onClick={() => { openModal('hapus', item); }}>
                                                 <Trash2 className='cursor-pointer' />
                                             </ActionButton>
                                         </div>

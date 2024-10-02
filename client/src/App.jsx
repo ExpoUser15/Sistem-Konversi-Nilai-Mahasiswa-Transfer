@@ -13,6 +13,7 @@ import AkademikLayout from './layout/AkademikLayout';
 import KaprodiLayout from './layout/KaprodiLayout';
 import Unauthorized from './Pages/error/Unauthorized';
 import Laporan from './Pages/akademik/Laporan';
+import KonversiDetail from './Pages/kaprodi/KonversiDetail';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -26,6 +27,7 @@ function App() {
             <Route element={<AkademikLayout />}>
               <Route path="/akademik" element={<DashboardAkademik />} />
               <Route path="/akademik/laporan" element={<Laporan />} />
+              <Route path="/konversi-detail/:id" element={<KonversiDetail />} />
             </Route>
           </Route>
 
@@ -37,7 +39,7 @@ function App() {
               <Route path="/kaprodi/mahasiswa" element={<Mahasiswa />} />
               <Route path="/kaprodi/pengguna" element={<Pengguna />} />
               <Route path="/kaprodi/matakuliah" element={<MataKuliah />} />
-              <Route path="/kaprodi/aktivitas" element={<LogAktivitas />} />
+              <Route path="/kaprodi/konversi/konversi-detail/:id" element={<KonversiDetail />} />
             </Route>
           </Route>
 

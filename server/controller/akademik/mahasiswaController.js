@@ -10,11 +10,14 @@ const mahasiswaSchema = require("../../model/mahasiswaSchema");
 const Queries = require("../../queries/queries");
 const { getCurrentFormattedDate } = require("../../utils/time");
 const konversiSchema = require("../../model/konversiSchema");
+const laporanSchema = require("../../model/laporanSchema");
+const recapSchema = require("../../model/recapSchema");
 
 const mahasiswaQueries = new Queries(mahasiswaSchema);
 const berkasQueries = new Queries(berkasSchema);
-const logSchema = new Queries(logActivitySchema);
+const documentQueries = new Queries(laporanSchema);
 const konveriQueries = new Queries(konversiSchema);
+const recapQueries = new Queries(recapSchema);
 
 
 const mahasiswaController = async (req, res) => {
@@ -79,6 +82,19 @@ const addMahasiswaController = async (req, res) => {
                     data: mahasiswaData[0]
                 });
             }
+        }
+
+        const nimExist = await sequelize.query('SELECT * FROM tb_students WHERE nim = :nim', {
+            type: QueryTypes.SELECT,
+            replacements: { nim }
+        });
+
+        if(nimExist.length === 1){
+            return res.status(422).json({
+                status: 'Warning',
+                message: `NIM sudah ada silahkan masukan NIM yang baru`,
+                data: mahasiswaData[0]
+            });
         }
 
         let mahasiswaId = await mahasiswaQueries.findAll();
@@ -161,8 +177,30 @@ const deleteMahasiswaController = async (req, res) => {
             type: QueryTypes.SELECT
         }); 
 
+        const doc = sequelize.query("SELECT * FROM tb_documents WHERE id_mahasiswa = :id", {
+            replacements: { id },
+            type: QueryTypes.SELECT
+        }); 
+
+        const recap = sequelize.query("SELECT * FROM tb_recapitulations WHERE id_mahasiswa = :id", {
+            replacements: { id },
+            type: QueryTypes.SELECT
+        }); 
+
         if(kon[0]){
             await konveriQueries.delete({
+                id_mahasiswa: id
+            });
+        }
+
+        if(doc[0]){
+            await documentQueries.delete({
+                id_mahasiswa: id
+            });
+        }
+
+        if(recap[0]){
+            await recapQueries.delete({
                 id_mahasiswa: id
             });
         }
@@ -290,7 +328,6 @@ const updateBerkasController = async (req, res) => {
         const validasi = berkasData.some(item => fileID === item.id_berkas);
 
         if (!validasi) {
-
             return res.json({
                 status: "Error",
                 message: "Gagal: ID tidak ditemukan!",

@@ -67,23 +67,12 @@ const DashboardKaprodi = () => {
         {/* Analytics Card */}
         <div>
           <div className="grid grid-cols-3 gap-8">
-            <Card />
-            <Card />
-            <Card />
+            <Card text={'Total Mata Kuliah'} drop={false} data={'30'}/>
+            <Card text={'Total Download'} drop={true} data={'45'}/>
+            <Card text={'Average Nilai Konversi'} drop={false} data={'12'}/>
           </div>
         </div>
-        {/* Chart */}
-        <div className="grid grid-cols-1 my-16 bg-white px-8 py-3 rounded-md shadow dark:bg-black dark:shadow-neutral-700">
-          <div className="flex gap-2 items-center">
-            <ChartNoAxesColumnIncreasing />
-            <h4 className="font-medium">Top 6 Mata Kuliah</h4>
-          </div>
-          <ConversionChart
-                categories={["Matematika", "Fisika", "Kimia", "Biologi", "Informatika", "Statistika"]}
-                series={[120, 110, 95, 85, 70, 65]}
-                height={350}
-              />
-        </div>
+        
         {/* Table */}
         <div className="my-16 bg-white px-8 py-3 rounded-md shadow dark:bg-black dark:shadow-neutral-700">
           <div className="flex gap-2 items-center mb-5">
@@ -140,13 +129,7 @@ const DashboardKaprodi = () => {
                         </div>
                       </div>
                     </div>
-                  )).concat(
-                    students.filter(item => item.status === "Pending").length === 0 ? (
-                      <div className='grid grid-cols-10 mb-7 text-sm-3 gap-5 pb-2' key="empty">
-                        <p className='text-center col-span-10 italic'>Data Kosong</p>
-                      </div>
-                    ) : []
-                  ) :
+                  )) :
                 (
                   <div className={`grid grid-cols-10 mb-7 text-sm-3 gap-5 pb-2`} >
                     <div className='col-span-10 flex justify-center'>

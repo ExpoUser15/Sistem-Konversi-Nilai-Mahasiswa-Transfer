@@ -17,6 +17,9 @@ function SearchField({ placeholder, searchType }){
         if(searchType === 'pengguna'){
             dispatch(postData({ endpoint: 'users/search', data: { search: value } }));
         }
+        if(searchType === 'laporan'){
+            dispatch(postData({ endpoint: 'laporan/search', data: { search: value } }));
+        }
     }
 
     return (

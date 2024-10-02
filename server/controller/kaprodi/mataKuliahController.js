@@ -1,6 +1,4 @@
-const { Op, QueryTypes } = require("sequelize");
-const { createLog } = require("../../functions/logActivity");
-const logActivitySchema = require("../../model/logActivitySchema");
+const { QueryTypes } = require("sequelize");
 const mataKuliahSchema = require("../../model/mataKuliahSchema");
 const Queries = require("../../queries/queries");
 const generateId = require("../../functions/generateId");
@@ -120,7 +118,7 @@ const updateMataKuliahController = async (req, res) => {
         }
 
        await mkQueries.update({
-            id_mk: Number(id_mk),
+            id_mk: id_mk,
             mata_kuliah,
             sks,
             semester

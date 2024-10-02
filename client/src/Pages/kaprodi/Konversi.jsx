@@ -3,9 +3,9 @@ import Tables from '../../components/tables/Tables';
 import { Edit, Eye, ArrowDownToLine, Trash2 } from 'lucide-react';
 import useDownload from '../../hooks/useDownload';
 import ActionButton from '../../components/buttons/ActionButton';
-import SearchingInput from '../../components/inputs/SearchingInput';
+import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteData, deleteKonversiData, fetchData, fetchKonversiData } from '../../redux/thunks/apiThunks';
+import { deleteData, deleteKonversiData, fetchData, fetchKonversiData, patchData, postData } from '../../redux/thunks/apiThunks';
 import Modal from '../../components/modalBox/Modal';
 import Input from '../../components/inputs/Input';
 import Loading from '../../components/loader/Loading';
@@ -26,6 +26,7 @@ function Konversi() {
     const [dataMahasiswa, setDataMahasiswa] = useState({});
     const [value, setValue] = useState({});
     const [berkasName, setBerkasName] = useState("");
+    const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
     const [spesifikBerkas, setSpesifikBerkas] = useState({});
     const [jenisFile, setJenisFile] = useState("");
     const [nama, setNama] = useState("");
@@ -39,8 +40,12 @@ function Konversi() {
 
     useEffect(() => {
         dispatch(fetchData({ endpoint: 'mahasiswa/all/akademik' }));
-        dispatch(fetchKonversiData({ endpoint: 'konversi' }));
+
         console.log(students);
+    }, [dispatch]);
+
+    useEffect(() => {
+        dispatch(fetchKonversiData({ endpoint: 'konversi' }));
     }, [dispatch]);
 
     const closeModal = () => {
@@ -50,10 +55,10 @@ function Konversi() {
         setIsDeleteModal(false);
         setIsModalOpen(false);
         setIsModalKonversi(false);
+        setIsUploadModalOpen(false);
     };
 
     const openModal = (item, item2, file) => {
-        console.log(item)
         if (item === "detail") {
             setIsModalDetail(true)
             setDataMahasiswa(item2);
@@ -79,22 +84,34 @@ function Konversi() {
         }
         if (item === 'hapus') {
             setDataMahasiswa(item2);
-            console.log(item2);
             setIsDeleteModal(true)
             return;
         }
+
         setIsModalOpen(true);
         setBerkasName(item);
         setNama(item2);
         setJenisFile(file);
     };
 
-    const handleAction = async (e, actionType) => {
+    const handleUpload = (e) => {
+        const file = e.target.files[0];
+        setSpesifikBerkas(file);
+    }
+
+    const handleAction = async (e, actionType, item) => {
         e.preventDefault();
         await new Promise(resolve => setTimeout(resolve, 0));
         if (actionType === 'hapus') {
             dispatch(deleteKonversiData({ endpoint: `konversi/delete/${dataMahasiswa.id_mahasiswa}/${dataMahasiswa.id_recap}` }));
             setIsDeleteModal(false);
+        }
+        if (actionType === 'upload') {
+            const file = spesifikBerkas;
+            const formData = new FormData();
+            formData.append('form', file);
+
+            dispatch(patchData({ endpoint: `mahasiswa/transkrip/update/${item.id_mahasiswa}`, data: formData, contentType: 'multipart/form-data' }));
         }
     }
 
@@ -202,7 +219,7 @@ function Konversi() {
                     <h4 className="font-medium">Riwayat Konversi</h4>
                     <SearchField placeholder={"Cari..."} searchType={'mahasiswa'} />
                 </div>
-                <Tables fields={["No", "Nama", "Tanggal Konversi", "Laporan", "Status", ""]} gap={"1"}>
+                <Tables fields={["No", "Nama", "Tanggal Konversi", "Laporan", "Laporan Lengkap", "Detail Konversi", "Status", ""]} gap={"2"}>
                     {
                         !loading ? (
                             konversiData
@@ -212,7 +229,7 @@ function Konversi() {
                                     .filter(item => item.status === "Converted")
                                     .map((item, index) => (
                                         <div
-                                            className={`grid grid-cols-6 mb-7 text-sm-3 gap-1 pb-2`}
+                                            className={`grid grid-cols-8 mb-7 text-sm-3 gap-2 pb-2`}
                                             style={{ borderBottom: "1px solid #CCCCCC" }}
                                             key={item.id_mahasiswa}
                                         >
@@ -228,13 +245,39 @@ function Konversi() {
                                                     </ActionButton>
                                                 </a>
                                             </div>
-                                            <div className='w-fit rounded-md text-green-600'>{item.status}</div>
-                                            <div className='flex gap-2 items-center justify-start'>
+                                            <div
+                                                className="cursor-pointer w-10 rounded-md indexedConvert"
+                                            >
+                                                {
+                                                    <ActionButton text={konversiData[index].daftar_konversi ? "Lihat Daftar Hasil Konversi" : 'Upload'} onClick={() => {
+                                                        openModal(konversiData[index].daftar_konversi ? konversiData[index].daftar_konversi : '',
+                                                            item.nama,
+                                                            konversiData[index].daftar_konversi ? "Daftar Hasil Konversi Lengkap" : 'Silahkan upload terlebih dahulu'
+                                                        );
+                                                        setDataMahasiswa(konversiData[index]);
+                                                        setIsUploadModalOpen(true);
+                                                    }
+                                                    }>
+                                                        <Eye className='cursor-pointer' />
+                                                    </ActionButton>
+                                                }
+                                            </div>
+                                            <div>
+                                                <Link to={`konversi-detail/${btoa(JSON.stringify({ id_mahasiswa: item.id_mahasiswa, nama: item.nama }))}`}>
+                                                    Detail
+                                                </Link>
+                                            </div>
+                                            <div>
+                                                <div className={`w-fit rounded-md ${item.status === 'Converted' ? 'text-green-600' : 'text-yellow-600'}`}>
+                                                    {item.status}
+                                                </div>
+                                            </div>
+                                            <div className='flex gap-2 items-center justify-start '>
+                                                <ActionButton text={"Download Hasil Konversi"}>
+                                                    <ArrowDownToLine className='cursor-pointer' onClick={() => handleDownload(item.report)} />
+                                                </ActionButton>
                                                 <ActionButton text={"Hapus"} onClick={() => openModal('hapus', item)}>
                                                     <Trash2 className='cursor-pointer' />
-                                                </ActionButton>
-                                                <ActionButton text={"Download"}>
-                                                    <ArrowDownToLine className='cursor-pointer' onClick={() => handleDownload(item.report)} />
                                                 </ActionButton>
                                             </div>
                                         </div>
@@ -245,8 +288,10 @@ function Konversi() {
                                 </div>
                             )
                         ) : (
-                            <div className='grid grid-cols-10 mb-7 text-sm-3 gap-5 pb-2' key="empty">
-                                <p className='text-center col-span-10 italic'>Data Kosong</p>
+                            <div className={`grid grid-cols-10 mb-7 text-sm-3 gap-5 pb-2`} >
+                                <div className='col-span-10 flex justify-center'>
+                                    <Loading />
+                                </div>
                             </div>
                         )
                     }
@@ -254,7 +299,10 @@ function Konversi() {
             </div>
 
             <Modal className={"w-[550px]"} open={isModalOpen}>
-                <Modal.ModalBerkas src={berkasName} onClose={closeModal} onClick={(e) => { handleAction(e, 'patch'); }} nama={nama} file={jenisFile} setSpesifikBerkas={setSpesifikBerkas} />
+                <Modal.ModalBerkas src={berkasName} onClose={closeModal} onClick={(e) => { handleAction(e, 'patch'); }} nama={nama} file={jenisFile} setSpesifikBerkas={setSpesifikBerkas} review={true} />
+            </Modal>
+            <Modal className={"w-[550px]"} open={isUploadModalOpen}>
+                <Modal.ModalBerkas src={berkasName} onClose={closeModal} onClick={(e) => { handleAction(e, 'upload', dataMahasiswa); }} nama={nama} file={jenisFile} setSpesifikBerkas={setSpesifikBerkas} upload={(e) => { handleUpload(e) }} />
             </Modal>
             <Modal className={"w-fit"} open={isModalDetail}>
                 <Modal.ModalCustom onClose={() => { closeModal('detail') }} title={"Detail Mahasiswa"} formClass={'grid grid-cols-2 gap-x-6'}>

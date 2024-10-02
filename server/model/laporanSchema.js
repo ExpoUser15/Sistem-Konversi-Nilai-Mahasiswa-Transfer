@@ -11,9 +11,13 @@ const laporanSchema = sequelize.define(
       },
       dokumen: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       formulir: {
+        type: DataTypes.STRING,
+        allowNull: true
+      },
+      daftar_konversi: {
         type: DataTypes.STRING,
         allowNull: true
       },

@@ -1,6 +1,5 @@
 import Cookies from "js-cookie";
 import {jwtDecode} from "jwt-decode"; 
-import { useNavigate } from "react-router-dom";
 
 const useAuth = () => {
     const tokenFromCookie = Cookies.get('token');

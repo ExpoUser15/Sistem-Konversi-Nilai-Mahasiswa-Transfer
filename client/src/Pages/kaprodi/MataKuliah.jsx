@@ -109,12 +109,12 @@ function Pengguna() {
                 notifRef={notifRef}
             />
             <div className="pb-1" style={{ borderBottom: "1px solid #CCCCCC" }}>
-                <h3 className="font-medium">Pengguna</h3>
+                <h3 className="font-medium">Mata Kuliah</h3>
             </div>
             {/* Table */}
             <div className="mb-16 mt-16 bg-white px-8 py-3 rounded-md shadow dark:bg-black dark:shadow-neutral-700">
                 <div className="flex gap-2 items-center justify-between mb-5">
-                    <h4 className="font-medium">Daftar Pengguna</h4>
+                    <h4 className="font-medium">Daftar Mata Kuliah</h4>
                     <SearchingInput placeholder={"Cari..."} searchType={"matakuliah"}/>
                 </div>
                 <Tables fields={["No", "Kode Mata Kuliah", "Mata Kuliah", "SKS", "Semester", ""]} gap={"1"}>
@@ -172,7 +172,7 @@ function Pengguna() {
                 </Modal.ModalCustom>
             </Modal>
             <Modal className={"w-fit"} open={isModalEdit}>
-                <Modal.ModalCustom onClose={() => { closeModal('edit') }} title={"Edit Users"} formClass={'grid grid-cols-2 gap-x-6'} action={true} onClick={(e) => { handleAction(e, 'edit'); }}>
+                <Modal.ModalCustom onClose={() => { closeModal('edit') }} title={"Edit Mata Kuliah"} formClass={'grid grid-cols-2 gap-x-6'} action={true} onClick={(e) => { handleAction(e, 'edit'); }}>
                     <Input.TextInput label={"Kode Mata Kuliah"} width={"full"} value={dataMk.id_mk} type={'text'} onChange={(e) => { handleInputValue(e, 'id_mk', 'edit') }} />
                     <Input.TextInput label={"Mata Kuliah"} width={"full"} type={'text'} value={dataMk.mata_kuliah} onChange={(e) => { handleInputValue(e, 'mata_kuliah', 'edit') }} />
                     <Input.SelectInput label={"SKS"} selected={dataMk.sks} width={"full"} value={['1', '2', '3', '4']} onChange={(e) => { handleInputValue(e, 'sks', 'edit') }} />

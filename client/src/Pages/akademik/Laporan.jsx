@@ -1,16 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Tables from '../../components/tables/Tables';
-import { Eye, Trash2 } from 'lucide-react';
+import { ArrowDownToLine, Eye, Trash2 } from 'lucide-react';
 import ActionButton from '../../components/buttons/ActionButton';
 import Button from '../../components/buttons/Button';
 import Modal from '../../components/modalBox/Modal';
-import { useSelectedProperties } from '../../hooks/useGetSelectedProperty';
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteData, fetchData, patchData, postData, updateData } from '../../redux/thunks/apiThunks';
+import { fetchData, patchData } from '../../redux/thunks/apiThunks';
 import Loading from '../../components/loader/Loading';
 import Notification from '../../components/notifications/Notification';
 import SearchField from '../../components/inputs/SearchingInput';
 import Input from '../../components/inputs/Input';
+import useDownload from '../../hooks/useDownload';
 
 function Laporan() {
     const dispatch = useDispatch();
@@ -23,21 +23,25 @@ function Laporan() {
     const notifRef = useRef();
 
     const [dataMahasiswa, setDataMahasiswa] = useState({});
-    const [value, setValue] = useState({});
     const [berkasName, setBerkasName] = useState("");
     const [nama, setNama] = useState("");
     const [jenisFile, setJenisFile] = useState({});
     const [spesifikBerkas, setSpesifikBerkas] = useState({});
+    const [isModalDetail, setIsModalDetail] = useState(false);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isDeleteModal, setIsDeleteModal] = useState(false);
 
     useEffect(() => {
         dispatch(fetchData({ endpoint: 'mahasiswa/laporan' }));
-        console.log(laporan);
     }, [dispatch]);
 
     const openModal = (item, item2, file) => {
+        if (item === "detail") {
+            setIsModalDetail(true)
+            setDataMahasiswa(item2);
+            return;
+        }
+
         setIsModalOpen(true);
         setBerkasName(item);
         setNama(item2);
@@ -46,11 +50,11 @@ function Laporan() {
 
     const closeModal = () => {
         setIsModalOpen(false);
+        setIsModalDetail(false);
     };
 
     const handleAction = async (e, actionType) => {
         e.preventDefault();
-        console.log(spesifikBerkas);
         if (actionType === 'patch') {
             const formData = new FormData();
             const key = Object.keys(spesifikBerkas)[0];
@@ -59,6 +63,12 @@ function Laporan() {
             setIsModalOpen(false);
             setSpesifikBerkas({});
         }
+    }
+
+    const downloadFile = useDownload();
+
+    const handleDownload = (fileUrl) => {
+        downloadFile(fileUrl);
     }
 
     return (
@@ -73,23 +83,56 @@ function Laporan() {
                 <h3 className="font-medium">Laporan</h3>
             </div>
             {/* Table */}
-            <div className="my-16 bg-white px-8 py-3 rounded-md shadow dark:bg-black dark:shadow-neutral-700">
+            <div className="max-w-fit my-16 bg-white px-8 py-3 rounded-md shadow dark:bg-black dark:shadow-neutral-700">
                 <div className="flex gap-2 items-center justify-between mb-5">
                     <h4 className="font-medium">Daftar Laporan</h4>
-                    <SearchField placeholder={"Cari..."} searchType={'mahasiswa'} />
+                    <SearchField placeholder={"Cari..."} searchType={'laporan'} />
                 </div>
-                <Tables fields={["Nama", "Tanggal", "Dokumen", "Formulir Lengkap", ""]} gap={"5"}>
+                <Tables fields={["Nama", "Tanggal", "Berkas", "Transkrip", "Surat Pindah", "Detail", "Dokumen", "Formulir Lengkap", ""]} gap={"1"}>
                     {
                         !loading ?
                             laporan
                                 .map((item, index) => (
                                     <div
-                                        className={`grid grid-cols-5 mb-7 text-sm-3 gap-5 pb-2`}
+                                        className={`grid grid-cols-9 mb-9 text-sm-3 pb-2`}
                                         style={{ borderBottom: "1px solid #CCCCCC" }}
                                         key={item.id_dokumen}
                                     >
                                         <div className='overflow-auto'>{item.nama}</div>
                                         <div>{item.tanggal}</div>
+                                        <div
+                                            className="cursor-pointer"
+                                            onClick={() => { openModal([item.ktp, item.kk, item.ijazah], item.nama, ["KTP", "KK", "Ijazah"]); setDataMahasiswa(laporan[index]); }}
+                                        >
+
+                                            <ActionButton text={"Lihat Berkas"}>
+                                                <Eye className='cursor-pointer' />
+                                            </ActionButton>
+                                        </div>
+                                        <div
+                                            className="cursor-pointer"
+                                            onClick={() => { openModal(item.transkrip_nilai, item.nama, "Transkrip Nilai"); setDataMahasiswa(laporan[index]); }}
+                                        >
+                                            <ActionButton text={"Lihat Transkrip"}>
+                                                <Eye className='cursor-pointer' />
+                                            </ActionButton>
+                                        </div>
+                                        <div
+                                            className="cursor-pointer"
+                                            onClick={() => { openModal(item.surat_pindah, item.nama, "Surat Pindah"); setDataMahasiswa(laporan[index]); }}
+                                        >
+                                            <ActionButton text={"Lihat Surat Pindah"}>
+                                                <Eye className='cursor-pointer' />
+                                            </ActionButton>
+                                        </div>
+                                        <div
+                                            className="cursor-pointer"
+                                            onClick={() => { openModal('detail', item); setDataMahasiswa(laporan[index]); }}
+                                        >
+                                            <ActionButton text={"Lihat Detail"}>
+                                                <Eye className='cursor-pointer' />
+                                            </ActionButton>
+                                        </div>
                                         <div className="cursor-pointer w-10 rounded-md">
                                             <a target='_blank' href={item.dokumen} className='text-black dark:text-slate-200 flex justify-center'>
                                                 <ActionButton text={"Lihat Dokumen"}>
@@ -106,7 +149,7 @@ function Laporan() {
                                                         <Eye className='cursor-pointer' />
                                                     </ActionButton>
                                                 ) : (
-                                                    <Input className={'w-fit bg-white ps-0 pt-0'} onChange={(e) => {
+                                                    <Input className={'w-fit bg-white ps-0 pt-0 text-white'} onChange={(e) => {
                                                         const file = e.target.files[0];
 
                                                         const formData = new FormData();
@@ -116,6 +159,11 @@ function Laporan() {
                                                     }}></Input>
                                                 )
                                             }
+                                        </div>
+                                        <div>
+                                            <ActionButton text={"Download Dokumen"}>
+                                                <ArrowDownToLine className='cursor-pointer' onClick={() => handleDownload(item.dokumen)} />
+                                            </ActionButton>
                                         </div>
                                     </div>
                                 )) :
@@ -131,12 +179,19 @@ function Laporan() {
             </div>
 
             <Modal className={"w-[550px]"} open={isModalOpen}>
-                <Modal.ModalBerkas src={berkasName} onClose={closeModal} nama={nama} file={jenisFile} review={false} onClick={(e) => { handleAction(e, 'patch'); }} setSpesifikBerkas={setSpesifikBerkas} />
+                <Modal.ModalBerkas src={berkasName} onClose={closeModal} nama={nama} file={jenisFile} review={true} onClick={(e) => { handleAction(e, 'patch'); }} setSpesifikBerkas={setSpesifikBerkas} />
             </Modal>
-            <Modal open={isDeleteModal}>
-                <Modal.ModalCustom onClose={() => { closeModal('hapus') }} title={`Apakah anda yakin ingin menghapus mahasiswa '${dataMahasiswa.nama}'?`} formClass={'flex gap-2'}>
-                    <Button text={"Hapus"} className={"mt-2 ms-auto w-full justify-center"} onClick={(e) => { handleAction(e, 'hapus'); }} />
-                    <Button text={"Batal"} className={"mt-2 ms-auto  bg-red-500 border-red-600 w-full text-center justify-center"} onClick={(e) => { e.preventDefault(); closeModal('hapus') }} />
+            <Modal className={"w-fit"} open={isModalDetail}>
+                <Modal.ModalCustom onClose={() => { closeModal('detail') }} title={"Detail Mahasiswa"} formClass={'grid grid-cols-2 gap-x-6'}>
+                    <Input.TextInput label={"Nama"} value={dataMahasiswa.nama} width={"full"} read={true} />
+                    <Input.TextInput label={"NIM"} value={dataMahasiswa.nim} width={"full"} read={true} />
+                    <Input.TextInput label={"Tanggal"} value={dataMahasiswa.tanggal} width={"full"} read={true} />
+                    <Input.TextInput label={"Email"} value={dataMahasiswa.email} width={"full"} read={true} />
+                    <Input.TextInput label={"PT Asal"} value={dataMahasiswa.pt_asal} width={"full"} read={true} />
+                    <Input.TextInput label={"Fakultas"} value={dataMahasiswa.fakultas} width={"full"} read={true} />
+                    <Input.TextInput label={"Prodi"} value={dataMahasiswa.prodi} width={"full"} read={true} />
+                    <Input.TextInput label={"Prodi Tujuan"} value={dataMahasiswa.prodi_tujuan} width={"full"} read={true} />
+                    <Input.TextInput label={"Status"} value={dataMahasiswa.status} width={"full"} read={true} />
                 </Modal.ModalCustom>
             </Modal>
         </>

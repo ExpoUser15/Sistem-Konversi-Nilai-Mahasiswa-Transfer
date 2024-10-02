@@ -51,7 +51,6 @@ const apiSlice = createSlice({
             state.message = action.payload.message;
             state.status = action.payload.status;
         }
-        console.log(data);
         state.data = data;
       })
       .addCase(postData.rejected, (state, action) => {

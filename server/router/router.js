@@ -9,10 +9,10 @@ const { validateUserKaprodi, validateUserAkademik } = require('../middleware/val
 const { notFound } = require('../controller/notFound');
 const {berkasUpload, docUpload} = require('../middleware/fileHandler');
 const fileController = require('../controller/fileResponse/filleController');
-const { konversiController, addKonversiController, updateKonversiController, deleteKonversiController, deletePreviewController } = require('../controller/kaprodi/konversiController');
+const { konversiController, addKonversiController, updateKonversiController, deleteKonversiController, deletePreviewController, detailKonversiController, konversiReportController } = require('../controller/kaprodi/konversiController');
 const logoutController = require('../controller/logoutController');
 const handleDuplicateData = require('../middleware/handleDuplicateData');
-const { laporanController, laporanPostController } = require('../controller/akademik/laporanController');
+const { laporanController, laporanPostController, searchLaporan, transkripPostController } = require('../controller/akademik/laporanController');
 
 const router = express.Router();
 
@@ -24,6 +24,8 @@ router.get('/users', handlingCookie, validateUserKaprodi, usersController);
 router.get('/log', handlingCookie, validateUserKaprodi, logController);
 router.get('/matakuliah', handlingCookie, validateUserKaprodi, mataKuliahController);
 router.get('/konversi', handlingCookie, validateUserKaprodi, konversiController);
+router.get('/konversi/:id', handlingCookie, validateUserKaprodi, konversiReportController);
+router.get('/konversi/detail/:id', handlingCookie, validateUserKaprodi, detailKonversiController);
 
 router.post('/auth', postLoginController);
 router.post('/users/add', handlingCookie, addUsersController);
@@ -33,7 +35,7 @@ router.post('/konversi/add/:id', handleDuplicateData, addKonversiController);
 router.delete('/users/delete/:id', deleteController);
 router.delete('/matakuliah/delete/:id', deleteMataKuliahController);
 router.delete('/konversi/delete/:id/:idkonversi', deleteKonversiController);
-router.delete('/konversi/riwayat/delete/:id/', deletePreviewController);
+router.delete('/konversi/preview/delete/:id', deletePreviewController);
 
 router.put('/users/update/:id', updateController);
 router.put('/matakuliah/update/:id', updateMataKuliahController);
@@ -49,6 +51,7 @@ router.post('/mahasiswa/laporan/add', docUpload, laporanPostController);
 router.post('/mahasiswa/search', searchingMahasiswa);
 router.post('/matakuliah/search', searchingMK);
 router.post('/users/search', searchingUsers);
+router.post('/laporan/search', searchLaporan);
 
 router.delete('/mahasiswa/delete/:id', deleteMahasiswaController);
 
@@ -56,6 +59,7 @@ router.put('/mahasiswa/update/:id', updateMahasiswaController);
 
 router.patch('/mahasiswa/update/:id/berkas/:fileID', berkasUpload, updateBerkasController);
 router.patch('/mahasiswa/laporan/update/:id', docUpload, laporanPostController);
+router.patch('/mahasiswa/transkrip/update/:id', docUpload, transkripPostController);
 
 // file router
 router.get('/file/:filename', handlingCookie, fileController);

@@ -23,7 +23,7 @@ function Modal({ children, open, className }) {
     )
 }
 
-const ModalBerkas = (({ src, open, onClose, file, nama, setSpesifikBerkas, onClick, review }) => {
+const ModalBerkas = (({ src, open, onClose, file, nama, setSpesifikBerkas, onClick, review, upload }) => {
     const [berkas, setBerkas] = useState('');
     const [index, setIndex] = useState(0);
 
@@ -98,9 +98,15 @@ const ModalBerkas = (({ src, open, onClose, file, nama, setSpesifikBerkas, onCli
                     <></>
                 ) : (
                     <div className='px-2 mt-5'>
-                        <Input type={"file"} label={'Edit File Ini'} onChange={handleEditFile} />
+                        {
+                            upload ? (
+                                <Input type={"file"} label={'Upload File'} onChange={upload} />
+                            ) : (
+                                <Input type={"file"} label={'Edit File Ini'} onChange={(e) => handleEditFile(e)} />
+                            )
+                        }
                         <div className='flex justify-end'>
-                            <Button text={'Edit'} onClick={onClick}></Button>
+                            <Button text={!upload ? 'Edit' : 'Upload'} onClick={onClick}></Button>
                         </div>
                     </div>
                 )
