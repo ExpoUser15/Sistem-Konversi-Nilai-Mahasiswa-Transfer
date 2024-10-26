@@ -1,18 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react'
-import Tables from '../../components/tables/Tables';
+import Tables from '../../components/Tables/Tables';
 import { Edit, Eye, ArrowDownToLine, Trash2 } from 'lucide-react';
 import useDownload from '../../hooks/useDownload';
-import ActionButton from '../../components/buttons/ActionButton';
+import ActionButton from '../../components/Buttons/ActionButton';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteData, deleteKonversiData, fetchData, fetchKonversiData, patchData, postData } from '../../redux/thunks/apiThunks';
-import Modal from '../../components/modalBox/Modal';
-import Input from '../../components/inputs/Input';
-import Loading from '../../components/loader/Loading';
-import ModalKonversi from '../../components/modalBox/ModalKonversi';
-import Notification from '../../components/notifications/Notification';
-import Button from '../../components/buttons/Button';
-import SearchField from '../../components/inputs/SearchingInput';
+import { deleteKonversiData, fetchData, fetchKonversiData, patchData, postData } from '../../redux/thunks/apiThunks';
+import Modal from '../../components/ModalBox/Modal';
+import Input from '../../components/Inputs/Input';
+import Loading from '../../components/Loader/Loading';
+import ModalKonversi from '../../components/ModalBox/ModalKonversi';
+import Notification from '../../components/Notifications/Notification';
+import Button from '../../components/Buttons/Button';
+import SearchField from '../../components/Inputs/SearchingInput';
 
 function Konversi() {
     const dispatch = useDispatch();
@@ -40,11 +40,6 @@ function Konversi() {
 
     useEffect(() => {
         dispatch(fetchData({ endpoint: 'mahasiswa/all/akademik' }));
-
-        console.log(students);
-    }, [dispatch]);
-
-    useEffect(() => {
         dispatch(fetchKonversiData({ endpoint: 'konversi' }));
     }, [dispatch]);
 
@@ -219,7 +214,7 @@ function Konversi() {
                     <h4 className="font-medium">Riwayat Konversi</h4>
                     <SearchField placeholder={"Cari..."} searchType={'mahasiswa'} />
                 </div>
-                <Tables fields={["No", "Nama", "Tanggal Konversi", "Laporan", "Laporan Lengkap", "Detail Konversi", "Status", ""]} gap={"2"}>
+                <Tables fields={["No", "Nama", "Tanggal Konversi", "Detail Konversi", "Status", ""]} gap={"2"}>
                     {
                         !loading ? (
                             konversiData
@@ -229,39 +224,13 @@ function Konversi() {
                                     .filter(item => item.status === "Converted")
                                     .map((item, index) => (
                                         <div
-                                            className={`grid grid-cols-8 mb-7 text-sm-3 gap-2 pb-2`}
+                                            className={`grid grid-cols-6 mb-7 text-sm-3 gap-2 pb-2`}
                                             style={{ borderBottom: "1px solid #CCCCCC" }}
                                             key={item.id_mahasiswa}
                                         >
                                             <div className='overflow-auto'>{index + 1}</div>
                                             <div>{item.nama}</div>
                                             <div>{item.tanggal}</div>
-                                            <div
-                                                className="cursor-pointer w-10 rounded-md"
-                                            >
-                                                <a target='_blank' href={item.report} className='text-black dark:text-slate-200 flex justify-center'>
-                                                    <ActionButton text={"Lihat Laporan"}>
-                                                        <Eye className='cursor-pointer' />
-                                                    </ActionButton>
-                                                </a>
-                                            </div>
-                                            <div
-                                                className="cursor-pointer w-10 rounded-md indexedConvert"
-                                            >
-                                                {
-                                                    <ActionButton text={konversiData[index].daftar_konversi ? "Lihat Daftar Hasil Konversi" : 'Upload'} onClick={() => {
-                                                        openModal(konversiData[index].daftar_konversi ? konversiData[index].daftar_konversi : '',
-                                                            item.nama,
-                                                            konversiData[index].daftar_konversi ? "Daftar Hasil Konversi Lengkap" : 'Silahkan upload terlebih dahulu'
-                                                        );
-                                                        setDataMahasiswa(konversiData[index]);
-                                                        setIsUploadModalOpen(true);
-                                                    }
-                                                    }>
-                                                        <Eye className='cursor-pointer' />
-                                                    </ActionButton>
-                                                }
-                                            </div>
                                             <div>
                                                 <Link to={`konversi-detail/${btoa(JSON.stringify({ id_mahasiswa: item.id_mahasiswa, nama: item.nama }))}`}>
                                                     Detail

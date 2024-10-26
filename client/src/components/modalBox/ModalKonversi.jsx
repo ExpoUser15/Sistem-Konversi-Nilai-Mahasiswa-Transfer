@@ -1,8 +1,8 @@
 import { CircleX, Plus, Trash2 } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react'
-import Form from '../forms/Form';
-import ActionButton from '../buttons/ActionButton';
-import Button from '../buttons/Button';
+import Form from '../Forms/Form';
+import ActionButton from '../Buttons/ActionButton';
+import Button from '../Buttons/Button';
 import { useDispatch, useSelector } from 'react-redux';
 import { addKonversi, clearData, deleteKonversi, updateKonversi } from '../../redux/slices/konversiSlice';
 import { postKonversiData } from '../../redux/thunks/apiThunks';

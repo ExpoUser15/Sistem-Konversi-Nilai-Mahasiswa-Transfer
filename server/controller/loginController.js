@@ -62,11 +62,6 @@ const postLoginController = async (req, res) => {
             
                 res.cookie("token", token);
 
-                createLog(logSchema, { 
-                    ket: `Berhasil melakukan login`,
-                    idUser: dataValues.id_pengguna
-                });
-
                 res.json({
                     status: "Success",
                     user: dataValues.user, 

@@ -9,7 +9,7 @@ const { validateUserKaprodi, validateUserAkademik } = require('../middleware/val
 const { notFound } = require('../controller/notFound');
 const {berkasUpload, docUpload} = require('../middleware/fileHandler');
 const fileController = require('../controller/fileResponse/filleController');
-const { konversiController, addKonversiController, updateKonversiController, deleteKonversiController, deletePreviewController, detailKonversiController, konversiReportController } = require('../controller/kaprodi/konversiController');
+const { konversiController, addKonversiController, updateKonversiController, deleteKonversiController, deletePreviewController, detailKonversiController, konversiReportController, penempatanController, penempatanMKController, semesterPostController, editDetailController } = require('../controller/kaprodi/konversiController');
 const logoutController = require('../controller/logoutController');
 const handleDuplicateData = require('../middleware/handleDuplicateData');
 const { laporanController, laporanPostController, searchLaporan, transkripPostController } = require('../controller/akademik/laporanController');
@@ -25,21 +25,24 @@ router.get('/log', handlingCookie, validateUserKaprodi, logController);
 router.get('/matakuliah', handlingCookie, validateUserKaprodi, mataKuliahController);
 router.get('/konversi', handlingCookie, validateUserKaprodi, konversiController);
 router.get('/konversi/:id', handlingCookie, validateUserKaprodi, konversiReportController);
+router.get('/konversi/penempatan/:id', handlingCookie, validateUserKaprodi, penempatanMKController);
+router.get('/konversi/semester/:id', handlingCookie, validateUserKaprodi, penempatanController);
 router.get('/konversi/detail/:id', handlingCookie, validateUserKaprodi, detailKonversiController);
 
 router.post('/auth', postLoginController);
 router.post('/users/add', handlingCookie, addUsersController);
+router.post('/konversi/semester/add/:id', semesterPostController);
 router.post('/matakuliah/add', addMataKuliahController);
 router.post('/konversi/add/:id', handleDuplicateData, addKonversiController);
 
 router.delete('/users/delete/:id', deleteController);
 router.delete('/matakuliah/delete/:id', deleteMataKuliahController);
 router.delete('/konversi/delete/:id/:idkonversi', deleteKonversiController);
-router.delete('/konversi/preview/delete/:id', deletePreviewController);
+router.delete('/konversi/detail/delete/:id', deletePreviewController);
 
 router.put('/users/update/:id', updateController);
 router.put('/matakuliah/update/:id', updateMataKuliahController);
-router.put('/konversi/update/:id/:idkonversi', updateKonversiController);
+router.put('/konversi/detail/:id', updateKonversiController);
 
 // akademik router
 router.get('/mahasiswa/:type/:page', handlingCookie, mahasiswaController);

@@ -1,13 +1,13 @@
 import { Eye } from "lucide-react";
-import ActionButton from "../../components/buttons/ActionButton";
-import Loading from "../../components/loader/Loading";
-import SearchField from "../../components/inputs/SearchingInput";
+import ActionButton from "../../components/Buttons/ActionButton";
+import Loading from "../../components/Loader/Loading";
+import SearchField from "../../components/Inputs/SearchingInput";
 import { useDispatch, useSelector } from "react-redux";
-import Tables from "../../components/tables/Tables";
+import Tables from "../../components/Tables/Tables";
 import { fetchData } from "../../redux/thunks/apiThunks";
 import { useEffect, useState } from "react";
-import Modal from "../../components/modalBox/Modal";
-import Input from "../../components/inputs/Input";
+import Modal from "../../components/ModalBox/Modal";
+import Input from "../../components/Inputs/Input";
 import useAuth from "../../hooks/useAuth";
 import Greeting from "../../utils/Greeting";
 
@@ -60,13 +60,13 @@ function DashboardAkademik() {
             <h4 className="font-medium">Pengajuan Konversi Terbaru</h4>
             <SearchField placeholder={"Cari..."} />
           </div>
-          <Tables fields={["Nama", "Tanggal", "Berkas", "Transkrip", "Surat Pindah", "Detail", "Dokumen"]} gap={"2"} className={'w-full'}>
+          <Tables fields={["Nama", "Tanggal", "Berkas", "Transkrip", "Surat Pindah", "Detail", "Dokumen", "Status"]} gap={"2"} className={'w-full'}>
             {
               !loading ?
                 students
                   .map((item, index) => (
                     <div
-                      className={`grid grid-cols-7 mb-7 text-sm-3 gap-1 pb-2`}
+                      className={`grid grid-cols-8 mb-7 text-sm-3 gap-1 pb-2`}
                       style={{ borderBottom: "1px solid #CCCCCC" }}
                       key={index}
                     >
@@ -109,8 +109,8 @@ function DashboardAkademik() {
                         className="cursor-pointer w-36 rounded-md"
                       >
                         {
-                          item.dokumen ? (
-                            <a target='_blank' href={item.dokumen} className='text-black dark:text-slate-200 flex'>
+                          item.report ? (
+                            <a target='_blank' href={item.report} className='text-black dark:text-slate-200 flex'>
                               <ActionButton text={"Lihat Dokumen"}>
                                 <Eye className='cursor-pointer' />
                               </ActionButton>
@@ -122,6 +122,7 @@ function DashboardAkademik() {
                           )
                         }
                       </div>
+                      <div className={`w-fit rounded-md ${item.status === 'Converted' ? 'text-green-600' : 'text-yellow-600'}`}>{item.status}</div>
                     </div>
                   )
                   ) :

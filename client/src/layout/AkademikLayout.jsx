@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
-import Sidebar, { SidebarItem } from '../components/navigation/Sidebar';
-import ModeButtons from '../components/buttons/ModeButtons';
+import Sidebar, { SidebarItem } from '../components/Navigation/Sidebar';
+import ModeButtons from '../components/Buttons/ModeButtons';
 import { House, File } from "lucide-react";
 import { ModeProvider } from '../context/ModeContext';
 

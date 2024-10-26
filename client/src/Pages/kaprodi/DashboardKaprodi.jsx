@@ -1,14 +1,13 @@
-import ConversionChart from "../../components/Charts/ConversionChart";
-import Card from "../../components/cards/CardAnalytics";
-import { ChartNoAxesColumnIncreasing, Table, Eye } from "lucide-react";
-import Tables from "../../components/tables/Tables";
+import Card from "../../components/Cards/CardAnalytics";
+import { Eye } from "lucide-react";
+import Tables from "../../components/Tables/Tables";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchData } from "../../redux/thunks/apiThunks";
-import ActionButton from "../../components/buttons/ActionButton";
-import Modal from "../../components/modalBox/Modal";
-import Input from "../../components/inputs/Input";
-import Loading from "../../components/loader/Loading";
+import ActionButton from "../../components/Buttons/ActionButton";
+import Modal from "../../components/ModalBox/Modal";
+import Input from "../../components/Inputs/Input";
+import Loading from "../../components/Loader/Loading";
 import useAuth from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import Greeting from "../../utils/Greeting";
@@ -27,12 +26,6 @@ const DashboardKaprodi = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalDetail, setIsModalDetail] = useState(false);
-
-  // useEffect(() => {
-  //   if(!token){
-  //     navigate('/login');
-  //   }
-  // }, []);
 
   useEffect(() => {
     dispatch(fetchData({ endpoint: 'mahasiswa/recent/dashboard-kaprodi' }));
@@ -68,7 +61,7 @@ const DashboardKaprodi = () => {
         <div>
           <div className="grid grid-cols-3 gap-8">
             <Card text={'Total Mata Kuliah'} drop={false} data={'30'}/>
-            <Card text={'Total Download'} drop={true} data={'45'}/>
+            <Card text={'Total Pengajuan Konversi'} drop={true} data={'45'}/>
             <Card text={'Average Nilai Konversi'} drop={false} data={'12'}/>
           </div>
         </div>

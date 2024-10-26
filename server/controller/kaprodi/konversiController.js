@@ -1,9 +1,7 @@
 const { Op, QueryTypes } = require("sequelize");
 const generateId = require("../../functions/generateId");
-const { createLog } = require("../../functions/logActivity");
 const recap = require("../../functions/recap");
 const konversiSchema = require("../../model/konversiSchema");
-const logActivitySchema = require("../../model/logActivitySchema");
 const recapSchema = require("../../model/recapSchema");
 const Queries = require("../../queries/queries");
 const { getCurrentFormattedDate } = require("../../utils/time");
@@ -12,12 +10,13 @@ const mahasiswaSchema = require("../../model/mahasiswaSchema");
 const sequelize = require("../../config/db");
 const document = require("../../utils/generateDoc");
 const laporanSchema = require("../../model/laporanSchema");
+const semesterSchema = require("../../model/semesterSchema");
 
 const konveriQueries = new Queries(konversiSchema);
 const recapQueries = new Queries(recapSchema);
-const logSchema = new Queries(logActivitySchema);
 const documentQueries = new Queries(laporanSchema);
 const mahasiswaQueries = new Queries(mahasiswaSchema);
+const semesterQueries = new Queries(semesterSchema);
 
 const konversiController = async (req, res) => {
     try {
@@ -55,12 +54,132 @@ const konversiReportController = async (req, res) => {
     }
 }
 
+const penempatanMKController = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const data = await sequelize.query(`
+            SELECT tb_courses.* 
+            FROM tb_courses 
+            LEFT JOIN tb_conversions 
+            ON tb_courses.id_mk = tb_conversions.id_mk 
+            AND tb_conversions.id_mahasiswa = :id 
+            WHERE tb_conversions.id_mk IS NULL
+        `, {
+            type: QueryTypes.SELECT,
+            replacements: { id }
+        });
+
+        res.json({
+            data: data
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            message: "Server Error"
+        });
+    }
+}
+
+const penempatanController = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const data = await sequelize.query(`
+            SELECT tb_semesters.semester, tb_courses.mata_kuliah, tb_courses.sks
+            FROM tb_semesters 
+            JOIN tb_courses 
+            ON tb_courses.id_mk = tb_semesters.id_mk 
+            WHERE id_mahasiswa = :id
+        `, {
+            type: QueryTypes.SELECT,
+            replacements: { id }
+        });
+
+        res.json({
+            data: data
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            message: "Server Error"
+        });
+    }
+}
+
+const semesterPostController = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { mata_kuliah, semester } = req.body;
+
+        let data = await sequelize.query(`
+            SELECT tb_semesters.semester, tb_courses.mata_kuliah, tb_semesters.id_semester, tb_courses.sks
+            FROM tb_semesters 
+            JOIN tb_courses 
+            ON tb_courses.id_mk = tb_semesters.id_mk 
+            WHERE id_mahasiswa = :id
+        `, {
+            type: QueryTypes.SELECT,
+            replacements: { id }
+        });
+
+        if (!mata_kuliah || !semester) {
+            return res.json({
+                status: "Warning",
+                message: "Silahkan mengisi data terlebih dahulu",
+                data
+            });
+        }
+        const { totalSKSAsal, totalSKSTujuan } = await recap(id);
+
+        const pdf = process.env.FILE_URL + "report/" + await generatePDF(id, totalSKSAsal, totalSKSTujuan);
+
+        let idUser;
+
+        let userId = await semesterQueries.findAll();
+        if (userId.length === 0) {
+            idUser = generateId(0, 'S');
+        } else {
+            userId = Number(userId[userId.length - 1].id_semester.substring(2));
+            idUser = generateId(userId, 'S');
+        }
+
+        await semesterQueries.create({
+            id_semester: idUser,
+            id_mk: mata_kuliah,
+            semester,
+            id_mahasiswa: id
+        });
+
+        data = await sequelize.query(`
+            SELECT tb_semesters.semester, tb_semesters.id_semester, tb_courses.mata_kuliah, tb_courses.sks
+            FROM tb_semesters 
+            JOIN tb_courses 
+            ON tb_courses.id_mk = tb_semesters.id_mk 
+            WHERE id_mahasiswa = :id
+        `, {
+            type: QueryTypes.SELECT,
+            replacements: { id }
+        });
+
+        res.json({
+            status: 'Success',
+            message: 'Berhasil Memasukan mata kuliah',
+            data: data
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            message: "Server Error"
+        });
+    }
+}
+
 const detailKonversiController = async (req, res) => {
     try {
         const { id } = req.params
 
         const data = await sequelize.query(`
             SELECT 
+                tb_conversions.id_konversi, 
                 tb_conversions.id_mahasiswa, 
                 tb_conversions.mk_asal, 
                 tb_conversions.sks_asal, 
@@ -76,8 +195,6 @@ const detailKonversiController = async (req, res) => {
             type: QueryTypes.SELECT,
             replacements: { id }
         });
-
-        console.log(data)
 
         res.json({
             data
@@ -211,7 +328,7 @@ const addKonversiController = async (req, res) => {
             tanggal
         });
 
-        const pdf = process.env.FILE_URL + "report/" + await generatePDF(id, totalSKSAsal, totalSKSTujuan);
+        const pdf = process.env.FILE_URL + "report/" + await document(id, totalSKSAsal, totalSKSTujuan);
 
         await recapQueries.update({
             report: pdf
@@ -268,18 +385,19 @@ const addKonversiController = async (req, res) => {
 
 const updateKonversiController = async (req, res) => {
     try {
-        const { mk_asal, sks_asal, nilai_asal, id_mk, sks_tujuan, nilai_tujuan } = req.body;
-        const { id, idkonversi } = req.params;
+        const { id_konversi, mk_asal, sks_asal, nilai_asal, id_mk, sks, nilai_tujuan } = req.body;
+        const { id } = req.params;
 
-        if (!mk_asal || !sks_asal || !nilai_asal || !id_mk || !sks_tujuan || !nilai_tujuan) {
-            return res.json({
-                status: "Error",
+        if (!mk_asal || !sks_asal || !nilai_asal || !id_mk || !sks || !nilai_tujuan) {
+            console.log(req.body)
+            return res.status(422).json({
+                status: "Warning",
                 message: "Silahkan mengisikan form terlebih dahulu!"
             });
         }
 
         const data = await konveriQueries.findAll();
-        const validasi = data.some(item => idkonversi === item.id_konversi && id === item.id_mahasiswa);
+        const validasi = data.some(item => id_konversi === item.id_konversi);
 
         if (!validasi) {
             return res.json({
@@ -288,20 +406,15 @@ const updateKonversiController = async (req, res) => {
             });
         }
 
-        const mk = await sequelize.query('SELECT * FROM tb_courses WHERE mata_kuliah = :id', {
-            type: QueryTypes.SELECT,
-            replacements: { id }
-        });
-
         await konveriQueries.update({
             mk_asal,
             sks_asal,
             nilai_asal,
-            id_mk: mk[0].id_mk,
-            sks_tujuan,
+            id_mk,
+            sks_tujuan: sks,
             nilai_tujuan,
         }, {
-            id_konversi: idkonversi
+            id_konversi
         });
 
         const { remainingMK, totalSKS, totalMK } = await recap(id);
@@ -314,7 +427,6 @@ const updateKonversiController = async (req, res) => {
             sisa_mk: remainingMK,
             total_hasil_konversi: totalMK,
             total_sks: totalSKS,
-            semester: !semester ? recapData.semester : semester,
             report: process.env.FILE_URL + "report/" + await generatePDF(id),
             id_mahasiswa: id,
             tanggal
@@ -322,7 +434,29 @@ const updateKonversiController = async (req, res) => {
             id_mahasiswa: id
         });
 
+        const data2 = await sequelize.query(`
+            SELECT 
+                tb_conversions.id_konversi, 
+                tb_conversions.id_mahasiswa, 
+                tb_conversions.mk_asal, 
+                tb_conversions.sks_asal, 
+                tb_conversions.nilai_asal, 
+                tb_courses.mata_kuliah, 
+                tb_courses.sks, 
+                tb_conversions.nilai_tujuan, 
+                tb_courses.id_mk 
+            FROM tb_conversions 
+            JOIN tb_courses ON tb_courses.id_mk = tb_conversions.id_mk 
+            WHERE id_mahasiswa = :id 
+            ORDER BY semester ASC`, {
+            type: QueryTypes.SELECT,
+            replacements: { id }
+        });
+
+        console.log(data2)
+
         res.json({
+            data: data2,
             status: "Success",
             message: "Berhasil mengubah hasil konversi"
         });
@@ -389,11 +523,6 @@ const deletePreviewController = async (req, res) => {
         const { id } = req.params;
 
         if (!id) {
-            await createLog(logSchema, {
-                ket: "Gagal menghapus konversi",
-                idUser: dataId
-            });
-
             return res.json({
                 status: "Error",
                 message: "Terjadi kesalahan!"
@@ -426,6 +555,27 @@ const deletePreviewController = async (req, res) => {
     }
 }
 
+const editDetailController = async (req, res) => {
+    try {
+        // const { id } = req.params;
+        // const { mk_asal, sks_asal, nilai_asal, sks, nilai_tujuan, id_mk } = req.body;
+
+        // console.log(req.body);
+
+        // konveriQueries.update();
+
+        // res.json({
+        //     status: "success",
+        //     message: "Berhasil mengubah konversi"
+        // });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            message: "Server Error"
+        });
+    }
+}
+
 module.exports = {
     konversiController,
     addKonversiController,
@@ -433,5 +583,9 @@ module.exports = {
     deleteKonversiController,
     deletePreviewController,
     detailKonversiController,
-    konversiReportController
+    konversiReportController,
+    penempatanController,
+    penempatanMKController,
+    semesterPostController,
+    editDetailController,
 }

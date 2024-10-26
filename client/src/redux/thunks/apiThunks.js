@@ -115,11 +115,29 @@ export const postKonversiData = createAsyncThunk(
 );
 
 export const deleteKonversiData = createAsyncThunk(
-  'apiData/deleteKonversiData',
+  'konversi/deleteKonversiData',
   async ({ endpoint }, { rejectWithValue }) => {
     try {
       const url = `http://localhost:3000/${endpoint}`;
       const response = await axios.delete(url);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response ? error.response.data : error.message);
+    }
+  }
+);
+export const updateKonversiData = createAsyncThunk(
+  'konversi/updateKonversiData',
+  async ({ endpoint, data, contentType }, { rejectWithValue }) => {
+    try {
+      axios.defaults.withCredentials = true;
+      const url = `http://localhost:3000/${endpoint}`;
+      const response = await axios.put(url, data, {
+        headers: {
+          'Content-Type': !contentType ? 'application/json' : contentType,
+        },
+      });
+      console.log(contentType);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response ? error.response.data : error.message);

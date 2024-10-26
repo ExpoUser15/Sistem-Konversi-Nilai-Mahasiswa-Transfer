@@ -4,7 +4,7 @@ const validateUserKaprodi = (req, res, next) => {
             return res.json({
                 auth: req.data,
             });
-        } else if (req.data.data.user !== 'Kaprodi') {
+        } else if (req.data.data?.user !== 'Kaprodi') {
             return res.json({
                 auth: {
                     status: 'Error',

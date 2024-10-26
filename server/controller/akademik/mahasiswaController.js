@@ -293,7 +293,6 @@ const updateBerkasController = async (req, res) => {
         let mahasiswaData = await sequelize.query("SELECT * FROM tb_students JOIN tb_files ON tb_files.id_mahasiswa = tb_students.id_mahasiswa ORDER BY tanggal ASC");
 
         if (!ktp && !kk && !ijazah && !surat_pindah && !transkrip) {
-
             return res.status(422).json({
                 status: "Warning",
                 message: "Silahkan masukan gambar terlebih dahulu!",
@@ -340,6 +339,8 @@ const updateBerkasController = async (req, res) => {
         });
 
         mahasiswaData = await sequelize.query("SELECT * FROM tb_students JOIN tb_files ON tb_files.id_mahasiswa = tb_students.id_mahasiswa ORDER BY tanggal ASC");
+
+        console.log(mahasiswaData);
 
         return res.json({
             status: "Success",

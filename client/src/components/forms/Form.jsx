@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import Input from '../inputs/Input';
+import Input from '../Inputs/Input';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { insertMK } from '../../redux/slices/konversiSlice';

@@ -1,15 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react'
-import Tables from '../../components/tables/Tables';
+import Tables from '../../components/Tables/Tables';
 import { ArrowDownToLine, Eye, Trash2 } from 'lucide-react';
-import ActionButton from '../../components/buttons/ActionButton';
-import Button from '../../components/buttons/Button';
-import Modal from '../../components/modalBox/Modal';
+import ActionButton from '../../components/Buttons/ActionButton';
+import Button from '../../components/Buttons/Button';
+import Modal from '../../components/ModalBox/Modal';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchData, patchData } from '../../redux/thunks/apiThunks';
-import Loading from '../../components/loader/Loading';
-import Notification from '../../components/notifications/Notification';
-import SearchField from '../../components/inputs/SearchingInput';
-import Input from '../../components/inputs/Input';
+import Loading from '../../components/Loader/Loading';
+import Notification from '../../components/Notifications/Notification';
+import SearchField from '../../components/Inputs/SearchingInput';
+import Input from '../../components/Inputs/Input';
 import useDownload from '../../hooks/useDownload';
 
 function Laporan() {
@@ -88,13 +88,13 @@ function Laporan() {
                     <h4 className="font-medium">Daftar Laporan</h4>
                     <SearchField placeholder={"Cari..."} searchType={'laporan'} />
                 </div>
-                <Tables fields={["Nama", "Tanggal", "Berkas", "Transkrip", "Surat Pindah", "Detail", "Dokumen", "Formulir Lengkap", ""]} gap={"1"}>
+                <Tables fields={["Nama", "Tanggal", "Berkas", "Transkrip", "Surat Pindah", "Detail", "Dokumen", ""]} gap={"1"}>
                     {
                         !loading ?
                             laporan
                                 .map((item, index) => (
                                     <div
-                                        className={`grid grid-cols-9 mb-9 text-sm-3 pb-2`}
+                                        className={`grid grid-cols-8 mb-9 text-sm-3 pb-2`}
                                         style={{ borderBottom: "1px solid #CCCCCC" }}
                                         key={item.id_dokumen}
                                     >
@@ -140,29 +140,9 @@ function Laporan() {
                                                 </ActionButton>
                                             </a>
                                         </div>
-                                        <div
-                                            className="cursor-pointer w-36 rounded-md"
-                                        >
-                                            {
-                                                item.formulir ? (
-                                                    <ActionButton text={"Lihat Formulir"} onClick={() => { openModal(item.formulir, item.nama, "Formulir Seleksi Calon Mahasiswa"); setDataMahasiswa(laporan[index]); }}>
-                                                        <Eye className='cursor-pointer' />
-                                                    </ActionButton>
-                                                ) : (
-                                                    <Input className={'w-fit bg-white ps-0 pt-0 text-white'} onChange={(e) => {
-                                                        const file = e.target.files[0];
-
-                                                        const formData = new FormData();
-                                                        formData.append('form', file);
-
-                                                        dispatch(patchData({ endpoint: `mahasiswa/laporan/update/${item.id_dokumen}`, data: formData, contentType: 'multipart/form-data' }));
-                                                    }}></Input>
-                                                )
-                                            }
-                                        </div>
                                         <div>
                                             <ActionButton text={"Download Dokumen"}>
-                                                <ArrowDownToLine className='cursor-pointer' onClick={() => handleDownload(item.dokumen)} />
+                                                <ArrowDownToLine className='cursor-pointer' onClick={() => handleDownload(item.report)} />
                                             </ActionButton>
                                         </div>
                                     </div>

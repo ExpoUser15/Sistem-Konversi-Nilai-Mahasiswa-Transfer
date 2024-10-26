@@ -1,16 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react'
-import Tables from '../../components/tables/Tables';
+import Tables from '../../components/Tables/Tables';
 import { Edit, Eye, Trash2 } from 'lucide-react';
-import ActionButton from '../../components/buttons/ActionButton';
-import Button from '../../components/buttons/Button';
-import Modal from '../../components/modalBox/Modal';
-import Input from '../../components/inputs/Input';
+import ActionButton from '../../components/Buttons/ActionButton';
+import Button from '../../components/Buttons/Button';
+import Modal from '../../components/ModalBox/Modal';
+import Input from '../../components/Inputs/Input';
 import { useSelectedProperties } from '../../hooks/useGetSelectedProperty';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteData, fetchData, patchData, postData, updateData } from '../../redux/thunks/apiThunks';
-import Loading from '../../components/loader/Loading';
-import Notification from '../../components/notifications/Notification';
-import SearchField from '../../components/inputs/SearchingInput';
+import Loading from '../../components/Loader/Loading';
+import Notification from '../../components/Notifications/Notification';
+import SearchField from '../../components/Inputs/SearchingInput';
 
 function Mahasiswa() {
     const dispatch = useDispatch();
@@ -132,9 +132,11 @@ function Mahasiswa() {
         }
 
         if (actionType === 'patch') {
+            console.log(spesifikBerkas);
             const formData = new FormData();
             const key = Object.keys(spesifikBerkas)[0];
             formData.append(key, spesifikBerkas[key]);
+            console.log(dataMahasiswa);
             dispatch(patchData({ endpoint: `mahasiswa/update/${dataMahasiswa.id_mahasiswa}/berkas/${dataMahasiswa.id_berkas}`, data: spesifikBerkas, contentType: 'multipart/form-data' }));
             setIsModalOpen(false);
             setSpesifikBerkas({});
@@ -167,13 +169,13 @@ function Mahasiswa() {
                                     <div
                                         className={`grid grid-cols-8 mb-7 text-sm-3 gap-5 pb-2`}
                                         style={{ borderBottom: "1px solid #CCCCCC" }}
-                                        key={index}
+                                        key={item.id_mahasiswa}
                                     >
                                         <div className='overflow-auto'>{item.nama}</div>
                                         <div>{item.tanggal}</div>
                                         <div
                                             className="cursor-pointer"
-                                            onClick={() => { openModal([item.ktp, item.kk, item.ijazah], item.nama, ["KTP", "KK", "Ijazah"]); setDataMahasiswa(students[index]); }}
+                                            onClick={() => { openModal([item.ktp, item.kk, item.ijazah], item.nama, ["KTP", "KK", "Ijazah"]); setDataMahasiswa(item); }}
                                         >
 
                                             <ActionButton text={"Lihat Berkas"}>
@@ -182,7 +184,7 @@ function Mahasiswa() {
                                         </div>
                                         <div
                                             className="cursor-pointer"
-                                            onClick={() => { openModal(item.transkrip_nilai, item.nama, "Transkrip Nilai"); setDataMahasiswa(students[index]); }}
+                                            onClick={() => { openModal(item.transkrip_nilai, item.nama, "Transkrip Nilai"); setDataMahasiswa(item); }}
                                         >
                                             <ActionButton text={"Lihat Transkrip"}>
                                                 <Eye className='cursor-pointer' />
@@ -190,7 +192,7 @@ function Mahasiswa() {
                                         </div>
                                         <div
                                             className="cursor-pointer"
-                                            onClick={() => { openModal(item.surat_pindah, item.nama, "Surat Pindah"); setDataMahasiswa(students[index]); }}
+                                            onClick={() => { openModal(item.surat_pindah, item.nama, "Surat Pindah"); setDataMahasiswa(item); }}
                                         >
                                             <ActionButton text={"Lihat Surat Pindah"}>
                                                 <Eye className='cursor-pointer' />
@@ -252,13 +254,13 @@ function Mahasiswa() {
                                     <div
                                         className={`grid grid-cols-8 mb-7 text-sm-3 gap-5 pb-2`}
                                         style={{ borderBottom: "1px solid #CCCCCC" }}
-                                        key={index}
+                                        key={item.id_mahasiswa}
                                     >
                                         <div className='overflow-auto'>{item.nama}</div>
                                         <div>{item.tanggal}</div>
                                         <div
                                             className="cursor-pointer"
-                                            onClick={() => openModal([item.ktp, item.kk, item.ijazah], item.nama, ["KTP", "KK", "Ijazah"])}
+                                            onClick={() => {openModal([item.ktp, item.kk, item.ijazah], item.nama, ["KTP", "KK", "Ijazah"]); setDataMahasiswa(item);}}
                                         >
 
                                             <ActionButton text={"Lihat Berkas"}>
@@ -267,7 +269,7 @@ function Mahasiswa() {
                                         </div>
                                         <div
                                             className="cursor-pointer"
-                                            onClick={() => openModal(item.transkrip, item.nama, "Transkrip Nilai")}
+                                            onClick={() => {openModal(item.transkrip_nilai, item.nama, "Transkrip Nilai"); setDataMahasiswa(item);}}
                                         >
                                             <ActionButton text={"Lihat Transkrip"}>
                                                 <Eye className='cursor-pointer' />
@@ -275,7 +277,7 @@ function Mahasiswa() {
                                         </div>
                                         <div
                                             className="cursor-pointer"
-                                            onClick={() => openModal(item.surat_pindah, item.nama, "Surat Pindah")}
+                                            onClick={() => {openModal(item.surat_pindah, item.nama, "Surat Pindah"); setDataMahasiswa(item);}}
                                         >
                                             <ActionButton text={"Lihat Surat Pindah"}>
                                                 <Eye className='cursor-pointer' />
@@ -283,7 +285,7 @@ function Mahasiswa() {
                                         </div>
                                         <div
                                             className="cursor-pointer"
-                                            onClick={() => openModal('detail', students[index])}
+                                            onClick={() => openModal('detail', item)}
                                         >
                                             <ActionButton text={"Lihat Detail"}>
                                                 <Eye className='cursor-pointer' />
@@ -297,10 +299,10 @@ function Mahasiswa() {
                                         <div
                                             className='flex'
                                         >
-                                            <ActionButton text={"Edit"} onClick={() => openModal('edit', students[index])}>
+                                            <ActionButton text={"Edit"} onClick={() => openModal('edit', item)}>
                                                 <Edit className='cursor-pointer' />
                                             </ActionButton>
-                                            <ActionButton text={"Hapus"} onClick={() => openModal('hapus', students[index])}>
+                                            <ActionButton text={"Hapus"} onClick={() => openModal('hapus', item)}>
                                                 <Trash2 className='cursor-pointer' />
                                             </ActionButton>
                                         </div>
@@ -358,11 +360,14 @@ function Mahasiswa() {
                     <Input label={"Fakultas"} width={"full"} type={'text'} inputName={"fakultas"} onChange={(e) => { handleInputValue(e, 'fakultas', 'tambah') }} />
                     <Input label={"Prodi"} width={"full"} type={'text'} inputName={"prodi"} onChange={(e) => { handleInputValue(e, 'prodi', 'tambah') }} />
                     <Input label={"Prodi Tujuan"} width={"full"} type={'text'} inputName={"prodi_tujuan"} onChange={(e) => { handleInputValue(e, 'prodi_tujuan') }} />
-                    <Input type={"file"} label={'KK'} inputName={'kk'} onChange={(e) => { handleInputValue(e, 'kk', 'tambah', true) }} />
-                    <Input type={"file"} label={'KTP'} inputName={'ktp'} onChange={(e) => { handleInputValue(e, 'ktp', 'tambah', true) }} />
-                    <Input type={"file"} label={'Ijazah'} inputName={'ijazah'} onChange={(e) => { handleInputValue(e, 'ijazah', 'tambah', true) }} />
-                    <Input type={"file"} label={'Surat Pindah'} inputName={'sp'} onChange={(e) => { handleInputValue(e, 'surat_pindah', 'tambah', true) }} />
+                    <Input type={"file"} label={'KK'} inputName={'kk'} onChange={(e) => { handleInputValue(e, 'kk', 'tambah', true) }} extensi={'.png, .jpg, .jpeg'}/>
+                    <Input type={"file"} label={'KTP'} inputName={'ktp'} onChange={(e) => { handleInputValue(e, 'ktp', 'tambah', true) }} extensi={'.png, .jpg, .jpeg'}/>
+                    <Input type={"file"} label={'Ijazah'} inputName={'ijazah'} onChange={(e) => { handleInputValue(e, 'ijazah', 'tambah', true) }} extensi={'.png, .jpg, .jpeg'}/>
+                    <Input type={"file"} label={'Surat Pindah'} inputName={'sp'} onChange={(e) => { handleInputValue(e, 'surat_pindah', 'tambah', true) }} extensi={'.png, .jpg, .jpeg'}/>
                     <Input type={"file"} label={'Transkrip Nilai'} inputName={'transkrip'} onChange={(e) => { handleInputValue(e, 'transkrip', 'tambah', true) }} />
+                    <div className='col-span-2 rounded-md'>
+                        <p className='italic text-sm-3 text-white' style={{fontSize: "12px"}}>Catatan: Berkas yang dimasukan harus berupa .PNG, .JPG, atau .JPEG.</p>
+                    </div>
                 </Modal.ModalCustom>
             </Modal>
             <Modal open={isDeleteModal}>

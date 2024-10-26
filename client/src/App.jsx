@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './Pages/login/Login';
 import DashboardAkademik from "./Pages/akademik/DashboardAkademik";
 import DashboardKaprodi from "./Pages/kaprodi/DashboardKaprodi";
 import PrivateRoutes from './utils/PrivateRoutes';
 import Konversi from './Pages/kaprodi/Konversi';
-import LogAktivitas from './Pages/kaprodi/LogAktivitas';
 import Pengguna from './Pages/kaprodi/Pengguna';
 import MataKuliah from './Pages/kaprodi/MataKuliah';
 import Mahasiswa from './Pages/kaprodi/Mahasiswa';
@@ -16,18 +15,18 @@ import Laporan from './Pages/akademik/Laporan';
 import KonversiDetail from './Pages/kaprodi/KonversiDetail';
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
     <>
       <BrowserRouter>
         <Routes>
           {/* Route untuk Akademik */}
+          <Route path='/' element={<Navigate to="/login" replace />} />
           <Route element={<PrivateRoutes allowedRole="Akademik" />}>
             <Route element={<AkademikLayout />}>
               <Route path="/akademik" element={<DashboardAkademik />} />
               <Route path="/akademik/laporan" element={<Laporan />} />
-              <Route path="/konversi-detail/:id" element={<KonversiDetail />} />
+              <Route path="/akademik/konversi-detail/:id" element={<KonversiDetail />} />
             </Route>
           </Route>
 

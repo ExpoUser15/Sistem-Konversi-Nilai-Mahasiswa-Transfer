@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchData, postData } from "../redux/thunks/loginApiThunks";
 import { useEffect, useRef, useState } from "react";
-import Notification from "./notifications/Notification";
+import Notification from "./Notifications/Notification";
 import useAuth from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 

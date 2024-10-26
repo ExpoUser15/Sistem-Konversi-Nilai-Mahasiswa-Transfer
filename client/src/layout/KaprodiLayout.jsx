@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
-import Sidebar, { SidebarItem } from '../components/navigation/Sidebar';
-import ModeButtons from '../components/buttons/ModeButtons';
+import Sidebar, { SidebarItem } from '../components/Navigation/Sidebar';
+import ModeButtons from '../components/Buttons/ModeButtons';
 import { House, Repeat, User, Logs, Users } from "lucide-react";
 import { ModeProvider } from '../context/ModeContext';
 import { useSelector } from 'react-redux';

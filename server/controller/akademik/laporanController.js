@@ -10,7 +10,9 @@ const dokumenQueries = new Queries(laporanSchema);
 
 const laporanController = async (req, res) => {
     try {
-        const mhs = await sequelize.query("SELECT * FROM tb_documents JOIN tb_students ON tb_students.id_mahasiswa = tb_documents.id_mahasiswa JOIN tb_files ON tb_files.id_mahasiswa = tb_students.id_mahasiswa");
+        const mhs = await sequelize.query("SELECT * FROM tb_documents JOIN tb_students ON tb_students.id_mahasiswa = tb_documents.id_mahasiswa JOIN tb_files ON tb_files.id_mahasiswa = tb_students.id_mahasiswa JOIN tb_recapitulations ON tb_recapitulations.id_mahasiswa = tb_students.id_mahasiswa");
+
+        console.log(mhs);
 
         return res.json({
             data: mhs[0]
@@ -73,8 +75,6 @@ const transkripPostController = async (req, res) => {
         const { form } = req.files;
 
         let mhs = await sequelize.query("SELECT * FROM tb_documents JOIN tb_students ON tb_students.id_mahasiswa = tb_documents.id_mahasiswa JOIN tb_files ON tb_files.id_mahasiswa = tb_students.id_mahasiswa");
-
-        console.log(mhs)
 
         if (!form) {
             return res.json({

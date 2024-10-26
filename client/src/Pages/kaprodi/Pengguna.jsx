@@ -1,15 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react'
-import Tables from '../../components/tables/Tables'
-import ActionButton from '../../components/buttons/ActionButton';
+import Tables from '../../components/Tables/Tables'
+import ActionButton from '../../components/Buttons/ActionButton';
 import { Edit, Plus, Trash2 } from 'lucide-react';
-import SearchingInput from '../../components/inputs/SearchingInput';
-import Button from '../../components/buttons/Button';
+import SearchingInput from '../../components/Inputs/SearchingInput';
+import Button from '../../components/Buttons/Button';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteData, fetchData, postData, updateData } from '../../redux/thunks/apiThunks';
-import Loading from '../../components/loader/Loading';
-import Modal from '../../components/modalBox/Modal';
-import Input from '../../components/inputs/Input';
-import Notification from '../../components/notifications/Notification';
+import Loading from '../../components/Loader/Loading';
+import Modal from '../../components/ModalBox/Modal';
+import Input from '../../components/Inputs/Input';
+import Notification from '../../components/Notifications/Notification';
 import { useSelectedProperties } from '../../hooks/useGetSelectedProperty';
 
 function Pengguna() {

@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { CircleX, ChevronLeft, ChevronRight } from "lucide-react";
 import "./backdrop.css";
-import Button from '../buttons/Button';
-import Input from '../inputs/Input';
+import Button from '../Buttons/Button';
+import Input from '../Inputs/Input';
 import useCompressedImage from '../../hooks/useCompressedImage';
 
 function Modal({ children, open, className }) {

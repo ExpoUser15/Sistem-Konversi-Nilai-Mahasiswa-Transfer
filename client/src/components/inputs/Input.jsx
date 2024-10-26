@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from 'react'
-import { useSelector } from 'react-redux'
 
-function Input({ label, value, read, width, onChange, emptyValue, inputName, type, className }) {
+function Input({ label, value, read, width, onChange, emptyValue, inputName, type, className, extensi }) {
 
     return (
         <div className='flex flex-col mt-2'>
@@ -9,28 +8,28 @@ function Input({ label, value, read, width, onChange, emptyValue, inputName, typ
                 type === 'text' ?
                     <TextInput label={label} value={value} width={width} read={read} onChange={onChange} emptyValue={emptyValue} inputName={inputName}/>
                     :
-                    <FileInput inputName={inputName} label={label} onChange={onChange} className={className}/>
+                    <FileInput inputName={inputName} label={label} onChange={onChange} className={className} accept={extensi}/>
             }
         </div>
     )
 }
 
-const SelectInput = ({ inputName, width, label, value=[], selected, onChange, data }) => {
+const SelectInput = ({ inputName, width, label, value=[], selected, onChange, data, reference }) => {
     return (
         <>
             {
                label ?  (<label htmlFor={inputName} className='dark:text-slate-200'>{label}</label>) : ''
             }
-            <select className={`${width} bg-gray-100 text-gray-900 border-0 rounded-md p-2 mb-4 focus:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150 dark:bg-[#2C2C2E] dark:text-slate-200`} onChange={onChange}>
+            <select ref={reference} className={`${width} bg-gray-100 text-gray-900 border-0 rounded-md p-2 mb-4 focus:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150 dark:bg-[#2C2C2E] dark:text-slate-200`} onChange={onChange}>
                 <option value="">{label ?  `Pilih ${label}` : ''}</option>
                 {
                     value
                         .map((item, index) => (
                             <option 
-                                value={typeof item === 'object' ? item.id_mk : item } 
-                                key={typeof item === 'object' ? item.id_mk : index} 
-                                selected={typeof item === 'object' ? data[1] === item.id_mk : selected === item}>
-                                    {typeof item === 'object' ? item.mata_kuliah : item }
+                                value={typeof item === 'object' && !Array.isArray(item) ? item.id_mk : item } 
+                                key={typeof item === 'object' && !Array.isArray(item) ? item.id_mk : item} 
+                                selected={typeof item === 'object' && !Array.isArray(item) ? data[1] === item.id_mk : selected === item}>
+                                    {typeof item === 'object' && !Array.isArray(item) ? item.mata_kuliah : item }
                             </option>
                         ))
                 }
@@ -39,7 +38,7 @@ const SelectInput = ({ inputName, width, label, value=[], selected, onChange, da
     )
 }
 
-const TextInput = ({ label, value, read, width, onChange, emptyValue, inputName }) => {
+const TextInput = ({ label, value, read, width, onChange, emptyValue, inputName, reference }) => {
     const inputRef = useRef();
 
     useEffect(() => {
@@ -56,17 +55,17 @@ const TextInput = ({ label, value, read, width, onChange, emptyValue, inputName 
                 readOnly={read}
                 defaultValue={value}
                 onChange={onChange}
-                ref={inputRef} 
+                ref={reference ? reference : inputRef} 
                 name={inputName}/>
         </>
     )
 }
 
-const FileInput = ({ label, inputName, onChange, className }) => {
+const FileInput = ({ label, inputName, onChange, className, accept }) => {
     return (
         <>
             <label htmlFor={inputName} className=' dark:text-slate-200'>{label}</label>
-            <input type="file" className={`${className} bg-gray-100 text-gray-900 dark:bg-[#2C2C2E] dark:text-slate-200 border-0 rounded-md p-2 mb-4 focus:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150`} placeholder="Resume" name={inputName} onChange={onChange}/>
+            <input type="file" className={`${className} bg-gray-100 text-gray-900 dark:bg-[#2C2C2E] dark:text-slate-200 border-0 rounded-md p-2 mb-4 focus:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150`} placeholder="Resume" name={inputName} onChange={onChange} accept={accept}/>
         </>
     )
 }

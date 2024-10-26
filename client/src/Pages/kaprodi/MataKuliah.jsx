@@ -1,16 +1,29 @@
 import React, { useEffect, useRef, useState } from 'react'
-import Tables from '../../components/tables/Tables'
-import ActionButton from '../../components/buttons/ActionButton';
+import Tables from '../../components/Tables/Tables'
+import ActionButton from '../../components/Buttons/ActionButton';
 import { Edit, Plus, Trash2 } from 'lucide-react';
-import SearchingInput from '../../components/inputs/SearchingInput';
-import Button from '../../components/buttons/Button';
+import SearchingInput from '../../components/Inputs/SearchingInput';
+import Button from '../../components/Buttons/Button';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteData, fetchData, postData, updateData } from '../../redux/thunks/apiThunks';
-import Loading from '../../components/loader/Loading';
-import Modal from '../../components/modalBox/Modal';
-import Input from '../../components/inputs/Input';
-import Notification from '../../components/notifications/Notification';
+import Loading from '../../components/Loader/Loading';
+import Modal from '../../components/ModalBox/Modal';
+import Input from '../../components/Inputs/Input';
+import Notification from '../../components/Notifications/Notification';
 import { useSelectedProperties } from '../../hooks/useGetSelectedProperty';
+import RcPagination from 'rc-pagination';
+import 'rc-pagination/assets/index.css';
+
+const locale = {
+    prev_page: 'Previous',
+    next_page: 'Next',
+    jump_to: 'Go to',
+    jump_to_confirm: 'Confirm',
+    page: 'Page',
+    items_per_page: 'items/page',
+};
+
+const ITEMS_PER_PAGE = 10;
 
 function Pengguna() {
     const dispatch = useDispatch();
@@ -29,6 +42,16 @@ function Pengguna() {
     const [isModalTambah, setIsModalTambah] = useState(false);
     const [isModalEdit, setIsModalEdit] = useState(false);
     const [isDeleteModal, setIsDeleteModal] = useState(false);
+
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    const currentData = mk.slice(startIndex, endIndex);
+
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+    };
 
     const openModal = (item, data) => {
         if (item === 'tambah') {
@@ -66,7 +89,7 @@ function Pengguna() {
             });
             return;
         }
-        
+
         const addData = {
             ...value,
             [item]: inputvalue
@@ -115,19 +138,19 @@ function Pengguna() {
             <div className="mb-16 mt-16 bg-white px-8 py-3 rounded-md shadow dark:bg-black dark:shadow-neutral-700">
                 <div className="flex gap-2 items-center justify-between mb-5">
                     <h4 className="font-medium">Daftar Mata Kuliah</h4>
-                    <SearchingInput placeholder={"Cari..."} searchType={"matakuliah"}/>
+                    <SearchingInput placeholder={"Cari..."} searchType={"matakuliah"} setCurrentPage={setCurrentPage}/>
                 </div>
                 <Tables fields={["No", "Kode Mata Kuliah", "Mata Kuliah", "SKS", "Semester", ""]} gap={"1"}>
                     {
                         !loading ? (
-                            mk.length > 0 ? (
-                                mk.map((item, index) => (
+                            currentData.length > 0 ? (
+                                currentData.map((item, index) => (
                                     <div
                                         className="grid grid-cols-6 mb-8 text-sm-3 gap-1 pb-2"
                                         style={{ borderBottom: "1px solid #CCCCCC" }}
                                         key={item.id_mk}
                                     >
-                                        <div className="overflow-x-auto">{index + 1}</div>
+                                        <div className="overflow-x-auto">{startIndex + index + 1}</div>
                                         <div className="overflow-x-auto">{item.id_mk}</div>
                                         <div className="overflow-x-auto">{item.mata_kuliah}</div>
                                         <div className="overflow-auto">{item.sks}</div>
@@ -136,10 +159,10 @@ function Pengguna() {
                                             className='flex'
                                         >
                                             <ActionButton text={"Edit"}>
-                                                <Edit className='cursor-pointer' onClick={() => openModal('edit', mk[index])}/>
+                                                <Edit className='cursor-pointer' onClick={() => openModal('edit', item)} />
                                             </ActionButton>
                                             <ActionButton text={"Hapus"}>
-                                                <Trash2 className='cursor-pointer' onClick={() => { openModal('hapus', mk[index]) }}/>
+                                                <Trash2 className='cursor-pointer' onClick={() => { openModal('hapus', item) }} />
                                             </ActionButton>
                                         </div>
                                     </div>
@@ -158,11 +181,21 @@ function Pengguna() {
                         )
                     }
                 </Tables>
+                <RcPagination
+                    current={currentPage}
+                    total={mk.length}
+                    pageSize={ITEMS_PER_PAGE}
+                    onChange={handlePageChange}
+                    showQuickJumper
+                    locale={locale}
+                    showLessItems={true}
+                    hideOnSinglePage={true}
+                />
                 <Button text={"Tambah"} onClick={() => { openModal('tambah') }} className={"mt-2 ms-auto"}>
                     <Plus size={20} />
                 </Button>
             </div>
-            
+
             <Modal className={"w-fit"} open={isModalTambah}>
                 <Modal.ModalCustom onClose={() => { closeModal('tambah') }} title={"Tambah Mata Kuliah"} formClass={'grid grid-cols-2 gap-x-6'} action={true} onClick={(e) => { handleAction(e, 'tambah'); }}>
                     <Input.TextInput label={"Kode Mata Kuliah"} width={"full"} type={'text'} onChange={(e) => { handleInputValue(e, 'id_mk', 'tambah') }} />
@@ -175,7 +208,7 @@ function Pengguna() {
                 <Modal.ModalCustom onClose={() => { closeModal('edit') }} title={"Edit Mata Kuliah"} formClass={'grid grid-cols-2 gap-x-6'} action={true} onClick={(e) => { handleAction(e, 'edit'); }}>
                     <Input.TextInput label={"Kode Mata Kuliah"} width={"full"} value={dataMk.id_mk} type={'text'} onChange={(e) => { handleInputValue(e, 'id_mk', 'edit') }} />
                     <Input.TextInput label={"Mata Kuliah"} width={"full"} type={'text'} value={dataMk.mata_kuliah} onChange={(e) => { handleInputValue(e, 'mata_kuliah', 'edit') }} />
-                    <Input.SelectInput label={"SKS"} selected={dataMk.sks} width={"full"} value={['1', '2', '3', '4']} onChange={(e) => { handleInputValue(e, 'sks', 'edit') }} />
+                    <Input.SelectInput label={"SKS"} selected={dataMk.sks} width={"full"} value={['1', '2', '3', '4']} onChange={(e) => { handleInputValue(e, 'sks', 'edit') }} data={['', dataMk.sks]}/>
                     <Input.SelectInput label={"Semester"} selected={dataMk.semester} width={"full"} value={['1', '2', '3', '4', '5', '6', '7', '8']} onChange={(e) => { handleInputValue(e, 'semester', 'edit') }} />
                 </Modal.ModalCustom>
             </Modal>

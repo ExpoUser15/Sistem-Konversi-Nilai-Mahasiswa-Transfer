@@ -8,7 +8,11 @@ const mkQueries = new Queries(mataKuliahSchema);
 
 const mataKuliahController = async (req, res) => {
     try {
-        const mkData = await mkQueries.findAll();
+        const mkData = await mkQueries.findAll({}, {
+            order: [
+                ['semester', 'ASC'] 
+            ]
+        });
 
         res.json({
             data: mkData
@@ -45,14 +49,18 @@ const addMataKuliahController = async (req, res) => {
             }
         }
 
-       await mkQueries.create({
+        await mkQueries.create({
             id_mk: !id_mk ? idUser : id_mk,
             mata_kuliah,
             sks,
             semester
         });
 
-        const mkData = await mkQueries.findAll();
+        const mkData = await mkQueries.findAll({}, {
+            order: [
+                ['semester', 'ASC'] // Sort by the 'createdAt' column in descending order
+            ]
+        });
 
         res.json({
             status: "Success",
@@ -75,7 +83,7 @@ const deleteMataKuliahController = async (req, res) => {
             id_mk: id
         });
 
-        if(!mk){
+        if (!mk) {
 
             return res.json({
                 status: "Error",
@@ -87,7 +95,11 @@ const deleteMataKuliahController = async (req, res) => {
             id_mk: id
         });
 
-        const mkData = await mkQueries.findAll();
+        const mkData = await mkQueries.findAll({}, {
+            order: [
+                ['semester', 'ASC']
+            ]
+        });
 
         res.json({
             status: "Success",
@@ -117,7 +129,7 @@ const updateMataKuliahController = async (req, res) => {
             });
         }
 
-       await mkQueries.update({
+        await mkQueries.update({
             id_mk: id_mk,
             mata_kuliah,
             sks,
@@ -126,8 +138,12 @@ const updateMataKuliahController = async (req, res) => {
             id_mk: id
         });
 
-        data = await mkQueries.findAll();
-       
+        data = await mkQueries.findAll({}, {
+            order: [
+                ['semester', 'ASC'] // Sort by the 'createdAt' column in descending order
+            ]
+        });
+
         res.json({
             status: "Success",
             message: `Berhasil mengubah mata kuliah`,

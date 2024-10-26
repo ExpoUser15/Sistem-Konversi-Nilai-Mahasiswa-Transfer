@@ -3,10 +3,11 @@ import React from 'react'
 import { postData } from '../../redux/thunks/apiThunks';
 import { useDispatch } from 'react-redux';
 
-function SearchField({ placeholder, searchType }){
+function SearchField({ placeholder, searchType, setCurrentPage }){
     const dispatch = useDispatch();
 
     const handleSearch = (e) => {
+        setCurrentPage(1);
         const value = e.target.value;
         if(searchType === 'mahasiswa'){
             dispatch(postData({ endpoint: 'mahasiswa/search', data: { search: value } }));

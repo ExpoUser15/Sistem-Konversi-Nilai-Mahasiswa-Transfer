@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { deleteKonversiData, fetchData, fetchKonversiData, postKonversiData } from "../thunks/apiThunks";
+import { deleteKonversiData, fetchKonversiData, postKonversiData, updateKonversiData } from "../thunks/apiThunks";
 
 const konversiSlice = createSlice({
     name: "konversi",
@@ -13,7 +13,6 @@ const konversiSlice = createSlice({
     },
     reducers: {
         addKonversi: (state, action) => {
-            const findData = state.data.findIndex(item => action.payload.mata_kuliah_tujuan === item.mata_kuliah_tujuan);
             state.data.push(action.payload);
         },
         clearData: (state) => {
@@ -25,7 +24,7 @@ const konversiSlice = createSlice({
         },
         deleteKonversi: (state, action) => {
             const index = action.payload.index;
-            state.data.splice(index, 1); 
+            state.data.splice(index, 1);
         },
         insertMK: (state, action) => {
             const data = action.payload;
@@ -98,6 +97,33 @@ const konversiSlice = createSlice({
                 }
             })
             .addCase(deleteKonversiData.rejected, (state, action) => {
+                state.loading = false;
+                state.action = true;
+                state.message = action.payload.message;
+                state.status = action.payload.status;
+            })
+
+            // Update konversi
+            .addCase(updateKonversiData.pending, (state, action) => {
+                state.action = false;
+                state.loading = true;
+                state.error = null;
+                state.status = null;
+                state.message = null;
+            })
+            .addCase(updateKonversiData.fulfilled, (state, action) => {
+                state.loading = false;
+                state.action = true;
+                const { status, message, data } = action.payload;
+                if (status) {
+                    state.status = status;
+                    state.message = message;
+                }
+                if (data) {
+                    state.konversiData = data;
+                }
+            })
+            .addCase(updateKonversiData.rejected, (state, action) => {
                 state.loading = false;
                 state.action = true;
                 state.message = action.payload.message;
