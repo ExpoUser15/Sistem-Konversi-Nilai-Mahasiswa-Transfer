@@ -13,6 +13,8 @@ import KaprodiLayout from './layout/KaprodiLayout';
 import Unauthorized from './Pages/error/Unauthorized';
 import Laporan from './Pages/akademik/Laporan';
 import KonversiDetail from './Pages/kaprodi/KonversiDetail';
+import Riwayat from './Pages/kaprodi/Riwayat';
+import Pimpinan from './Pages/kaprodi/Pimpinan';
 
 function App() {
 
@@ -25,7 +27,7 @@ function App() {
           <Route element={<PrivateRoutes allowedRole="Akademik" />}>
             <Route element={<AkademikLayout />}>
               <Route path="/akademik" element={<DashboardAkademik />} />
-              <Route path="/akademik/laporan" element={<Laporan />} />
+              <Route path="/akademik/mahasiswa" element={<Laporan />} />
               <Route path="/akademik/konversi-detail/:id" element={<KonversiDetail />} />
             </Route>
           </Route>
@@ -35,10 +37,12 @@ function App() {
             <Route element={<KaprodiLayout />}>
               <Route path="/kaprodi" element={<DashboardKaprodi />} />
               <Route path="/kaprodi/konversi" element={<Konversi />} />
+              <Route path="/kaprodi/riwayat" element={<Riwayat />} />
               <Route path="/kaprodi/mahasiswa" element={<Mahasiswa />} />
               <Route path="/kaprodi/pengguna" element={<Pengguna />} />
               <Route path="/kaprodi/matakuliah" element={<MataKuliah />} />
-              <Route path="/kaprodi/konversi/konversi-detail/:id" element={<KonversiDetail />} />
+              <Route path="/kaprodi/riwayat/konversi-detail/:id" element={<KonversiDetail />} />
+              <Route path="/kaprodi/Pimpinan" element={<Pimpinan />} />
             </Route>
           </Route>
 

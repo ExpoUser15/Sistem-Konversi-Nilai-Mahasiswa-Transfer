@@ -7,7 +7,9 @@ function SearchField({ placeholder, searchType, setCurrentPage }){
     const dispatch = useDispatch();
 
     const handleSearch = (e) => {
-        setCurrentPage(1);
+        if(setCurrentPage){
+            setCurrentPage(1);
+        }
         const value = e.target.value;
         if(searchType === 'mahasiswa'){
             dispatch(postData({ endpoint: 'mahasiswa/search', data: { search: value } }));
@@ -20,6 +22,9 @@ function SearchField({ placeholder, searchType, setCurrentPage }){
         }
         if(searchType === 'laporan'){
             dispatch(postData({ endpoint: 'laporan/search', data: { search: value } }));
+        }
+        if(searchType === 'pimpinan'){
+            dispatch(postData({ endpoint: 'pimpinan/search', data: { search: value } }));
         }
     }
 

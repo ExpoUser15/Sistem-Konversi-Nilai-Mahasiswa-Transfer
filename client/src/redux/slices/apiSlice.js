@@ -11,6 +11,12 @@ const apiSlice = createSlice({
     status: '',
     action: false
   },
+  reducers: {
+    addData: (state, action) => {
+      const newData = action.payload;
+      state.data = newData;
+    }
+  },
   extraReducers: (builder) => {
     // Handle GET request
     builder
@@ -30,7 +36,7 @@ const apiSlice = createSlice({
       .addCase(fetchData.rejected, (state, action) => {
         state.loading = false;
         state.message = action.payload.message;
-            state.status = action.payload.status;
+        state.status = action.payload.status;
         state.error = true;
       })
 
@@ -45,11 +51,11 @@ const apiSlice = createSlice({
       .addCase(postData.fulfilled, (state, action) => {
         state.loading = false;
         const data = action.payload.data;
-        
-        if(!action.payload.search){
-            state.action = true;
-            state.message = action.payload.message;
-            state.status = action.payload.status;
+
+        if (!action.payload.search) {
+          state.action = true;
+          state.message = action.payload.message;
+          state.status = action.payload.status;
         }
         state.data = data;
       })
@@ -143,6 +149,6 @@ const apiSlice = createSlice({
   },
 });
 
-export const { orderBy} = apiSlice.actions;
+export const { orderBy, addData } = apiSlice.actions;
 export default apiSlice.reducer;
 

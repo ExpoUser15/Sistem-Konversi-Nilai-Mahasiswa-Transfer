@@ -1,8 +1,6 @@
 const { QueryTypes } = require("sequelize");
 const sequelize = require("../../config/db");
 const generateId = require("../../functions/generateId");
-const { createLog } = require("../../functions/logActivity")
-const logActivitySchema = require("../../model/logActivitySchema");
 const usersSchema = require("../../model/usersSchema");
 const Queries = require("../../queries/queries")
 const bcrypt = require('bcrypt');

@@ -2,22 +2,21 @@ const { QueryTypes } = require("sequelize");
 const sequelize = require("../../config/db");
 const { deleteFile } = require("../../functions/deleteFile");
 const generateId = require("../../functions/generateId");
-const { createLog } = require("../../functions/logActivity");
-const { upload } = require("../../middleware/fileHandler");
 const berkasSchema = require("../../model/berkasSchema");
-const logActivitySchema = require("../../model/logActivitySchema");
 const mahasiswaSchema = require("../../model/mahasiswaSchema");
 const Queries = require("../../queries/queries");
 const { getCurrentFormattedDate } = require("../../utils/time");
 const konversiSchema = require("../../model/konversiSchema");
-const laporanSchema = require("../../model/laporanSchema");
 const recapSchema = require("../../model/recapSchema");
+const semesterSchema = require("../../model/semesterSchema");
+const fs = require('fs');
+const path = require('path');
 
 const mahasiswaQueries = new Queries(mahasiswaSchema);
 const berkasQueries = new Queries(berkasSchema);
-const documentQueries = new Queries(laporanSchema);
 const konveriQueries = new Queries(konversiSchema);
 const recapQueries = new Queries(recapSchema);
+const semestersQueries = new Queries(semesterSchema);
 
 
 const mahasiswaController = async (req, res) => {
@@ -155,7 +154,6 @@ const deleteMahasiswaController = async (req, res) => {
         let mahasiswaData = await sequelize.query("SELECT * FROM tb_students JOIN tb_files ON tb_files.id_mahasiswa = tb_students.id_mahasiswa ORDER BY tanggal ASC");
 
         if (!id) {
-
             return res.status(422).json({
                 status: "Error",
                 message: "Gagal menghapus mahasiswa",
@@ -172,35 +170,50 @@ const deleteMahasiswaController = async (req, res) => {
             id_mahasiswa: id
         });
 
-        const kon = sequelize.query("SELECT * FROM tb_conversions WHERE id_mahasiswa = :id", {
+        const kon = await sequelize.query("SELECT * FROM tb_conversions WHERE id_mahasiswa = :id", {
             replacements: { id },
             type: QueryTypes.SELECT
         }); 
 
-        const doc = sequelize.query("SELECT * FROM tb_documents WHERE id_mahasiswa = :id", {
+        const recap = await sequelize.query("SELECT * FROM tb_recapitulations WHERE id_mahasiswa = :id", {
             replacements: { id },
             type: QueryTypes.SELECT
         }); 
 
-        const recap = sequelize.query("SELECT * FROM tb_recapitulations WHERE id_mahasiswa = :id", {
+        const detail = await sequelize.query("SELECT * FROM tb_semesters WHERE id_mahasiswa = :id", {
             replacements: { id },
             type: QueryTypes.SELECT
         }); 
 
-        if(kon[0]){
+        if(kon.length !== 0){
             await konveriQueries.delete({
                 id_mahasiswa: id
             });
         }
 
-        if(doc[0]){
-            await documentQueries.delete({
+        if(recap.length !== 0){
+            if(recap[0].report){
+                const filePath = path.join(process.cwd(), `tmp/laporan`, recap[0].report);
+                console.log(filePath);
+                await fs.promises.unlink(filePath); 
+            }
+            if(recap[0].formulir){
+                const filePath = path.join(process.cwd(), `tmp/formulir`, recap[0].formulir);
+                await fs.promises.unlink(filePath); 
+            }
+
+            if(recap[0].upload){
+                const filePath = path.join(process.cwd(), `tmp/form`, recap[0].upload);
+                console.log(filePath);
+                await fs.promises.unlink(filePath); 
+            }
+            await recapQueries.delete({
                 id_mahasiswa: id
             });
         }
 
-        if(recap[0]){
-            await recapQueries.delete({
+        if(detail.length !== 0){
+            await semestersQueries.delete({
                 id_mahasiswa: id
             });
         }
@@ -339,8 +352,6 @@ const updateBerkasController = async (req, res) => {
         });
 
         mahasiswaData = await sequelize.query("SELECT * FROM tb_students JOIN tb_files ON tb_files.id_mahasiswa = tb_students.id_mahasiswa ORDER BY tanggal ASC");
-
-        console.log(mahasiswaData);
 
         return res.json({
             status: "Success",

@@ -34,6 +34,14 @@ const recapSchema = sequelize.define(
         type: DataTypes.STRING,
         allowNull: true
       },
+      formulir: {
+        type: DataTypes.STRING,
+        allowNull: true
+      },
+      upload: {
+        type: DataTypes.STRING,
+        allowNull: true
+      },
       id_mahasiswa: {
         type: DataTypes.STRING,
         allowNull: false

@@ -11,13 +11,16 @@ import Loading from "../../components/Loader/Loading";
 import useAuth from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import Greeting from "../../utils/Greeting";
+import axios from "axios";
 
 const DashboardKaprodi = () => {
   const dispatch = useDispatch();
   const token = useAuth();
-  const navigate = useNavigate();
   const students = useSelector(state => state.apiData.data);
   const loading = useSelector(state => state.apiData.loading);
+
+  const [totalMK, setTotalMk] = useState(0);
+  const [totalStudent, setTotalSudent] = useState(0);
 
   const [dataMahasiswa, setDataMahasiswa] = useState({});
   const [berkasName, setBerkasName] = useState("");
@@ -29,6 +32,14 @@ const DashboardKaprodi = () => {
 
   useEffect(() => {
     dispatch(fetchData({ endpoint: 'mahasiswa/recent/dashboard-kaprodi' }));
+
+    axios.get(`http://localhost:3000/analisis`)
+    .then(res => {
+      console.log(res.data.countMK[0][0]);
+      setTotalMk(res.data.countMK[0][0].total_mk);
+      setTotalSudent(res.data.countStudents[0][0].total_student);
+    })
+    .catch(err => console.log(err));
   }, [dispatch]);
 
   const openModal = (item, item2, file) => {
@@ -59,10 +70,10 @@ const DashboardKaprodi = () => {
         </div>
         {/* Analytics Card */}
         <div>
-          <div className="grid grid-cols-3 gap-8">
-            <Card text={'Total Mata Kuliah'} drop={false} data={'30'}/>
-            <Card text={'Total Pengajuan Konversi'} drop={true} data={'45'}/>
-            <Card text={'Average Nilai Konversi'} drop={false} data={'12'}/>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+            <Card text={'Total Mata Kuliah'} drop={false} data={totalMK === 0 ? '0' : totalMK}/>
+            <Card text={'Total Pengajuan Konversi'} drop={true} data={totalStudent === 0 ? '0' : totalStudent}/>
+            <Card text={'Average Konversi Terbaru'} drop={false} data={'12'}/>
           </div>
         </div>
         
@@ -77,7 +88,7 @@ const DashboardKaprodi = () => {
                 students
                   .map((item, index) => (
                     <div
-                      className={`grid grid-cols-7 mb-7 text-sm-3 gap-5 pb-2`}
+                      className={`min-w-[700px] sm:max-h-fit grid grid-cols-7 mb-7 text-sm-3 gap-5 pb-2`}
                       style={{ borderBottom: "1px solid #CCCCCC" }}
                       key={index}
                     >

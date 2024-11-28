@@ -2,8 +2,6 @@ const usersSchema = require("../model/usersSchema");
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const Queries = require("../queries/queries");
-const logActivitySchema = require("../model/logActivitySchema");
-const { createLog } = require("../functions/logActivity");
 
 const loginController =  async(req, res) => {
     try {
@@ -31,8 +29,6 @@ const postLoginController = async (req, res) => {
         }
 
         const userQueries = new Queries(usersSchema);
-
-        const logSchema = new Queries(logActivitySchema);
 
         const data = await userQueries.findOne({ username });
 

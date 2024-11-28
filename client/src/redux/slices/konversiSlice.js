@@ -5,7 +5,9 @@ const konversiSlice = createSlice({
     name: "konversi",
     initialState: {
         data: [],
+        filteredMk: [],
         konversiData: [],
+        spesifikFilteredData: [],
         mkData: [],
         loading: false,
         message: null,
@@ -15,20 +17,36 @@ const konversiSlice = createSlice({
         addKonversi: (state, action) => {
             state.data.push(action.payload);
         },
-        clearData: (state) => {
-            state.data = [];
-        },
-        updateKonversi: (state, action) => {
-            const { index, key, value } = action.payload;
-            state.data[index][key] = value;
-        },
         deleteKonversi: (state, action) => {
             const index = action.payload.index;
             state.data.splice(index, 1);
+            const arr = [];
+            state.data.forEach(item => {
+                const regex = /\(([^)]+)\)/g;
+                const matches = item.dataTujuan.match(regex);
+                const mk = matches ? matches.map(match => match.slice(1, -1)) : [];
+                arr.push(mk[0]);
+            });
+            const filteredArray = state.mkData.filter(item1 =>
+                !arr.some(item2 => item2 === item1.mata_kuliah)
+            );
+            state.filteredMk = filteredArray;
         },
         insertMK: (state, action) => {
             const data = action.payload;
             state.mkData = data;
+        },
+        emptyData: (state, action) => {
+            state.data = [];
+        },
+        emptyFilteredData: (state, action) => {
+            state.filteredMk = [];
+        },
+        filteredKonversi: (state, action) => {
+            state.filteredMk = action.payload;
+        },
+        insertData: (state, action) => {
+            state.konversiData = action.payload;
         }
     },
     extraReducers: (builder) => {
@@ -43,6 +61,7 @@ const konversiSlice = createSlice({
             .addCase(fetchKonversiData.fulfilled, (state, action) => {
                 const data = action.payload.data;
                 state.konversiData = data;
+                state.filteredData = data;
                 state.loading = false;
             })
             .addCase(fetchKonversiData.rejected, (state, action) => {
@@ -86,14 +105,15 @@ const konversiSlice = createSlice({
                 state.message = null;
             })
             .addCase(deleteKonversiData.fulfilled, (state, action) => {
-                const data = action.payload.data;
-                state.konversiData = data;
-                state.action = true;
                 state.loading = false;
-                if (action.payload.status) {
-                    state.status = action.payload.status;
-                    state.message = action.payload.message;
-                    return;
+                state.action = true;
+                const { status, message, data } = action.payload;
+                if (status) {
+                    state.status = status;
+                    state.message = message;
+                }
+                if (data) {
+                    state.konversiData = data;
                 }
             })
             .addCase(deleteKonversiData.rejected, (state, action) => {
@@ -133,5 +153,5 @@ const konversiSlice = createSlice({
     }
 });
 
-export const { addKonversi, clearData, updateKonversi, deleteKonversi, insertMK } = konversiSlice.actions;
+export const { addKonversi, deleteKonversi, insertMK, emptyData, emptyFilteredData, filteredKonversi, insertData } = konversiSlice.actions;
 export default konversiSlice.reducer;

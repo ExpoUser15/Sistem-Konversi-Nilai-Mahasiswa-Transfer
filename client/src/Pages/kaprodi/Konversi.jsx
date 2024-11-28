@@ -1,11 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Tables from '../../components/Tables/Tables';
-import { Edit, Eye, ArrowDownToLine, Trash2 } from 'lucide-react';
-import useDownload from '../../hooks/useDownload';
+import { Edit, Eye } from 'lucide-react';
 import ActionButton from '../../components/Buttons/ActionButton';
-import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteKonversiData, fetchData, fetchKonversiData, patchData, postData } from '../../redux/thunks/apiThunks';
+import { deleteKonversiData, fetchData, patchData } from '../../redux/thunks/apiThunks';
 import Modal from '../../components/ModalBox/Modal';
 import Input from '../../components/Inputs/Input';
 import Loading from '../../components/Loader/Loading';
@@ -13,12 +11,12 @@ import ModalKonversi from '../../components/ModalBox/ModalKonversi';
 import Notification from '../../components/Notifications/Notification';
 import Button from '../../components/Buttons/Button';
 import SearchField from '../../components/Inputs/SearchingInput';
+import { formattedDate } from '../../utils/formattedDate';
 
 function Konversi() {
     const dispatch = useDispatch();
     const students = useSelector(state => state.apiData.data);
     const loading = useSelector(state => state.apiData.loading);
-    const konversiData = useSelector(state => state.konversi.konversiData);
     const action = useSelector(state => state.konversi.action);
     const message = useSelector(state => state.konversi.message);
     const status = useSelector(state => state.konversi.status);
@@ -40,7 +38,6 @@ function Konversi() {
 
     useEffect(() => {
         dispatch(fetchData({ endpoint: 'mahasiswa/all/akademik' }));
-        dispatch(fetchKonversiData({ endpoint: 'konversi' }));
     }, [dispatch]);
 
     const closeModal = () => {
@@ -110,12 +107,6 @@ function Konversi() {
         }
     }
 
-    const downloadFile = useDownload();
-
-    const handleDownload = (fileUrl) => {
-        downloadFile(fileUrl);
-    }
-
     const notifRef = useRef();
     return (
         <>
@@ -130,7 +121,7 @@ function Konversi() {
             </div>
             {/* Table */}
             <div className="my-16 bg-white px-8 py-3 rounded-md shadow dark:bg-black dark:shadow-neutral-700">
-                <div className="flex gap-2 items-center justify-between mb-5">
+                <div className="flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between sm:mb-5 mb-10">
                     <h4 className="font-medium">Pengajuan Konversi</h4>
                     <SearchField placeholder={"Cari..."} searchType={'mahasiswa'} />
                 </div>
@@ -141,12 +132,12 @@ function Konversi() {
                                 .filter(item => item.status === "Pending")
                                 .map((item, index) => (
                                     <div
-                                        className={`grid grid-cols-8 mb-7 text-sm-3 gap-5 pb-2`}
+                                        className={`min-w-[700px] sm:max-h-fit grid grid-cols-8 mb-7 text-sm-3 pb-2`}
                                         style={{ borderBottom: "1px solid #CCCCCC" }}
                                         key={item.id_mahasiswa}
                                     >
                                         <div className='overflow-auto'>{item.nama}</div>
-                                        <div>{item.tanggal}</div>
+                                        <div>{formattedDate(item.tanggal)}</div>
                                         <div
                                             className="cursor-pointer"
                                             onClick={() => { openModal([item.ktp, item.kk, item.ijazah], item.nama, ["KTP", "KK", "Ijazah"]); setDataMahasiswa(students[index]); }}
@@ -187,9 +178,7 @@ function Konversi() {
                                         <div
                                             className='flex'
                                         >
-                                            <ActionButton text={"Konversi"} onClick={() => openModal('konversi', item)}>
-                                                <Edit className='cursor-pointer' />
-                                            </ActionButton>
+                                            <Button onClick={() => openModal('konversi', item)}>Konversi</Button>
                                         </div>
                                     </div>
                                 )).concat(
@@ -206,63 +195,6 @@ function Konversi() {
                                     </div>
                                 </div>
                             )
-                    }
-                </Tables>
-            </div>
-            <div className='mb-16 bg-white px-8 py-3 rounded-md shadow dark:bg-black dark:shadow-neutral-700'>
-                <div className="flex gap-2 items-center justify-between mb-5">
-                    <h4 className="font-medium">Riwayat Konversi</h4>
-                    <SearchField placeholder={"Cari..."} searchType={'mahasiswa'} />
-                </div>
-                <Tables fields={["No", "Nama", "Tanggal Konversi", "Detail Konversi", "Status", ""]} gap={"2"}>
-                    {
-                        !loading ? (
-                            konversiData
-                                .filter(item => item.status === "Converted")
-                                .length > 0 ? (
-                                konversiData
-                                    .filter(item => item.status === "Converted")
-                                    .map((item, index) => (
-                                        <div
-                                            className={`grid grid-cols-6 mb-7 text-sm-3 gap-2 pb-2`}
-                                            style={{ borderBottom: "1px solid #CCCCCC" }}
-                                            key={item.id_mahasiswa}
-                                        >
-                                            <div className='overflow-auto'>{index + 1}</div>
-                                            <div>{item.nama}</div>
-                                            <div>{item.tanggal}</div>
-                                            <div>
-                                                <Link to={`konversi-detail/${btoa(JSON.stringify({ id_mahasiswa: item.id_mahasiswa, nama: item.nama }))}`}>
-                                                    Detail
-                                                </Link>
-                                            </div>
-                                            <div>
-                                                <div className={`w-fit rounded-md ${item.status === 'Converted' ? 'text-green-600' : 'text-yellow-600'}`}>
-                                                    {item.status}
-                                                </div>
-                                            </div>
-                                            <div className='flex gap-2 items-center justify-start '>
-                                                <ActionButton text={"Download Hasil Konversi"}>
-                                                    <ArrowDownToLine className='cursor-pointer' onClick={() => handleDownload(item.report)} />
-                                                </ActionButton>
-                                                <ActionButton text={"Hapus"} onClick={() => openModal('hapus', item)}>
-                                                    <Trash2 className='cursor-pointer' />
-                                                </ActionButton>
-                                            </div>
-                                        </div>
-                                    ))
-                            ) : (
-                                <div className='grid grid-cols-10 mb-7 text-sm-3 gap-5 pb-2' key="empty">
-                                    <p className='text-center col-span-10 italic'>Data Kosong</p>
-                                </div>
-                            )
-                        ) : (
-                            <div className={`grid grid-cols-10 mb-7 text-sm-3 gap-5 pb-2`} >
-                                <div className='col-span-10 flex justify-center'>
-                                    <Loading />
-                                </div>
-                            </div>
-                        )
                     }
                 </Tables>
             </div>

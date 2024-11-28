@@ -1,6 +1,3 @@
-const logActivitySchema = require("../model/logActivitySchema");
-const Queries = require("../queries/queries");
-
 const logoutController = async (req, res) => {
     try {
         const cookie = req.cookies;

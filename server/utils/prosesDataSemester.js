@@ -1,3 +1,4 @@
+const { QueryTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
 function dataTable(query) {
@@ -20,130 +21,6 @@ function dataTableMK(query){
 }
 
 async function proses(id) {
-    const result = await sequelize.query(`
-    SELECT * 
-    FROM (
-        SELECT 
-        k.id_mahasiswa, 
-        mk.id_mk, 
-        mk.mata_kuliah, 
-        mk.sks, 
-        mk.semester, 
-        (
-            SELECT SUM(mk2.sks) 
-            FROM tb_conversions k2 
-            JOIN tb_courses mk2 ON k2.id_mk = mk2.id_mk 
-            WHERE k2.id_mahasiswa = k.id_mahasiswa 
-            AND mk2.id_mk <= mk.id_mk 
-            AND mk2.semester % 2 = 1
-        ) AS running_sks 
-        FROM tb_conversions k 
-        JOIN tb_courses mk ON k.id_mk = mk.id_mk 
-        WHERE k.id_mahasiswa = :id
-        AND mk.semester % 2 = 1
-    ) AS temp 
-    WHERE running_sks <= 24
-    ORDER BY running_sks DESC;
-    `, {
-        type: sequelize.QueryTypes.SELECT,
-        replacements: { id }
-    });
-
-    const data = dataTable(result);
-
-    const result2 = await sequelize.query(`
-    SELECT * 
-    FROM (
-        SELECT 
-        k.id_mahasiswa, 
-        mk.id_mk, 
-        mk.mata_kuliah, 
-        mk.sks, 
-        mk.semester, 
-        (
-            SELECT SUM(mk2.sks) 
-            FROM tb_conversions k2 
-            JOIN tb_courses mk2 ON k2.id_mk = mk2.id_mk 
-            WHERE k2.id_mahasiswa = k.id_mahasiswa 
-            AND mk2.id_mk <= mk.id_mk 
-            AND mk2.semester % 2 = 1
-        ) AS running_sks 
-        FROM tb_conversions k 
-        JOIN tb_courses mk ON k.id_mk = mk.id_mk 
-        WHERE k.id_mahasiswa = :id
-        AND mk.semester % 2 = 1
-    ) AS temp 
-    WHERE running_sks > 24
-    ORDER BY running_sks DESC;
-    `, {
-        type: sequelize.QueryTypes.SELECT,
-        replacements: { id }
-    });
-
-    const data2 = dataTable(result2);
-
-    const result3 = await sequelize.query(`
-    SELECT * 
-    FROM (
-        SELECT 
-            k.id_mahasiswa, 
-            mk.id_mk, 
-            mk.mata_kuliah, 
-            mk.sks, 
-            mk.semester, 
-            (
-                SELECT SUM(mk2.sks) 
-                FROM tb_conversions k2 
-                JOIN tb_courses mk2 ON k2.id_mk = mk2.id_mk 
-                WHERE k2.id_mahasiswa = k.id_mahasiswa 
-                AND mk2.id_mk <= mk.id_mk 
-                AND mk2.semester % 2 = 0
-            ) AS running_sks 
-        FROM tb_conversions k 
-        JOIN tb_courses mk ON k.id_mk = mk.id_mk 
-        WHERE k.id_mahasiswa = :id 
-        AND mk.semester % 2 = 0
-    ) AS temp 
-    WHERE running_sks <= 24
-    ORDER BY running_sks DESC;
-`, {
-    type: sequelize.QueryTypes.SELECT,
-    replacements: { id }
-});
-
-    const data3 = dataTable(result3);
-
-    const result4 = await sequelize.query(`
-    SELECT * 
-    FROM (
-        SELECT 
-        k.id_mahasiswa, 
-        mk.id_mk, 
-        mk.mata_kuliah, 
-        mk.sks, 
-        mk.semester, 
-        (
-            SELECT SUM(mk2.sks) 
-            FROM tb_conversions k2 
-            JOIN tb_courses mk2 ON k2.id_mk = mk2.id_mk 
-            WHERE k2.id_mahasiswa = k.id_mahasiswa 
-            AND mk2.id_mk <= mk.id_mk 
-            AND mk2.semester % 2 = 0
-        ) AS running_sks 
-        FROM tb_conversions k 
-        JOIN tb_courses mk ON k.id_mk = mk.id_mk 
-        WHERE k.id_mahasiswa = :id
-        AND mk.semester % 2 = 0
-    ) AS temp 
-    WHERE running_sks > 24
-    ORDER BY running_sks DESC;
-    `, {
-        type: sequelize.QueryTypes.SELECT,
-        replacements: { id }
-    });
-
-    const data4 = dataTable(result4);
-
     const query = `
     SELECT 
         mk.semester, 
@@ -175,11 +52,49 @@ async function proses(id) {
 
     results = dataTableMK(results);
 
+    const data100 = await sequelize.query(
+        `
+        SELECT tb_semesters.id_semester, tb_semesters.penempatan, tb_courses.mata_kuliah, tb_courses.sks, tb_courses.semester
+        FROM tb_semesters 
+        JOIN tb_courses 
+        ON tb_courses.id_mk = tb_semesters.id_mk 
+        WHERE id_mahasiswa = :id
+        ORDER BY tb_semesters.penempatan ASC
+        `,
+        {
+            type: QueryTypes.SELECT,
+            replacements: { id },
+        }
+    );
+
+    const groupedData = data100.reduce((acc, item) => {
+        const penempatan = item.penempatan;
+
+        let placementGroup = acc.find((group) => group.penempatan === penempatan);
+
+        if (!placementGroup) {
+            placementGroup = { penempatan, courses: [], total_sks: 0 };
+            acc.push(placementGroup);
+        }
+
+        placementGroup.courses.push({
+            mata_kuliah: item.mata_kuliah,
+            sks: item.sks,
+            penempatan: item.penempatan,
+            semester: item.semester,
+            kode: item.id_semester,
+            totalSKS: placementGroup.total_sks + item.sks
+        });
+
+        placementGroup.total_sks += item.sks;
+
+        return acc;
+    }, []);
+
+    const result100 = groupedData.map(group => (group.courses));
+
     return {
-        ganjil: result.length != 0 ? { data, total: result[0].running_sks } : '',
-        ganjilLebih: result2.length != 0 ? { data: data2, total: result2[result2.length - 1].running_sks } : '',
-        genap: result3.length != 0 ? { data: data3, total: result3[0].running_sks } : '',
-        genapLebih: result4.length != 0 ? { data: data4, total: result4[result4.length - 1].running_sks } : '',
+        dataPenempatan: result100,
         mkBelum: { data: results, total: totalMK }
     }
 }

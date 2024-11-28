@@ -8,8 +8,8 @@ async function recap(id) {
         `SELECT tb_courses.*
          FROM tb_courses 
          LEFT JOIN tb_conversions 
-         ON tb_courses.id_mk = tb_conversions.id_mk 
-         AND tb_conversions.id_mahasiswa = :id
+         ON tb_courses.id_mk = tb_conversions.id_mk
+         AND tb_conversions.id_mahasiswa = :id 
          WHERE tb_conversions.id_mk IS NULL`,
         {
             type: QueryTypes.SELECT,
@@ -31,10 +31,11 @@ async function recap(id) {
     const totalSks = await sequelize.query(`
             SELECT 
                 id_mahasiswa,
-                SUM(sks_asal) AS total_sks_asal,
-                SUM(sks_tujuan) AS total_sks_tujuan
+                SUM(tb_courses.sks) AS total_sks_tujuan,
+                SUM(tb_conversions.sks_asal) AS total_sks_asal
             FROM 
                 tb_conversions
+            JOIN tb_courses ON tb_courses.id_mk = tb_conversions.id_mk
             WHERE 
                 id_mahasiswa = :id_mahasiswa
             GROUP BY 
@@ -45,9 +46,6 @@ async function recap(id) {
         }
     );
 
-    console.log(totalSks);
-    console.log(id);
-
     result.remainingMK = `${countQuery.length} MK`;
     result.totalSKSAsal = `${String(totalSks[0].total_sks_asal)} SKS`;
     result.totalSKSTujuan = `${String(totalSks[0].total_sks_tujuan)} SKS`;
@@ -55,6 +53,5 @@ async function recap(id) {
 
     return result;
 }
-
 
 module.exports = recap;

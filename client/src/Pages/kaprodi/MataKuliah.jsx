@@ -35,6 +35,9 @@ function Pengguna() {
     const status = useSelector(state => state.apiData.status);
 
     const notifRef = useRef();
+    const sksRef = useRef();
+    const mkRef = useRef();
+    const semesterRef = useRef();
 
     const [dataMk, setDataMk] = useState({});
     const [value, setValue] = useState({});
@@ -80,6 +83,14 @@ function Pengguna() {
         dispatch(fetchData({ endpoint: 'matakuliah' }));
     }, [dispatch]);
 
+    useEffect(() => {
+        if(isModalEdit){
+            sksRef.current.value = dataMk.sks;
+            mkRef.current.value = dataMk.mata_kuliah;
+            semesterRef.current.value = dataMk.semester;
+        }
+    }, [isModalEdit]);
+
     const handleInputValue = async (e, item, action) => {
         const inputvalue = e.target.value;
         if (action === 'edit') {
@@ -101,7 +112,6 @@ function Pengguna() {
         e.preventDefault();
         await new Promise(resolve => setTimeout(resolve, 0));
         if (actionType === 'tambah') {
-            console.log('Tambahhh: ', value);
             dispatch(postData({ endpoint: 'matakuliah/add', data: value }));
             setIsModalTambah(false);
         }
@@ -136,7 +146,7 @@ function Pengguna() {
             </div>
             {/* Table */}
             <div className="mb-16 mt-16 bg-white px-8 py-3 rounded-md shadow dark:bg-black dark:shadow-neutral-700">
-                <div className="flex gap-2 items-center justify-between mb-5">
+                <div className="flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between sm:mb-5 mb-10">
                     <h4 className="font-medium">Daftar Mata Kuliah</h4>
                     <SearchingInput placeholder={"Cari..."} searchType={"matakuliah"} setCurrentPage={setCurrentPage}/>
                 </div>
@@ -146,7 +156,7 @@ function Pengguna() {
                             currentData.length > 0 ? (
                                 currentData.map((item, index) => (
                                     <div
-                                        className="grid grid-cols-6 mb-8 text-sm-3 gap-1 pb-2"
+                                        className="min-w-[700px] sm:max-h-fit grid grid-cols-6 mb-7 text-sm-3 gap-5 pb-2"
                                         style={{ borderBottom: "1px solid #CCCCCC" }}
                                         key={item.id_mk}
                                     >
@@ -207,9 +217,9 @@ function Pengguna() {
             <Modal className={"w-fit"} open={isModalEdit}>
                 <Modal.ModalCustom onClose={() => { closeModal('edit') }} title={"Edit Mata Kuliah"} formClass={'grid grid-cols-2 gap-x-6'} action={true} onClick={(e) => { handleAction(e, 'edit'); }}>
                     <Input.TextInput label={"Kode Mata Kuliah"} width={"full"} value={dataMk.id_mk} type={'text'} onChange={(e) => { handleInputValue(e, 'id_mk', 'edit') }} />
-                    <Input.TextInput label={"Mata Kuliah"} width={"full"} type={'text'} value={dataMk.mata_kuliah} onChange={(e) => { handleInputValue(e, 'mata_kuliah', 'edit') }} />
-                    <Input.SelectInput label={"SKS"} selected={dataMk.sks} width={"full"} value={['1', '2', '3', '4']} onChange={(e) => { handleInputValue(e, 'sks', 'edit') }} data={['', dataMk.sks]}/>
-                    <Input.SelectInput label={"Semester"} selected={dataMk.semester} width={"full"} value={['1', '2', '3', '4', '5', '6', '7', '8']} onChange={(e) => { handleInputValue(e, 'semester', 'edit') }} />
+                    <Input.TextInput label={"Mata Kuliah"} width={"full"} type={'text'} value={dataMk.mata_kuliah} onChange={(e) => { handleInputValue(e, 'mata_kuliah', 'edit') }} reference={mkRef}/>
+                    <Input.SelectInput label={"SKS"} selected={dataMk.sks} width={"full"} value={['1', '2', '3', '4']} onChange={(e) => { handleInputValue(e, 'sks', 'edit') }} data={['', dataMk.sks]} reference={sksRef}/>
+                    <Input.SelectInput label={"Semester"} selected={dataMk.semester} width={"full"} value={['1', '2', '3', '4', '5', '6', '7', '8']} onChange={(e) => { handleInputValue(e, 'semester', 'edit') }} reference={semesterRef}/>
                 </Modal.ModalCustom>
             </Modal>
             <Modal open={isDeleteModal}>

@@ -2,19 +2,22 @@ import React, { useEffect, useRef, useState } from 'react'
 import Tables from '../../components/Tables/Tables';
 import { ArrowDownToLine, Eye, Trash2 } from 'lucide-react';
 import ActionButton from '../../components/Buttons/ActionButton';
-import Button from '../../components/Buttons/Button';
 import Modal from '../../components/ModalBox/Modal';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchData, patchData } from '../../redux/thunks/apiThunks';
+import { fetchData, patchData, postData } from '../../redux/thunks/apiThunks';
 import Loading from '../../components/Loader/Loading';
 import Notification from '../../components/Notifications/Notification';
 import SearchField from '../../components/Inputs/SearchingInput';
 import Input from '../../components/Inputs/Input';
 import useDownload from '../../hooks/useDownload';
+import { formattedDate } from '../../utils/formattedDate';
+import axios from 'axios';
+import Button from '../../components/Buttons/Button';
+import useCompressedImage from '../../hooks/useCompressedImage';
 
 function Laporan() {
     const dispatch = useDispatch();
-    const laporan = useSelector(state => state.apiData.data);
+    const students = useSelector(state => state.apiData.data);
     const loading = useSelector(state => state.apiData.loading);
     const action = useSelector(state => state.apiData.action);
     const message = useSelector(state => state.apiData.message);
@@ -22,6 +25,7 @@ function Laporan() {
 
     const notifRef = useRef();
 
+    const [value, setValue] = useState({});
     const [dataMahasiswa, setDataMahasiswa] = useState({});
     const [berkasName, setBerkasName] = useState("");
     const [nama, setNama] = useState("");
@@ -29,7 +33,7 @@ function Laporan() {
     const [spesifikBerkas, setSpesifikBerkas] = useState({});
     const [isModalDetail, setIsModalDetail] = useState(false);
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isModalUploadOpen, setIsModalUploadOpen] = useState(false);
 
     useEffect(() => {
         dispatch(fetchData({ endpoint: 'mahasiswa/laporan' }));
@@ -42,33 +46,42 @@ function Laporan() {
             return;
         }
 
-        setIsModalOpen(true);
+        setIsModalUploadOpen(true);
+        setDataMahasiswa(item2);
+        setJenisFile(file);
         setBerkasName(item);
         setNama(item2);
-        setJenisFile(file);
     };
 
     const closeModal = () => {
-        setIsModalOpen(false);
+        setIsModalUploadOpen(false);
         setIsModalDetail(false);
     };
 
     const handleAction = async (e, actionType) => {
         e.preventDefault();
-        if (actionType === 'patch') {
+        await new Promise(resolve => setTimeout(resolve, 0));
+        if (actionType === 'upload') {
             const formData = new FormData();
-            const key = Object.keys(spesifikBerkas)[0];
-            formData.append('form', spesifikBerkas[key]);
-            dispatch(patchData({ endpoint: `mahasiswa/laporan/update/${dataMahasiswa.id_dokumen}`, data: formData, contentType: 'multipart/form-data' }));
-            setIsModalOpen(false);
+            const compress = await useCompressedImage(spesifikBerkas);
+            formData.append('form', compress);
+            dispatch(postData({ endpoint: `mahasiswa/upload/${dataMahasiswa.id_mahasiswa}`, data: formData, contentType: 'multipart/form-data' }));
+            setIsModalUploadOpen(false);
             setSpesifikBerkas({});
         }
     }
 
     const downloadFile = useDownload();
 
-    const handleDownload = (fileUrl) => {
-        downloadFile(fileUrl);
+    const handleGeneratePDF = (item) => {
+        axios.get(`http://localhost:3000/file/report/${item.id_mahasiswa}/all`, {
+            responseType: 'blob'
+        })
+            .then(res => {
+                const url = window.URL.createObjectURL(new Blob([res.data]));
+                const filename = `laporan_${item.nama}_${btoa(item.id_nama + item.id_mahasiswa)}.pdf`;
+                downloadFile(url, filename);
+            });
     }
 
     return (
@@ -82,84 +95,66 @@ function Laporan() {
             <div className="pb-1" style={{ borderBottom: "1px solid #CCCCCC" }}>
                 <h3 className="font-medium">Laporan</h3>
             </div>
-            {/* Table */}
-            <div className="max-w-fit my-16 bg-white px-8 py-3 rounded-md shadow dark:bg-black dark:shadow-neutral-700">
-                <div className="flex gap-2 items-center justify-between mb-5">
-                    <h4 className="font-medium">Daftar Laporan</h4>
-                    <SearchField placeholder={"Cari..."} searchType={'laporan'} />
-                </div>
-                <Tables fields={["Nama", "Tanggal", "Berkas", "Transkrip", "Surat Pindah", "Detail", "Dokumen", ""]} gap={"1"}>
-                    {
-                        !loading ?
-                            laporan
-                                .map((item, index) => (
-                                    <div
-                                        className={`grid grid-cols-8 mb-9 text-sm-3 pb-2`}
-                                        style={{ borderBottom: "1px solid #CCCCCC" }}
-                                        key={item.id_dokumen}
-                                    >
-                                        <div className='overflow-auto'>{item.nama}</div>
-                                        <div>{item.tanggal}</div>
+            <main className="my-16">
+                <div className="bg-white px-8 py-3 rounded-md shadow dark:bg-black dark:shadow-neutral-700">
+                    <div className="flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between sm:mb-5 mb-10">
+                        <h4 className="font-medium">Laporan</h4>
+                        <SearchField placeholder={"Cari..."} />
+                    </div>
+                    <Tables fields={["No", "Nama", "Tanggal", "Formulir", "Download", "Status"]} gap={"2"} className={'w-full'}>
+                        {
+                            !loading ? (
+                                students.length > 0 ? (
+                                    students.map((item, index) => (
                                         <div
-                                            className="cursor-pointer"
-                                            onClick={() => { openModal([item.ktp, item.kk, item.ijazah], item.nama, ["KTP", "KK", "Ijazah"]); setDataMahasiswa(laporan[index]); }}
+                                            className={`min-w-[700px] sm:max-h-fit grid grid-cols-6 mb-7 text-sm-3 pb-2`}
+                                            style={{ borderBottom: "1px solid #CCCCCC" }}
+                                            key={index}
                                         >
-
-                                            <ActionButton text={"Lihat Berkas"}>
-                                                <Eye className='cursor-pointer' />
-                                            </ActionButton>
-                                        </div>
-                                        <div
-                                            className="cursor-pointer"
-                                            onClick={() => { openModal(item.transkrip_nilai, item.nama, "Transkrip Nilai"); setDataMahasiswa(laporan[index]); }}
-                                        >
-                                            <ActionButton text={"Lihat Transkrip"}>
-                                                <Eye className='cursor-pointer' />
-                                            </ActionButton>
-                                        </div>
-                                        <div
-                                            className="cursor-pointer"
-                                            onClick={() => { openModal(item.surat_pindah, item.nama, "Surat Pindah"); setDataMahasiswa(laporan[index]); }}
-                                        >
-                                            <ActionButton text={"Lihat Surat Pindah"}>
-                                                <Eye className='cursor-pointer' />
-                                            </ActionButton>
-                                        </div>
-                                        <div
-                                            className="cursor-pointer"
-                                            onClick={() => { openModal('detail', item); setDataMahasiswa(laporan[index]); }}
-                                        >
-                                            <ActionButton text={"Lihat Detail"}>
-                                                <Eye className='cursor-pointer' />
-                                            </ActionButton>
-                                        </div>
-                                        <div className="cursor-pointer w-10 rounded-md">
-                                            <a target='_blank' href={item.dokumen} className='text-black dark:text-slate-200 flex justify-center'>
-                                                <ActionButton text={"Lihat Dokumen"}>
-                                                    <Eye className='cursor-pointer' />
+                                            <div>{index + 1}</div>
+                                            <div className='overflow-auto'>{item.nama}</div>
+                                            <div>{formattedDate(item.tanggal)}</div>
+                                            <div className="cursor-pointer">
+                                                {
+                                                    !item.upload ? (
+                                                        <Button onClick={() => { openModal("upload", item.nama, "Formulir"); setDataMahasiswa(item); }}>Upload</Button>
+                                                    ) : (
+                                                        <ActionButton text={"Lihat Formulir"} onClick={() => { openModal(item.upload, item.nama, "Formulir"); setDataMahasiswa(item); }}>
+                                                            <Eye className='cursor-pointer' />
+                                                        </ActionButton>
+                                                    )
+                                                }
+                                            </div>
+                                            <div>
+                                                <ActionButton text={"Download Dokumen"}>
+                                                    <ArrowDownToLine className='cursor-pointer' onClick={() => handleGeneratePDF(item)} />
                                                 </ActionButton>
-                                            </a>
+                                            </div>
+                                            <div className={`w-fit rounded-md ${item.status === 'Converted' ? 'text-green-600' : 'text-yellow-600'}`}>{item.status}</div>
                                         </div>
-                                        <div>
-                                            <ActionButton text={"Download Dokumen"}>
-                                                <ArrowDownToLine className='cursor-pointer' onClick={() => handleDownload(item.report)} />
-                                            </ActionButton>
-                                        </div>
+                                    ))
+                                ) : (
+                                    <div className='grid grid-cols-10 mb-7 text-sm-3 gap-5 pb-2' key="empty">
+                                        <p className='text-center col-span-10 italic'>Data Kosong</p>
                                     </div>
-                                )) :
-                            (
-                                <div className={`grid grid-cols-10 mb-7 text-sm-3 gap-5 pb-2`} >
+                                )
+                            ) : (
+                                <div className={`grid grid-cols-10 mb-7 text-sm-3 gap-5 pb-2`}>
                                     <div className='col-span-10 flex justify-center'>
                                         <Loading />
                                     </div>
                                 </div>
                             )
-                    }
-                </Tables>
-            </div>
+                        }
+                    </Tables>
 
-            <Modal className={"w-[550px]"} open={isModalOpen}>
-                <Modal.ModalBerkas src={berkasName} onClose={closeModal} nama={nama} file={jenisFile} review={true} onClick={(e) => { handleAction(e, 'patch'); }} setSpesifikBerkas={setSpesifikBerkas} />
+                </div>
+            </main>
+
+            <Modal className={"w-[550px]"} open={isModalUploadOpen}>
+                <Modal.ModalBerkas src={berkasName} onClose={closeModal} onClick={(e) => { handleAction(e, 'upload'); }} nama={nama} file={jenisFile} upload={(e) => {
+                    setSpesifikBerkas(e);
+                }} />
             </Modal>
             <Modal className={"w-fit"} open={isModalDetail}>
                 <Modal.ModalCustom onClose={() => { closeModal('detail') }} title={"Detail Mahasiswa"} formClass={'grid grid-cols-2 gap-x-6'}>

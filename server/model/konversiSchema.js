@@ -25,10 +25,6 @@ const konversiSchema = sequelize.define(
         type: DataTypes.STRING,
         allowNull: false
       },
-      sks_tujuan: {
-        type: DataTypes.STRING,
-        allowNull: false
-      },
       nilai_tujuan: {
         type: DataTypes.STRING,
         allowNull: false

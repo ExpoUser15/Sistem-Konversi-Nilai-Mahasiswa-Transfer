@@ -6,15 +6,9 @@ const Notification = ({ className = "", text, status, notifRef, state }) => {
         if (state) {
             // Tampilkan notifikasi (reset animasi)
             notifRef.current.classList.replace("translate-x-[1000px]", "translate-x-[0]");
-            // if (notifAudioRef.current) {
-            //     notifAudioRef.current.muted = false; // Unmute the audio
-            // }
 
             const timer = setTimeout(() => {
                 notifRef.current.classList.replace("translate-x-[0]", "translate-x-[1000px]");
-                // if (notifAudioRef.current) {
-                //     notifAudioRef.current.muted = true;
-                // }
             }, 6000);
 
             return () => clearTimeout(timer);

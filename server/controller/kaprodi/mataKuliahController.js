@@ -170,8 +170,6 @@ const searchingMK = async (req, res) => {
             }
         );
 
-        console.log(mkData);
-
         return res.json({
             search: true,
             data: mkData

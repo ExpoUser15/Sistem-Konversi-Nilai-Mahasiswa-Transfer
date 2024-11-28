@@ -37,7 +37,7 @@ function Form({ className, label, width, read, data, onChange, dataIndex, emptyV
                                     <>
                                         <div className='flex flex-col mt-2'>
                                             <Input.SelectInput
-                                                key={index}
+                                                key={btoa(String(index))}
                                                 width={'h-8'}
                                                 value={mk}
                                                 onChange={(e) => onChange(e, key, dataIndex)} 
@@ -47,11 +47,11 @@ function Form({ className, label, width, read, data, onChange, dataIndex, emptyV
                                             />
                                         </div>
                                     </>
-                                ):key === 'sks_tujuan' ? (
+                                ):key === 'sks_tujuan' || key === 'sks_asal' ? (
                                     <>
                                         <div className='flex flex-col mt-2'>
                                             <Input.SelectInput
-                                                key={label[index]}
+                                                key={btoa(String(label[index]))}
                                                 width={'h-8'}
                                                 value={['1', '2', '3', '4']}
                                                 onChange={(e) => onChange(e, key, dataIndex)} 
@@ -63,7 +63,7 @@ function Form({ className, label, width, read, data, onChange, dataIndex, emptyV
                                     </>
                                 ):(
                                     <Input
-                                        key={index}
+                                        key={btoa(String(index))}
                                         label={label.length !== 0 ? label[index] : ""}
                                         width={width}
                                         read={read}

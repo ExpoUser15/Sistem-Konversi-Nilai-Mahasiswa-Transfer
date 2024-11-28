@@ -1,4 +1,4 @@
-import { Eye } from "lucide-react";
+import { ArrowDownToLine, Eye } from "lucide-react";
 import ActionButton from "../../components/Buttons/ActionButton";
 import Loading from "../../components/Loader/Loading";
 import SearchField from "../../components/Inputs/SearchingInput";
@@ -10,6 +10,7 @@ import Modal from "../../components/ModalBox/Modal";
 import Input from "../../components/Inputs/Input";
 import useAuth from "../../hooks/useAuth";
 import Greeting from "../../utils/Greeting";
+import { formattedDate } from "../../utils/formattedDate";
 
 function DashboardAkademik() {
   const dispatch = useDispatch();
@@ -56,27 +57,26 @@ function DashboardAkademik() {
           <h4 className="font-medium">Overview</h4>
         </div>
         <div className="bg-white px-8 py-3 rounded-md shadow dark:bg-black dark:shadow-neutral-700">
-          <div className="flex gap-2 items-center justify-between mb-5">
-            <h4 className="font-medium">Pengajuan Konversi Terbaru</h4>
-            <SearchField placeholder={"Cari..."} />
+          <div className="flex items-center sm:mb-5 mb-10">
+            <h4 className="font-medium">Pengajuan Konversi</h4>
           </div>
-          <Tables fields={["Nama", "Tanggal", "Berkas", "Transkrip", "Surat Pindah", "Detail", "Dokumen", "Status"]} gap={"2"} className={'w-full'}>
+          <Tables fields={["No", "Nama", "Tanggal", "Berkas", "Transkrip", "Surat Pindah", "Detail", "Status"]} gap={"2"} className={'w-full'}>
             {
-              !loading ?
-                students
-                  .map((item, index) => (
+              !loading ? (
+                students.length > 0 ? (
+                  students.map((item, index) => (
                     <div
-                      className={`grid grid-cols-8 mb-7 text-sm-3 gap-1 pb-2`}
+                      className={`min-w-[700px] sm:max-h-fit grid grid-cols-8 mb-7 text-sm-3 pb-2`}
                       style={{ borderBottom: "1px solid #CCCCCC" }}
                       key={index}
                     >
+                      <div>{index + 1}</div>
                       <div className='overflow-auto'>{item.nama}</div>
-                      <div>{item.tanggal}</div>
+                      <div>{formattedDate(item.tanggal)}</div>
                       <div
                         className="cursor-pointer"
                         onClick={() => { openModal([item.ktp, item.kk, item.ijazah], item.nama, ["KTP", "KK", "Ijazah"]); setDataMahasiswa(students[index]); }}
                       >
-
                         <ActionButton text={"Lihat Berkas"}>
                           <Eye className='cursor-pointer' />
                         </ActionButton>
@@ -91,9 +91,8 @@ function DashboardAkademik() {
                       </div>
                       <div
                         className="cursor-pointer"
-                        onClick={() => { openModal(item.surat_pindah, item.nama, "Surat Pindah"); setDataMahasiswa(students[index]); }}
                       >
-                        <ActionButton text={"Lihat Surat Pindah"}>
+                        <ActionButton text={"Lihat Surat Pindah"} onClick={() => { openModal(item.surat_pindah, item.nama, "Surat Pindah"); setDataMahasiswa(students[index]); }}>
                           <Eye className='cursor-pointer' />
                         </ActionButton>
                       </div>
@@ -105,36 +104,24 @@ function DashboardAkademik() {
                           <Eye className='cursor-pointer' />
                         </ActionButton>
                       </div>
-                      <div
-                        className="cursor-pointer w-36 rounded-md"
-                      >
-                        {
-                          item.report ? (
-                            <a target='_blank' href={item.report} className='text-black dark:text-slate-200 flex'>
-                              <ActionButton text={"Lihat Dokumen"}>
-                                <Eye className='cursor-pointer' />
-                              </ActionButton>
-                            </a>
-                          ) : (
-                            <div className="italic">
-                              Kosong
-                            </div>
-                          )
-                        }
-                      </div>
                       <div className={`w-fit rounded-md ${item.status === 'Converted' ? 'text-green-600' : 'text-yellow-600'}`}>{item.status}</div>
                     </div>
-                  )
-                  ) :
-                (
-                  <div className={`grid grid-cols-10 mb-7 text-sm-3 gap-5 pb-2`} >
-                    <div className='col-span-10 flex justify-center'>
-                      <Loading />
-                    </div>
+                  ))
+                ) : (
+                  <div className='grid grid-cols-10 mb-7 text-sm-3 gap-5 pb-2' key="empty">
+                    <p className='text-center col-span-10 italic'>Data Kosong</p>
                   </div>
                 )
+              ) : (
+                <div className={`grid grid-cols-10 mb-7 text-sm-3 gap-5 pb-2`}>
+                  <div className='col-span-10 flex justify-center'>
+                    <Loading />
+                  </div>
+                </div>
+              )
             }
           </Tables>
+
         </div>
       </main>
 

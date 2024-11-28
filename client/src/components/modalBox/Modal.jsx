@@ -53,12 +53,12 @@ const ModalBerkas = (({ src, open, onClose, file, nama, setSpesifikBerkas, onCli
 
     const handleEditFile = async (e) => {
         if (typeof file === 'object') {
-            return setSpesifikBerkas({ [file[index].toLowerCase()]: e.target.files[0] });
+            return setSpesifikBerkas({ [file[index].toLowerCase()]: e });
         }
         const splitKey = file.toLowerCase().split(' ');
         const str = splitKey.join('_');
         const key = file === 'Transkrip Nilai' ? splitKey[0] : str;
-        setSpesifikBerkas({ [key]: e.target.files[0] });
+        setSpesifikBerkas({ [key]: e });
     }
 
     useEffect(() => {
@@ -78,7 +78,7 @@ const ModalBerkas = (({ src, open, onClose, file, nama, setSpesifikBerkas, onCli
                     <CircleX className="text-red-600" />
                 </button>
             </div>
-            <img src={typeof src === 'object' ? src[index] : src} alt={file} className="w-full h-auto" loading='lazy' ref={berkasRef} />
+            <img src={typeof src === 'object' ? src[index] : src} alt={file} className="w-full h-auto" loading='lazy' ref={berkasRef} id='berkasImg'/>
             {
                 typeof src === 'object' ? (
                     <>

@@ -1,30 +1,26 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
-const semesterSchema = sequelize.define(
-    'tb_semester',
+const pimpinanSchema = sequelize.define(
+    'tb_leader',
     {
-      id_semester: {
+      kode: {
         type: DataTypes.STRING,
         primaryKey: true,
         allowNull: false,
       },
-      id_mk: {
+      nama: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      penempatan: {
-        type: DataTypes.STRING,
-        allowNull: false
-      },
-      id_mahasiswa: {
+      jabatan: {
         type: DataTypes.STRING,
         allowNull: false
       }
     },
     {
-        timestamps: false
+        timestamps: false,
     }
 );
 
-module.exports = semesterSchema;
+module.exports = pimpinanSchema;

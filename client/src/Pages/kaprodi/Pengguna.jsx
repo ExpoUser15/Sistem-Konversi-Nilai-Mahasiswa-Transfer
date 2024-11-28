@@ -114,7 +114,7 @@ function Pengguna() {
             </div>
             {/* Table */}
             <div className="mb-16 mt-16 bg-white px-8 py-3 rounded-md shadow dark:bg-black dark:shadow-neutral-700">
-                <div className="flex gap-2 items-center justify-between mb-5">
+                <div className="flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between sm:mb-5 mb-10">
                     <h4 className="font-medium">Daftar Pengguna</h4>
                     <SearchingInput placeholder={"Cari Pengguna..."} searchType={'pengguna'}/>
                 </div>
@@ -124,7 +124,7 @@ function Pengguna() {
                             users.length > 0 ? (
                                 users.map((item, index) => (
                                     <div
-                                        className="grid grid-cols-5 mb-7 text-sm-3 gap-1 pb-2"
+                                        className="min-w-[700px] sm:max-h-fit grid grid-cols-5 mb-7 text-sm-3 pb-2"
                                         style={{ borderBottom: "1px solid #CCCCCC" }}
                                         key={item.id_pengguna}
                                     >

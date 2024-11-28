@@ -6,18 +6,23 @@ function getCurrentTime() {
     return `${hours}:${minutes}:${seconds}`;
 }
 
-function getCurrentFormattedDate(now = new Date()) {
-    const day = String(now.getDate()).padStart(2, '0');
+function getCurrentFormattedDate(now) {
+    let date = new Date(now);
+    if(!now){
+        date = new Date();
+    }
+    const day = String(date.getDate()).padStart(2, '0');
     const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-    const month = monthNames[now.getMonth()].substring(0, 3);
-    const completeMonth = monthNames[now.getMonth()];
-    const year = now.getFullYear();
+    const month = monthNames[date.getMonth()];
+    const year = date.getFullYear();
+    
     return {
-        formatDate: `${day} ${month} ${year}`,
-        formatDate2: `${year}-${String(now.getMonth()).padStart(2, 0)}-${day}`,
-        formatDate3: `${day} ${completeMonth} ${year}`
+        formatDate: `${day} ${month} ${year}`, // Format: 02 Februari 2024
+        formatDate2: `${year}-${String(date.getMonth() + 1).padStart(2, '0')}-${day}`, // Format: 2024-02-02
+        formatDate3: `${day} ${month} ${year}` // Format: 02 Februari 2024 (alternatif)
     };
 }
+
 
 function getLastSunday() {
     const today = new Date();

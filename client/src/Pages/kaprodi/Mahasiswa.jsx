@@ -11,6 +11,22 @@ import { deleteData, fetchData, patchData, postData, updateData } from '../../re
 import Loading from '../../components/Loader/Loading';
 import Notification from '../../components/Notifications/Notification';
 import SearchField from '../../components/Inputs/SearchingInput';
+import { formattedDate } from '../../utils/formattedDate';
+import useCompressedImage from '../../hooks/useCompressedImage';
+import RcPagination from 'rc-pagination';
+import 'rc-pagination/assets/index.css';
+
+const locale = {
+    prev_page: 'Previous',
+    next_page: 'Next',
+    jump_to: 'Go to',
+    jump_to_confirm: 'Confirm',
+    page: 'Page',
+    items_per_page: 'items/page',
+};
+
+const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE2 = 10;
 
 function Mahasiswa() {
     const dispatch = useDispatch();
@@ -38,6 +54,20 @@ function Mahasiswa() {
     useEffect(() => {
         dispatch(fetchData({ endpoint: 'mahasiswa/all/akademik' }));
     }, [dispatch]);
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const [currentPage2, setCurrentPage2] = useState(1);
+
+    const studentsPending = students.filter(item => item.status === "Pending");
+    const studentsConverted = students.filter(item => item.status === "Converted");
+
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    const currentDataPending = studentsPending.slice(startIndex, endIndex);
+
+    const startIndex2 = (currentPage2 - 1) * ITEMS_PER_PAGE2;
+    const endIndex2 = startIndex2 + ITEMS_PER_PAGE2;
+    const currentDataConverted = studentsConverted.slice(startIndex2, endIndex2);
 
     const openModal = (item, item2, file) => {
         if (item === "detail") {
@@ -75,6 +105,7 @@ function Mahasiswa() {
         setIsDeleteModal(false);
         setIsModalOpen(false);
     };
+    
 
     const handleInputValue = async (e, item, action, file) => {
         const inputvalue = e.target.value;
@@ -88,7 +119,7 @@ function Mahasiswa() {
 
         let fileOrText;
         if (file) {
-            fileOrText = e.target.files[0]; 
+            fileOrText = await useCompressedImage(e);
         } else {
             fileOrText = inputvalue; 
         }
@@ -107,7 +138,6 @@ function Mahasiswa() {
             const formData = new FormData();
 
             for (let key in value) {
-                console.log(key);
                 formData.append(key, value[key]);
             }
 
@@ -132,16 +162,23 @@ function Mahasiswa() {
         }
 
         if (actionType === 'patch') {
-            console.log(spesifikBerkas);
             const formData = new FormData();
             const key = Object.keys(spesifikBerkas)[0];
-            formData.append(key, spesifikBerkas[key]);
-            console.log(dataMahasiswa);
-            dispatch(patchData({ endpoint: `mahasiswa/update/${dataMahasiswa.id_mahasiswa}/berkas/${dataMahasiswa.id_berkas}`, data: spesifikBerkas, contentType: 'multipart/form-data' }));
+            const compress = await useCompressedImage(spesifikBerkas[key]);
+            formData.append(key, compress);
+            dispatch(patchData({ endpoint: `mahasiswa/update/${dataMahasiswa.id_mahasiswa}/berkas/${dataMahasiswa.id_berkas}`, data: formData, contentType: 'multipart/form-data' }));
             setIsModalOpen(false);
             setSpesifikBerkas({});
         }
     }
+
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+    };
+
+    const handlePageChange2 = (page) => {
+        setCurrentPage2(page);
+    };
 
     return (
         <>
@@ -156,53 +193,51 @@ function Mahasiswa() {
             </div>
             {/* Table */}
             <div className="my-16 bg-white px-8 py-3 rounded-md shadow dark:bg-black dark:shadow-neutral-700">
-                <div className="flex gap-2 items-center justify-between mb-5">
+                <div className="flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between sm:mb-5 mb-10">
                     <h4 className="font-medium">Pengajuan Konversi</h4>
                     <SearchField placeholder={"Cari..."} searchType={'mahasiswa'}/>
                 </div>
                 <Tables fields={["Nama", "Tanggal", "Berkas", "Transkrip", "Surat Pindah", "Detail", "Status", ""]} gap={"5"}>
                     {
                         !loading ?
-                            students
-                                .filter(item => item.status === "Pending")
+                            studentsPending
                                 .map((item, index) => (
                                     <div
-                                        className={`grid grid-cols-8 mb-7 text-sm-3 gap-5 pb-2`}
+                                        className={`min-w-[700px] sm:max-h-fit grid grid-cols-8 mb-7 text-sm-3 gap-5 pb-2`}
                                         style={{ borderBottom: "1px solid #CCCCCC" }}
                                         key={item.id_mahasiswa}
                                     >
                                         <div className='overflow-auto'>{item.nama}</div>
-                                        <div>{item.tanggal}</div>
+                                        <div>{formattedDate(item.tanggal)}</div>
                                         <div
                                             className="cursor-pointer"
-                                            onClick={() => { openModal([item.ktp, item.kk, item.ijazah], item.nama, ["KTP", "KK", "Ijazah"]); setDataMahasiswa(item); }}
                                         >
 
-                                            <ActionButton text={"Lihat Berkas"}>
+                                            <ActionButton text={"Lihat Berkas"}  onClick={() => { openModal([item.ktp, item.kk, item.ijazah], item.nama, ["KTP", "KK", "Ijazah"]); setDataMahasiswa(item); }}>
                                                 <Eye className='cursor-pointer' />
                                             </ActionButton>
                                         </div>
                                         <div
                                             className="cursor-pointer"
-                                            onClick={() => { openModal(item.transkrip_nilai, item.nama, "Transkrip Nilai"); setDataMahasiswa(item); }}
                                         >
-                                            <ActionButton text={"Lihat Transkrip"}>
+                                            <ActionButton text={"Lihat Transkrip"} 
+                                            onClick={() => { openModal(item.transkrip_nilai, item.nama, "Transkrip Nilai"); setDataMahasiswa(item); }}>
                                                 <Eye className='cursor-pointer' />
                                             </ActionButton>
                                         </div>
                                         <div
                                             className="cursor-pointer"
-                                            onClick={() => { openModal(item.surat_pindah, item.nama, "Surat Pindah"); setDataMahasiswa(item); }}
                                         >
-                                            <ActionButton text={"Lihat Surat Pindah"}>
+                                            <ActionButton text={"Lihat Surat Pindah"} 
+                                            onClick={() => { openModal(item.surat_pindah, item.nama, "Surat Pindah"); setDataMahasiswa(item); }}>
                                                 <Eye className='cursor-pointer' />
                                             </ActionButton>
                                         </div>
                                         <div
                                             className="cursor-pointer"
-                                            onClick={() => { openModal('detail', item); setDataMahasiswa(item); }}
                                         >
-                                            <ActionButton text={"Lihat Detail"}>
+                                            <ActionButton text={"Lihat Detail"} 
+                                            onClick={() => { openModal('detail', item); setDataMahasiswa(item); }}>
                                                 <Eye className='cursor-pointer' />
                                             </ActionButton>
                                         </div>
@@ -238,26 +273,37 @@ function Mahasiswa() {
                             )
                     }
                 </Tables>
-                <Button text={"Tambah"} className={"mt-2 ms-auto"} onClick={(e) => { e.preventDefault(); openModal("tambah"); }} />
+                <div className='flex mt-8'>
+                    <RcPagination
+                        current={currentPage}
+                        total={studentsPending.length}
+                        pageSize={ITEMS_PER_PAGE}
+                        onChange={handlePageChange}
+                        showQuickJumper
+                        locale={locale}
+                        showLessItems={true}
+                        hideOnSinglePage={true}
+                    />
+                    <Button text={"Tambah"} className={"ms-auto"} onClick={(e) => { e.preventDefault(); openModal("tambah"); }} />
+                </div>
             </div>
             <div className='mb-16 bg-white px-8 py-3 rounded-md shadow dark:bg-black dark:shadow-neutral-700'>
-                <div className="flex gap-2 items-center justify-between mb-5">
+                <div className="flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between sm:mb-5 mb-10">
                     <h4 className="font-medium">Daftar Mahasiswa Transfer</h4>
                     <SearchField placeholder={"Cari..."} searchType={"mahasiswa"}/>
                 </div>
                 <Tables fields={["Nama", "Tanggal", "Berkas", "Transkrip", "Surat Pindah", "Detail", "Status", ""]} gap={"5"}>
                     {
                         students.length > 0 ?
-                            students
-                                .filter(item => item.status === "Converted")
+                            currentDataConverted
                                 .map((item, index) => (
                                     <div
-                                        className={`grid grid-cols-8 mb-7 text-sm-3 gap-5 pb-2`}
+                                        className={`min-w-[700px] sm:max-h-fit grid grid-cols-8 mb-7 text-sm-3 gap-5 pb-2`}
                                         style={{ borderBottom: "1px solid #CCCCCC" }}
                                         key={item.id_mahasiswa}
                                     >
                                         <div className='overflow-auto'>{item.nama}</div>
-                                        <div>{item.tanggal}</div>
+                                        <div>{formattedDate(item.tanggal)}</div>
                                         <div
                                             className="cursor-pointer"
                                             onClick={() => {openModal([item.ktp, item.kk, item.ijazah], item.nama, ["KTP", "KK", "Ijazah"]); setDataMahasiswa(item);}}
@@ -323,6 +369,18 @@ function Mahasiswa() {
                             )
                     }
                 </Tables>
+                <div className="flex mt-8">
+                    <RcPagination
+                        current={currentPage2}
+                        total={studentsConverted.length}
+                        pageSize={ITEMS_PER_PAGE2}
+                        onChange={handlePageChange2}
+                        showQuickJumper
+                        locale={locale}
+                        showLessItems={true}
+                        hideOnSinglePage={true}
+                    />
+                </div>
             </div>
             <Modal className={"w-[550px]"} open={isModalOpen}>
                 <Modal.ModalBerkas src={berkasName} onClose={closeModal} onClick={(e) => { handleAction(e, 'patch'); }} nama={nama} file={jenisFile} setSpesifikBerkas={setSpesifikBerkas} />

@@ -9,22 +9,21 @@ exports.deleteFile = async (berkas, fileArr) => {
             kk: 'kk',
             ktp: 'ktp',
             surat_pindah: 'surat_pindah',
-            transkrip_nilai: 'transkrip' // Mapped to 'transkrip' folder
+            transkrip_nilai: 'transkrip' 
         };
 
         for (const field of fileArr) {
             if (berkas[field]) {
-                // Ambil URL dan pisahkan untuk mendapatkan path dan nama file
                 const fileUrl = new URL(berkas[field]);
-                const filePathName = folderMap[field]; // Mengambil nama folder dari mapping
-                const fileName = fileUrl.pathname.split('/').pop(); // 'nama_file.png'
+                const filePathName = folderMap[field]; 
+                const fileName = fileUrl.pathname.split('/').pop();
 
                 const filePath = path.join(__dirname, '..', `tmp/${filePathName}`, fileName);
                 try {
-                    await fs.promises.unlink(filePath); // Menggunakan fs.promises.unlink untuk operasi asinkron
+                    await fs.promises.unlink(filePath); 
                 } catch (err) {
                     console.error(`Gagal menghapus file ${fileName}:`, err);
-                    return false; // Menghentikan loop dan mengembalikan false jika ada kesalahan
+                    return false; 
                 }
             }
         }

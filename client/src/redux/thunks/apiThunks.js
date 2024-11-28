@@ -137,7 +137,6 @@ export const updateKonversiData = createAsyncThunk(
           'Content-Type': !contentType ? 'application/json' : contentType,
         },
       });
-      console.log(contentType);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response ? error.response.data : error.message);
