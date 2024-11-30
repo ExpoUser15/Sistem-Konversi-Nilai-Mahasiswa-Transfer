@@ -11,10 +11,10 @@ const store = configureStore({
     }
 });
 
-console.log("Store Created: ", store.getState())
+// console.log("Store Created: ", store.getState())
 
-store.subscribe(() => {
-    console.log("Store Change: ", store.getState())
-});
+// store.subscribe(() => {
+//     console.log("Store Change: ", store.getState())
+// });
 
 export default store;

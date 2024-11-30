@@ -145,10 +145,6 @@ function KonversiDetail() {
         if (data.length === 0) navigate('/kaprodi/riwayat');
     }, [data]);
 
-    useEffect(() => {
-        console.log(status);
-    }, [status]);
-
     const openModal = (cek, item) => {
         if (cek === 'edit') {
             setIsModalEdit(true);
@@ -257,7 +253,6 @@ function KonversiDetail() {
                     setMessage(res.data.message);
                     setAction(true);
                     setDataSemester(res.data.data);
-                    console.log(res.data);
 
                     const penempatanIndex = res.data.data.findIndex(item => item[0].penempatan === semester);
                     if (penempatanIndex === -1) {
@@ -341,7 +336,6 @@ function KonversiDetail() {
                     mata_kuliah: '',
                     semester: ''
                 });
-                console.log(res.data)
                 if(res.data.mkData !== 0){
                     setDataSemester(res.data.data);
                     setMkRemaining([]);
@@ -475,17 +469,17 @@ function KonversiDetail() {
                     <div className="flex gap-2 items-center justify-between mb-5">
                         <h4 className="font-medium">Rekapitulasi</h4>
                     </div>
-                    <div className='text-sm-3 grid grid-cols-5'>
+                    <div className='text-sm-3 grid grid-cols-1 sm:grid-cols-5'>
                         <div className='grid grid-cols-1'>
-                            <Input.TextInput label={'Mata Kuliah/SKS'} width={'w-32'} read={true} reference={totalSKSRef} ></Input.TextInput>
+                            <Input.TextInput label={'Mata Kuliah/SKS'} width={'sm:w-32 w-42'} read={true} reference={totalSKSRef} ></Input.TextInput>
                         </div>
                         <div className='grid grid-cols-1'>
-                            <Input.TextInput label={'MK yang harus ditempuh'} width={'w-32'} read={true} reference={mkTempuhRef} ></Input.TextInput>
+                            <Input.TextInput label={'MK yang harus ditempuh'} width={'sm:w-32 w-42'} read={true} reference={mkTempuhRef} ></Input.TextInput>
                         </div>
                         <div className='grid grid-cols-1'>
                             <Input.TextInput
                                 label={'Penempatan Semester'}
-                                width={'w-32'}
+                                width={'sm:w-32 w-42'}
                                 reference={semesterRef}
                                 read={true}
                             />
@@ -513,7 +507,7 @@ function KonversiDetail() {
                                 currentData
                                     .map((item, index) => (
                                         <div
-                                            className={`grid grid-cols-8 mb-7 text-sm-3 gap-5 pb-2`}
+                                            className={`min-w-[700px] sm:max-h-fit grid grid-cols-8 mb-7 text-sm-3 gap-5 pb-2`}
                                             style={{ borderBottom: "1px solid #CCCCCC" }}
                                             key={btoa(String(index))}
                                         >
@@ -557,7 +551,7 @@ function KonversiDetail() {
                     <div className="flex gap-2 items-center justify-between mb-5">
                         <h4 className="font-medium">Penempatan</h4>
                     </div>
-                    <div className='text-sm-3 grid grid-cols-4 gap-2'>
+                    <div className='text-sm-3 grid grid-col-1 sm:grid-cols-4 gap-2 mb-7'>
                         <div className='grid grid-cols-1'>
                             <Input.SelectInput reference={mkPenempatanRef} width={'100%'} value={mkRemaining} data={["", ""]} label={'Mata Kuliah'} onChange={(e) => {
                                 setSemestervalue({ ...semesterValue, mata_kuliah: e.target.value });
@@ -573,10 +567,10 @@ function KonversiDetail() {
 
                     {
                         dataSemester.length !== 0 ? (
-                            <div className="text-sm-3 grid grid-cols-12">
+                            <div className="text-sm-3 grid grid-cols-2 sm:grid-cols-12">
                                 {
                                     dataSemester.map((item, index) => (
-                                        <Button key={item[0].penempatan} className={'col-span-2 margin-auto h-fit w-fit my-auto bg-slate-600 border-slate-500'} onClick={() => { handleSemesterMenu(index) }}>Semester {item[0].penempatan}</Button>
+                                        <Button key={item[0].penempatan} className={'sm:col-span-2 margin-auto h-fit w-fit my-auto bg-slate-600 border-slate-500 text-nowrap'} onClick={() => { handleSemesterMenu(index) }}>Semester {item[0].penempatan}</Button>
                                     ))
                                 }
                             </div>
@@ -593,7 +587,7 @@ function KonversiDetail() {
                                         spesifikSemesterData.length === 0 ? (
                                             dataSemester[0].map((item, index) => (
                                                 <div
-                                                    className={`grid grid-cols-5 mb-7 text-sm-3 gap-2 pb-2`}
+                                                    className={`min-w-[700px] sm:max-h-fit grid grid-cols-5 mb-7 text-sm-3 gap-5 pb-2`}
                                                     style={{ borderBottom: "1px solid #CCCCCC" }}
                                                     key={item.kode}
                                                 >
@@ -638,14 +632,14 @@ function KonversiDetail() {
                                         )
                                     }
                                 </Tables>
-                                <Button className={'ms-auto h-fit w-fit my-auto bg-red-500 border-red-500'} onClick={() => { openModal('hapus tabel', spesifikSemesterData.length === 0 ? dataSemester[0][0].penempatan : spesifikSemesterData[0].penempatan) }}>Hapus Tabel Semester {spesifikSemesterData.length === 0 ? dataSemester[0][0].penempatan : spesifikSemesterData[0].penempatan}</Button>
+                                <Button className={'ms-auto h-fit w-fit mb-10 bg-red-500 border-red-500'} onClick={() => { openModal('hapus tabel', spesifikSemesterData.length === 0 ? dataSemester[0][0].penempatan : spesifikSemesterData[0].penempatan) }}>Hapus Tabel Semester {spesifikSemesterData.length === 0 ? dataSemester[0][0].penempatan : spesifikSemesterData[0].penempatan}</Button>
                             </div>
                         ) : (
                             <></>
                         )
                     }
 
-                    <div className='flex gap-2'>
+                    <div className='flex gap-2 mb-2'>
                         {
                             dataSemester.length !== 0 ? (
                                 <>

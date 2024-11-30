@@ -116,7 +116,7 @@ function Riwayat() {
                                     .filter(item => item.status === "Converted")
                                     .map((item, index) => (
                                         <div
-                                            className={`min-w-[700px] sm:max-h-fit grid grid-cols-7 mb-7 text-sm-3 gap-5 pb-2`}
+                                            className={`min-w-[700px] sm:max-h-fit grid grid-cols-7 mb-7 text-sm-3 gap-2 sm:gap-5 pb-2`}
                                             style={{ borderBottom: "1px solid #CCCCCC" }}
                                             key={item.id_mahasiswa}
                                         >
@@ -126,7 +126,7 @@ function Riwayat() {
                                             <div>
                                                 {
                                                     !item.upload ? (
-                                                        <span className='italic'>Belum diupload</span>
+                                                        <span className='italic'>Belum Diupload</span>
                                                     ) : (
                                                         <ActionButton text={"Lihat Formulir"} onClick={() => { openModal(item.upload, item.nama, "Formulir"); setDataMahasiswa(item); }}>
                                                             <Eye className='cursor-pointer' />

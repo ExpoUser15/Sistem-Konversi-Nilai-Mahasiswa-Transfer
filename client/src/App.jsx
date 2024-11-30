@@ -15,6 +15,7 @@ import Laporan from './Pages/akademik/Laporan';
 import KonversiDetail from './Pages/kaprodi/KonversiDetail';
 import Riwayat from './Pages/kaprodi/Riwayat';
 import Pimpinan from './Pages/kaprodi/Pimpinan';
+import NotFound from './Pages/error/NotFound';
 
 function App() {
 
@@ -51,6 +52,7 @@ function App() {
 
           {/* Route jika user mencoba mengakses halaman yang tidak sesuai dengan role */}
           <Route path="/unauthorized" element={<Unauthorized />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </>

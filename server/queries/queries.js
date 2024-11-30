@@ -63,15 +63,6 @@ class Queries {
             throw new Error(error.message);
         }
     }
-
-    async count(){
-        try {
-            const result = await this.model.count();
-            return result;
-        } catch (error) {
-            throw new Error(error.message);
-        }
-    }
 }
 
 module.exports = Queries;

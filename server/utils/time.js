@@ -1,11 +1,3 @@
-function getCurrentTime() {
-    const now = new Date();
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
-    return `${hours}:${minutes}:${seconds}`;
-}
-
 function getCurrentFormattedDate(now) {
     let date = new Date(now);
     if(!now){
@@ -23,29 +15,6 @@ function getCurrentFormattedDate(now) {
     };
 }
 
-
-function getLastSunday() {
-    const today = new Date();
-    const todayDayOfWeek = today.getDay();
-    const lastSunday = new Date(today);
-    lastSunday.setDate(today.getDate() - todayDayOfWeek);
-    
-    return lastSunday;
-}
-
-function formatDateToYYYYMMDD(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); 
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-}
-
-const lastSunday = getLastSunday();
-const formattedDate = formatDateToYYYYMMDD(lastSunday);
-console.log(`Tanggal hari Minggu kemarin: ${formattedDate}`);
-
 module.exports = {
-    getCurrentTime,
-    getCurrentFormattedDate,
-    formattedDate
+    getCurrentFormattedDate
 };

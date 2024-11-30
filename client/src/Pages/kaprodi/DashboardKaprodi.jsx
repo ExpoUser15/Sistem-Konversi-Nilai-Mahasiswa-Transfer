@@ -21,6 +21,7 @@ const DashboardKaprodi = () => {
 
   const [totalMK, setTotalMk] = useState(0);
   const [totalStudent, setTotalSudent] = useState(0);
+  const [totalSKS, setTotalSKS] = useState(0);
 
   const [dataMahasiswa, setDataMahasiswa] = useState({});
   const [berkasName, setBerkasName] = useState("");
@@ -35,9 +36,9 @@ const DashboardKaprodi = () => {
 
     axios.get(`http://localhost:3000/analisis`)
     .then(res => {
-      console.log(res.data.countMK[0][0]);
       setTotalMk(res.data.countMK[0][0].total_mk);
       setTotalSudent(res.data.countStudents[0][0].total_student);
+      setTotalSKS(res.data.totalSKS[0][0].total_sks);
     })
     .catch(err => console.log(err));
   }, [dispatch]);
@@ -71,9 +72,9 @@ const DashboardKaprodi = () => {
         {/* Analytics Card */}
         <div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-            <Card text={'Total Mata Kuliah'} drop={false} data={totalMK === 0 ? '0' : totalMK}/>
-            <Card text={'Total Pengajuan Konversi'} drop={true} data={totalStudent === 0 ? '0' : totalStudent}/>
-            <Card text={'Average Konversi Terbaru'} drop={false} data={'12'}/>
+            <Card text={'Total Mahasiswa Transfer'} data={totalStudent === 0 ? '0' : totalStudent}/>
+            <Card text={'Total Mata Kuliah'} drop={true} data={totalMK === 0 ? '0' : totalMK}/>
+            <Card text={'Total SKS'} data={totalSKS === 0 ? '0' : totalSKS}/>
           </div>
         </div>
         

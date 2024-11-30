@@ -27,12 +27,22 @@ const addUsersController = async (req, res) => {
     try {
         const { id, username, password, user } = req.body;
 
+        let users = await userQueries.findAll();
         if (!username || !password || !user) {
-            const users = await userQueries.findAll();
 
             return res.json({
                 status: "Warning",
                 message: "Silahkan mengisikan form terlebih dahulu!",
+                data: users
+            });
+        }
+
+        const usersExists = await userQueries.findOne({ username });
+
+        if(usersExists){
+            return res.json({
+                status: "Warning",
+                message: `Username '${username}' sudah ada.`,
                 data: users
             });
         }
@@ -44,7 +54,8 @@ const addUsersController = async (req, res) => {
             if (userData) {
                 return res.json({
                     status: "Error",
-                    message: 'ID user sudah ada'
+                    message: 'ID user sudah ada',
+                    data: users
                 });
             }
         }
@@ -71,7 +82,7 @@ const addUsersController = async (req, res) => {
                     user
                 });
 
-                const users = await userQueries.findAll();
+                users = await userQueries.findAll();
 
                 res.json({
                     status: "Success",
@@ -97,16 +108,72 @@ const deleteController = async (req, res) => {
     try {
         const { id } = req.params;
 
+        let role = await sequelize.query(
+            `
+            SELECT COUNT(*) AS totalUsers 
+            FROM tb_users 
+            WHERE user = 'Kaprodi'
+              AND (
+                EXISTS (
+                  SELECT 1 
+                  FROM tb_users 
+                  WHERE id_pengguna = :id AND user = 'Kaprodi'
+                )
+              )
+            `,
+            {
+                replacements: { id },
+                type: QueryTypes.SELECT,
+            }
+        );
+
+        let role2 = await sequelize.query(
+            `
+            SELECT COUNT(*) AS totalUsers 
+            FROM tb_users 
+            WHERE user = 'Akademik'
+              AND (
+                EXISTS (
+                  SELECT 1 
+                  FROM tb_users 
+                  WHERE id_pengguna = :id AND user = 'Akademik'
+                )
+              )
+            `,
+            {
+                replacements: { id },
+                type: QueryTypes.SELECT,
+            }
+        );
+
+        let users = await userQueries.findAll();
+
+        if (role[0].totalUsers === 1) {
+            return res.json({
+                status: "Warning",
+                message: "Tidak bisa menghapus Kaprodi terakhir yang tersedia.",
+                data: users
+            });
+        }
+
+        if (role2[0].totalUsers === 1) {
+            return res.json({
+                status: "Warning",
+                message: "Tidak bisa menghapus Akademik terakhir yang tersedia.",
+                data: users
+            });
+        }
+
         await userQueries.delete({
             id_pengguna: id
         });
 
-        const user = await userQueries.findAll();
+        users = await userQueries.findAll();
 
         res.json({
             status: "Success",
             message: "Berhasil menghapus user",
-            data: user
+            data: users
         });
     } catch (error) {
         console.log(error);
@@ -119,7 +186,7 @@ const deleteController = async (req, res) => {
 const updateController = async (req, res) => {
     try {
         const { id_pengguna, username, password, user } = req.body;
-        console.log(req.body);
+
         const { id } = req.params;
 
         if (!username || !user || !id_pengguna) {

@@ -30,14 +30,13 @@ const handlingCookie = (req, res, next) => {
                     }
                 };
             });
-            next();
         } else {
             req.data = {
                 status: "Unauthenticated",
                 message: "Silahkan login terlebih dahulu!"
             }
-            next();
         }
+        next();
     } catch (error) {
         console.log(error);
         res.status(500).json({
