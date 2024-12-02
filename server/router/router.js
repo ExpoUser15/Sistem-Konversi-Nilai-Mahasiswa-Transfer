@@ -4,14 +4,13 @@ const handlingCookie = require('../middleware/handlingCookie');
 const { usersController, addUsersController, deleteController, updateController, searchingUsers } = require('../controller/kaprodi/usersController');
 const { addMahasiswaController, mahasiswaController, deleteMahasiswaController, updateMahasiswaController, updateBerkasController, searchingMahasiswa } = require('../controller/akademik/mahasiswaController');
 const { mataKuliahController, addMataKuliahController, deleteMataKuliahController, updateMataKuliahController, searchingMK } = require('../controller/kaprodi/mataKuliahController');
-const { validateUserKaprodi, validateUserAkademik } = require('../middleware/validateUsers');
 const { notFound } = require('../controller/notFound');
 const {berkasUpload, docUpload} = require('../middleware/fileHandler');
 const fileController = require('../controller/fileResponse/filleController');
 const { konversiController, addKonversiController, updateKonversiController, deleteKonversiController, detailKonversiController, konversiReportController, penempatanController, penempatanMKController, semesterPostController, deleteSpesifikKonversiController, deleteMKPenempatanController, deletePenempatanController, recapController, generatePDFContoller, updateDateController } = require('../controller/kaprodi/konversiController');
 const logoutController = require('../controller/logoutController');
 const handleDuplicateData = require('../middleware/handleDuplicateData');
-const { laporanController, laporanPostController, searchLaporan, transkripPostController, generatePDFContoller2, reviewUploadController } = require('../controller/akademik/laporanController');
+const { laporanController, laporanPostController, searchLaporan, generatePDFContoller2 } = require('../controller/akademik/laporanController');
 const { pimpinanController, addPimpinanController, deletePimpinanController, updatePimpinanController, searchingPimpinan } = require('../controller/kaprodi/pimpinanController');
 const { analyticsController } = require('../controller/kaprodi/dashboardController');
 
@@ -21,16 +20,16 @@ router.get('/login', handlingCookie, loginController);
 router.get('/logout', logoutController);
 
 // kaprodi router
-router.get('/users', handlingCookie, validateUserKaprodi, usersController);
-router.get('/matakuliah', handlingCookie, validateUserKaprodi, mataKuliahController);
-router.get('/konversi', handlingCookie, validateUserKaprodi, konversiController);
-router.get('/konversi/:id', handlingCookie, validateUserKaprodi, konversiReportController);
-router.get('/konversi/penempatan/:id', handlingCookie, validateUserKaprodi, penempatanMKController);
-router.get('/konversi/semester/:id', handlingCookie, validateUserKaprodi, penempatanController);
-router.get('/konversi/detail/:id', handlingCookie, validateUserKaprodi, detailKonversiController);
-router.get('/konversi/recap/:id', handlingCookie, validateUserKaprodi, recapController);
-router.get('/pimpinan', handlingCookie, validateUserKaprodi, pimpinanController);
-router.get('/analisis', handlingCookie, validateUserKaprodi, analyticsController);
+router.get('/users', handlingCookie, usersController);
+router.get('/matakuliah', handlingCookie, mataKuliahController);
+router.get('/konversi', handlingCookie, konversiController);
+router.get('/konversi/:id', handlingCookie, konversiReportController);
+router.get('/konversi/penempatan/:id', handlingCookie, penempatanMKController);
+router.get('/konversi/semester/:id', handlingCookie, penempatanController);
+router.get('/konversi/detail/:id', handlingCookie, detailKonversiController);
+router.get('/konversi/recap/:id', handlingCookie, recapController);
+router.get('/pimpinan', handlingCookie, pimpinanController);
+router.get('/analisis', handlingCookie, analyticsController);
 
 router.post('/auth', postLoginController);
 router.post('/users/add', handlingCookie, addUsersController);

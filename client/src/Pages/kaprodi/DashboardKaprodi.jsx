@@ -9,9 +9,9 @@ import Modal from "../../components/ModalBox/Modal";
 import Input from "../../components/Inputs/Input";
 import Loading from "../../components/Loader/Loading";
 import useAuth from "../../hooks/useAuth";
-import { useNavigate } from "react-router-dom";
 import Greeting from "../../utils/Greeting";
 import axios from "axios";
+import { formattedDate } from '../../utils/formattedDate';
 
 const DashboardKaprodi = () => {
   const dispatch = useDispatch();
@@ -94,7 +94,7 @@ const DashboardKaprodi = () => {
                       key={index}
                     >
                       <div className='overflow-auto'>{item.nama}</div>
-                      <div>{item.tanggal}</div>
+                      <div>{formattedDate(item.tanggal)}</div>
                       <div
                         className="cursor-pointer"
                         onClick={() => { openModal([item.ktp, item.kk, item.ijazah], item.nama, ["KTP", "KK", "Ijazah"]); setDataMahasiswa(students[index]); }}

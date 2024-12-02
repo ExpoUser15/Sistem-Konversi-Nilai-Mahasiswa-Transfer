@@ -47,14 +47,14 @@ const postLoginController = async (req, res) => {
                     return res.status(422).json({
                         status: "Warning",
                         message: "Username atau Password Salah!"
-                    })
+                    });
                 }
 
                 const token = jwt.sign({ 
                     username: dataValues.username, 
                     user: dataValues.user, 
                     id: dataValues.id_pengguna 
-                }, process.env.SECRET_KEY, { expiresIn: '1d' });
+                }, process.env.SECRET_KEY, { expiresIn: '5s' });
             
                 res.cookie("token", token);
 

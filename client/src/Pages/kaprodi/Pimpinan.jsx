@@ -127,7 +127,7 @@ function Pimpinan() {
                             data.map((item, index) => (
                                 <div
                                     className="min-w-[700px] sm:max-h-fit grid grid-cols-4 mb-7 text-sm-3 gap-5 pb-2"
-                                    key={item.id_pimpinan} style={{ borderBottom: "1px solid #CCCCCC" }}
+                                    key={btoa(item.kode)} style={{ borderBottom: "1px solid #CCCCCC" }}
                                 >
                                     <div>{item.kode}</div>
                                     <div className="overflow-auto">{item.nama}</div>

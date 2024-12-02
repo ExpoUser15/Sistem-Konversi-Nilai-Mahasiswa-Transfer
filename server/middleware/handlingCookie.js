@@ -10,30 +10,29 @@ const handlingCookie = (req, res, next) => {
                     if (err.name === "TokenExpiredError") {
                         res.clearCookie("token");
                         return req.data = {
-                            status: "Expired",
+                            status: "Error",
                             message: "Sesi anda telah berakhir, silahkan login kembali."
                         };
                     }
                     return req.data = {
-                        status: "Unauthenticated",
-                        message: "Silahkan login terlebih dahulu!"
+                        status: "Warning",
+                        message: "Sesi anda telah berakhir, silahkan login kembali."
                     };
                 }
 
                 req.data = {
-                    status: "Authenticated",
+                    status: "Success",
                     data: {
                         id: decoded.id,
                         username: decoded.username,
-                        user: decoded.user,
-                        token: token.token
+                        user: decoded.user
                     }
                 };
             });
         } else {
             req.data = {
-                status: "Unauthenticated",
-                message: "Silahkan login terlebih dahulu!"
+                status: "Warning",
+                message: "Sesi anda telah berakhir, silahkan login kembali."
             }
         }
         next();

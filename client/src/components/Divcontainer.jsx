@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import Notification from "./Notifications/Notification";
 import useAuth from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { changeNavigated } from "../redux/slices/loginSlice";
 
 const Divcontainer = ({ className = "" }) => {
   const dispatch = useDispatch();
@@ -13,35 +14,42 @@ const Divcontainer = ({ className = "" }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const auth = useSelector(state => state.loginData.status); 
-  const action = useSelector(state => state.loginData.action);  
-  const message = useSelector(state => state.loginData.message); 
+  const auth = useSelector(state => state.loginData.status);
+  const action = useSelector(state => state.loginData.action);
+  const message = useSelector(state => state.loginData.message);
+
   const notifRef = useRef();
 
-  useEffect(() => {
-    dispatch(fetchData({ endpoint: 'login' }));
-  }, []);
+  const data = useSelector(state => state.loginData.data);
+  const token = useSelector(state => state.loginData.tokenExpired);
 
-  useEffect(() => {    
-    if(otentikasi){
+  // useEffect(() => {
+  //   dispatch(fetchData({ endpoint: 'login' }));
+  // }, [dispatch]);
+
+  useEffect(() => {
+    if (otentikasi) {
       navigate(`/${otentikasi.user.toLowerCase()}`);
-    }else{
+    } else {
       navigate(`/login`);
+    }
+
+    
+    if(data.status === "Error"){
+      console.log(data);
     }
   }, [auth]);
 
-  const handleLogin = async (e) => {
+  const handleLogin = (e) => {
     e.preventDefault();
 
-    const resultAction = await dispatch(postData({ endpoint: 'auth', data: { username, password } }));
-  
+    const resultAction = dispatch(postData({ endpoint: 'auth', data: { username, password } }));
+
     if (postData.fulfilled.match(resultAction)) {
       navigate(`/${otentikasi.user.toLowerCase()}`);
-    } else {
-      console.error('Login failed:', resultAction.error.message);
     }
   };
-  
+
 
   return (
     <>
