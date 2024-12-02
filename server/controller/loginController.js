@@ -54,7 +54,7 @@ const postLoginController = async (req, res) => {
                     username: dataValues.username, 
                     user: dataValues.user, 
                     id: dataValues.id_pengguna 
-                }, process.env.SECRET_KEY, { expiresIn: '5s' });
+                }, process.env.SECRET_KEY, { expiresIn: '1d' });
             
                 res.cookie("token", token);
 
