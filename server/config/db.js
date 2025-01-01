@@ -1,8 +1,7 @@
-const { Sequelize } = require('sequelize')
+const { Sequelize } = require('sequelize');
 
-const sequelize = new Sequelize('db_konversi_nilai', 'root', '', {
-    host: process.env.DB_HOST,
-    dialect: 'mysql'
-});
+const URI = `mysql://${MYSQLUSER}:${MYSQLPASSWORD}@${MYSQLHOST}:${MYSQLPORT}/${MYSQLDATABASE}`;
+
+const sequelize = new Sequelize(URI);
 
 module.exports = sequelize;
