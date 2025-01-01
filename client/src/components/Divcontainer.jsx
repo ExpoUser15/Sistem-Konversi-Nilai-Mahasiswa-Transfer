@@ -23,7 +23,7 @@ const Divcontainer = ({ className = "" }) => {
   const data = useSelector(state => state.loginData.data);
 
   useEffect(() => {
-    axios.get(`http://localhost:3000/csrf-token`)
+    axios.get(`${import.meta.env.VITE_API_URL}csrf-token`)
     .then(res => {
       console.log(res);
     })

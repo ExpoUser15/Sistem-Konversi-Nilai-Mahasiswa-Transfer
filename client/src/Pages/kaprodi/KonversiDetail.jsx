@@ -95,13 +95,13 @@ function KonversiDetail() {
     }, [dispatch]);
 
     useEffect(() => {
-        axios.get(`http://localhost:3000/konversi/recap/${id_mahasiswa}`)
+        axios.get(`${import.meta.env.VITE_API_URL}konversi/recap/${id_mahasiswa}`)
             .then(res => {
                 const { data } = res;
                 setDataRecap(data.data);
             }).catch(err => console.log(err));
 
-        axios.get(`http://localhost:3000/konversi/semester/${id_mahasiswa}`)
+        axios.get(`${import.meta.env.VITE_API_URL}konversi/semester/${id_mahasiswa}`)
             .then(res => {
                 const { data } = res;
                 setDataSemester(data.data);
@@ -113,7 +113,7 @@ function KonversiDetail() {
                 }
             }).catch(err => console.log(err));
 
-        axios.get(`http://localhost:3000/konversi/penempatan/${id_mahasiswa}`)
+        axios.get(`${import.meta.env.VITE_API_URL}konversi/penempatan/${id_mahasiswa}`)
             .then(res => {
                 let data = res.data.data.map(item => {
                     return {
@@ -209,7 +209,7 @@ function KonversiDetail() {
         setAction('');
         await new Promise(resolve => setTimeout(resolve, 0));
         if (actionType === 'hapus') {
-            axios.delete(`http://localhost:3000/konversi/detail/delete/${dataKonversi.id_konversi}/${id_mahasiswa}`)
+            axios.delete(`${import.meta.env.VITE_API_URL}konversi/detail/delete/${dataKonversi.id_konversi}/${id_mahasiswa}`)
                 .then(res => {
                     const { data } = res;
                     setDataRecap(data.recapData);
@@ -230,7 +230,7 @@ function KonversiDetail() {
                 ...value
             }
 
-            axios.put(`http://localhost:3000/konversi/detail/${id_mahasiswa}`, updatedData)
+            axios.put(`${import.meta.env.VITE_API_URL}konversi/detail/${id_mahasiswa}`, updatedData)
                 .then(res => {
                     const { data } = res;
                     setDataRecap(data.recapData);
@@ -247,7 +247,7 @@ function KonversiDetail() {
         if (actionType === 'hapus penempatan') {
             penempatanSelectRef.current.value = "";
             setMkRemaining([]);
-            axios.delete(`http://localhost:3000/konversi/semester/delete/${dataKonversi.kode}/${id_mahasiswa}/${semester}`)
+            axios.delete(`${import.meta.env.VITE_API_URL}konversi/semester/delete/${dataKonversi.kode}/${id_mahasiswa}/${semester}`)
                 .then(res => {
                     setStatus(res.data.status);
                     setMessage(res.data.message);
@@ -288,7 +288,7 @@ function KonversiDetail() {
         if (actionType === 'hapus tabel') {
             penempatanSelectRef.current.value = "";
             setMkRemaining([]);
-            axios.delete(`http://localhost:3000/konversi/semester/tabel/delete/${dataKonversi}/${id_mahasiswa}`)
+            axios.delete(`${import.meta.env.VITE_API_URL}konversi/semester/tabel/delete/${dataKonversi}/${id_mahasiswa}`)
                 .then(res => {
                     setStatus(res.data.status);
                     setMessage(res.data.message);
@@ -323,7 +323,7 @@ function KonversiDetail() {
         setStatus('');
         setMessage('');
         setAction(false);
-        axios.post(`http://localhost:3000/konversi/semester/add/${id_mahasiswa}`, semesterValue, {
+        axios.post(`${import.meta.env.VITE_API_URL}konversi/semester/add/${id_mahasiswa}`, semesterValue, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -421,7 +421,7 @@ function KonversiDetail() {
             return;
         }
 
-        axios.put(`http://localhost:3000/konversi/update/date/${id_mahasiswa}`, {
+        axios.put(`${process.env.REACT_APP_API_URI}konversi/update/date/${id_mahasiswa}`, {
             tanggal: formattedDate
         }).then(res => {
             setStatus(res.data.status);
@@ -441,7 +441,7 @@ function KonversiDetail() {
     const downloadFile = useDownload();
 
     const handleGeneratePDF = () => {
-        axios.get(`http://localhost:3000/file/report/${id_mahasiswa}`, {
+        axios.get(`${process.env.REACT_APP_API_URI}file/report/${id_mahasiswa}`, {
             responseType: 'blob'
         })
             .then(res => {

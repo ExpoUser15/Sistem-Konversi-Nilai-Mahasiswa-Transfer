@@ -11,7 +11,7 @@ function Form({ className, label, width, read, data, onChange, dataIndex, emptyV
     const getMKData = async () => {
         try {
             axios.defaults.withCredentials = true;
-            const url = `http://localhost:3000/matakuliah`;
+            const url = `${import.meta.env.VITE_API_URL}matakuliah`;
             const response = await axios.get(url);
             setMk(response.data.data);
             dispacth(insertMK(response.data.data));

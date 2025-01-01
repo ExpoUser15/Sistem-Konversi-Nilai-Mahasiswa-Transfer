@@ -14,7 +14,6 @@ import axios from "axios";
 import { formattedDate } from '../../utils/formattedDate';
 import { rateLimitterStatus } from "../../redux/slices/loginSlice";
 import Notification from "../../components/Notifications/Notification";
-import Cookies from "js-cookie";
 
 const DashboardKaprodi = () => {
   const dispatch = useDispatch();
@@ -40,7 +39,7 @@ const DashboardKaprodi = () => {
   useEffect(() => {
     dispatch(fetchData({ endpoint: 'mahasiswa/recent/dashboard-kaprodi' }));
 
-    axios.get(`http://localhost:3000/analisis`)
+    axios.get(`${import.meta.env.VITE_API_URL}analisis`)
     .then(res => {
       setTotalMk(res.data.countMK[0][0].total_mk);
       setTotalSudent(res.data.countStudents[0][0].total_student);
@@ -51,10 +50,6 @@ const DashboardKaprodi = () => {
       console.log(err);
     });
   }, [dispatch]);
-
-  useEffect(() => {
-    console.log(action);
-  }, [action])
 
   const openModal = (item, item2, file) => {
     if (item === "detail") {

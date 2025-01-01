@@ -41,7 +41,6 @@ const Notification = ({ className = "", text, status, notifRef, state }) => {
             <div className="flex-1 relative leading-[16px] font-medium flex items-center mix-blend-normal min-w-[203px] text-sm-3 z-[1] text-wrap">
                 {text}
             </div>
-            {/* <audio src="/omg-bruh-oh-hell-nah.mp3" autoPlay ref={notifAudioRef}></audio> */}
         </div>
     );
 };

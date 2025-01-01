@@ -53,13 +53,14 @@ function Mahasiswa() {
 
     useEffect(() => {
         dispatch(fetchData({ endpoint: 'mahasiswa/all/akademik' }));
+        console.log(students)
     }, [dispatch]);
 
     const [currentPage, setCurrentPage] = useState(1);
     const [currentPage2, setCurrentPage2] = useState(1);
 
-    const studentsPending = students.filter(item => item.status === "Pending");
-    const studentsConverted = students.filter(item => item.status === "Converted");
+    const studentsPending = students.filter(item => item.status === "Pending").sort((a, b) =>  new Date(b.tanggal) - new Date(a.tanggal));
+    const studentsConverted = students.filter(item => item.status === "Converted").sort((a, b) =>  new Date(b.tanggal) - new Date(a.tanggal));
 
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
@@ -200,7 +201,7 @@ function Mahasiswa() {
                 <Tables fields={["Nama", "Tanggal", "Berkas", "Transkrip", "Surat Pindah", "Detail", "Status", ""]} gap={"5"}>
                     {
                         !loading ?
-                            studentsPending
+                            currentDataPending
                                 .map((item, index) => (
                                     <div
                                         className={`min-w-[700px] sm:max-h-fit grid grid-cols-8 mb-7 text-sm-3 gap-5 pb-2`}

@@ -6,7 +6,7 @@ export const fetchData = createAsyncThunk(
   async ({ endpoint }, { rejectWithValue }) => {
     try {
       axios.defaults.withCredentials = true;
-      const url = `http://localhost:3000/${endpoint}`;
+      const url = `${import.meta.env.VITE_API_URL}${endpoint}`;
       const response = await axios.get(url);
       return response.data;
     } catch (error) {
@@ -20,8 +20,8 @@ export const postData = createAsyncThunk(
   async ({ endpoint, data, contentType }, { rejectWithValue }) => {
     try {
       axios.defaults.withCredentials = true;
-      const url = `http://localhost:3000/${endpoint}`;
-      const csrf = await axios.get(`http://localhost:3000/csrf-token`);
+      const url = `${import.meta.env.VITE_API_URL}${endpoint}`;
+      const csrf = await axios.get(`${import.meta.env.VITE_API_URL}csrf-token`);
       const response = await axios.post(url, data, {
         headers: {
           'Content-Type': contentType || 'application/json',
@@ -40,8 +40,8 @@ export const patchData = createAsyncThunk(
   async ({ endpoint, data, contentType }, { rejectWithValue }) => {
     try {
       axios.defaults.withCredentials = true;
-      const url = `http://localhost:3000/${endpoint}`;
-      const csrf = await axios.get(`http://localhost:3000/csrf-token`);
+      const url = `${import.meta.env.VITE_API_URL}${endpoint}`;
+      const csrf = await axios.get(`${import.meta.env.VITE_API_URL}csrf-token`);
       const response = await axios.patch(url, data, {
         headers: {
           'Content-Type': contentType || 'application/json',
@@ -60,8 +60,8 @@ export const updateData = createAsyncThunk(
   async ({ endpoint, data, contentType }, { rejectWithValue }) => {
     try {
       axios.defaults.withCredentials = true;
-      const url = `http://localhost:3000/${endpoint}`;
-      const csrf = await axios.get(`http://localhost:3000/csrf-token`);
+      const url = `$${import.meta.env.VITE_API_URL}${endpoint}`;
+      const csrf = await axios.get(`${import.meta.env.VITE_API_URL}csrf-token`);
       const response = await axios.put(url, data, {
         headers: {
           'Content-Type': contentType || 'application/json',
@@ -79,8 +79,8 @@ export const deleteData = createAsyncThunk(
   'apiData/deleteData',
   async ({ endpoint }, { rejectWithValue }) => {
     try {
-      const url = `http://localhost:3000/${endpoint}`;
-      const csrf = await axios.get(`http://localhost:3000/csrf-token`);
+      const url = `${import.meta.env.VITE_API_URL}${endpoint}`;
+      const csrf = await axios.get(`${import.meta.env.VITE_API_URL}csrf-token`);
       const response = await axios.delete(url, {
         headers: {
           'CSRF-Token': csrf.data.csrfToken
@@ -98,7 +98,7 @@ export const fetchKonversiData = createAsyncThunk(
   async ({ endpoint }, { rejectWithValue }) => {
     try {
       axios.defaults.withCredentials = true;
-      const url = `http://localhost:3000/${endpoint}`;
+      const url = `${import.meta.env.VITE_API_URL}${endpoint}`;
       const response = await axios.get(url);
       return response.data;
     } catch (error) {
@@ -112,8 +112,8 @@ export const postKonversiData = createAsyncThunk(
   async ({ endpoint, data, contentType }, { rejectWithValue }) => {
     try {
       axios.defaults.withCredentials = true;
-      const url = `http://localhost:3000/${endpoint}`;
-      const csrf = await axios.get(`http://localhost:3000/csrf-token`);
+      const url = `${import.meta.env.VITE_API_URL}${endpoint}`;
+      const csrf = await axios.get(`${import.meta.env.VITE_API_URL}csrf-token`);
       const response = await axios.post(url, data, {
         headers: {
           'Content-Type': contentType || 'application/json',
@@ -131,8 +131,8 @@ export const deleteKonversiData = createAsyncThunk(
   'konversi/deleteKonversiData',
   async ({ endpoint }, { rejectWithValue }) => {
     try {
-      const url = `http://localhost:3000/${endpoint}`;
-      const csrf = await axios.get(`http://localhost:3000/csrf-token`);
+      const url = `${import.meta.env.VITE_API_URL}${endpoint}`;
+      const csrf = await axios.get(`${import.meta.env.VITE_API_URL}csrf-token`);
       const response = await axios.delete(url, {
         headers: {
           'CSRF-Token': csrf.data.csrfToken
@@ -149,8 +149,8 @@ export const updateKonversiData = createAsyncThunk(
   async ({ endpoint, data, contentType }, { rejectWithValue }) => {
     try {
       axios.defaults.withCredentials = true;
-      const url = `http://localhost:3000/${endpoint}`;
-      const csrf = await axios.get(`http://localhost:3000/csrf-token`);
+      const url = `${import.meta.env.VITE_API_URL}${endpoint}`;
+      const csrf = await axios.get(`${import.meta.env.VITE_API_URL}csrf-token`);
       const response = await axios.put(url, data, {
         headers: {
           'Content-Type': contentType || 'application/json',

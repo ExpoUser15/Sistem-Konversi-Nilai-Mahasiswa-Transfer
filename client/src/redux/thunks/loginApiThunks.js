@@ -6,7 +6,7 @@ export const postData = createAsyncThunk(
     async ({ endpoint, data }, { rejectWithValue }) => {
         try {
             axios.defaults.withCredentials = true;
-            const url = `http://localhost:3000/${endpoint}`;
+            const url = `${import.meta.env.VITE_API_URL}${endpoint}`;
             const response = await axios.post(url, data, {
                 headers: {
                     'Content-Type': 'application/json',
@@ -24,7 +24,7 @@ export const fetchData = createAsyncThunk(
     async ({ endpoint }, { rejectWithValue }) => {
         try {
             axios.defaults.withCredentials = true;
-            const url = `http://localhost:3000/${endpoint}`;
+            const url = `${import.meta.env.VITE_API_URL}${endpoint}`;
             const response = await axios.get(url);
             return response.data;
         } catch (error) {

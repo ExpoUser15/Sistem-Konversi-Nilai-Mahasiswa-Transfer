@@ -21,7 +21,7 @@ const semestersQueries = new Queries(semesterSchema);
 
 const mahasiswaController = async (req, res) => {
     try {
-        const { type, page } = req.params;
+        const { type } = req.params;
 
         if (type === 'all') {
             const mahasiswaData = await sequelize.query("SELECT * FROM tb_students JOIN tb_files ON tb_files.id_mahasiswa = tb_students.id_mahasiswa ORDER BY tanggal ASC");

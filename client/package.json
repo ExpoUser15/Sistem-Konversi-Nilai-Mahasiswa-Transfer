@@ -19,6 +19,7 @@
     "axios": "^1.7.5",
     "browser-image-compression": "^2.0.2",
     "crypto": "^1.0.1",
+    "dotenv": "^16.4.7",
     "js-cookie": "^3.0.5",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.428.0",

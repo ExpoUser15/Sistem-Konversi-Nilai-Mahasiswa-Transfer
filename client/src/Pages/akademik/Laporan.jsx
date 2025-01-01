@@ -25,7 +25,6 @@ function Laporan() {
 
     const notifRef = useRef();
 
-    const [value, setValue] = useState({});
     const [dataMahasiswa, setDataMahasiswa] = useState({});
     const [berkasName, setBerkasName] = useState("");
     const [nama, setNama] = useState("");
@@ -74,7 +73,7 @@ function Laporan() {
     const downloadFile = useDownload();
 
     const handleGeneratePDF = (item) => {
-        axios.get(`http://localhost:3000/file/report/${item.id_mahasiswa}/all`, {
+        axios.get(`${import.meta.env.VITE_API_URL}file/report/${item.id_mahasiswa}/all`, {
             responseType: 'blob'
         })
             .then(res => {
