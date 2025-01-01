@@ -53,7 +53,6 @@ function Mahasiswa() {
 
     useEffect(() => {
         dispatch(fetchData({ endpoint: 'mahasiswa/all/akademik' }));
-        console.log(students)
     }, [dispatch]);
 
     const [currentPage, setCurrentPage] = useState(1);
