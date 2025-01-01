@@ -4,7 +4,6 @@ import {jwtDecode} from "jwt-decode";
 const useAuth = () => {
     const tokenFromCookie = Cookies.get('token');
 
-    
     if (tokenFromCookie) {
         try {
             const decoded = jwtDecode(tokenFromCookie);

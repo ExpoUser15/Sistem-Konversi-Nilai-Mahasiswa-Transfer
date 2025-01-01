@@ -114,6 +114,7 @@ function Pengguna() {
         if (actionType === 'tambah') {
             dispatch(postData({ endpoint: 'matakuliah/add', data: value }));
             setIsModalTambah(false);
+            setValue({});
         }
 
         if (actionType === 'hapus') {

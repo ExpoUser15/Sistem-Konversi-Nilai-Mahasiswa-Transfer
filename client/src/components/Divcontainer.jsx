@@ -1,11 +1,11 @@
 import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchData, postData } from "../redux/thunks/loginApiThunks";
+import { postData } from "../redux/thunks/loginApiThunks";
 import { useEffect, useRef, useState } from "react";
 import Notification from "./Notifications/Notification";
 import useAuth from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
-import { changeNavigated } from "../redux/slices/loginSlice";
+import axios from "axios";
 
 const Divcontainer = ({ className = "" }) => {
   const dispatch = useDispatch();
@@ -21,11 +21,14 @@ const Divcontainer = ({ className = "" }) => {
   const notifRef = useRef();
 
   const data = useSelector(state => state.loginData.data);
-  const token = useSelector(state => state.loginData.tokenExpired);
 
-  // useEffect(() => {
-  //   dispatch(fetchData({ endpoint: 'login' }));
-  // }, [dispatch]);
+  useEffect(() => {
+    axios.get(`http://localhost:3000/csrf-token`)
+    .then(res => {
+      console.log(res);
+    })
+    .catch(err => console.log(err));
+  }, [])
 
   useEffect(() => {
     if (otentikasi) {

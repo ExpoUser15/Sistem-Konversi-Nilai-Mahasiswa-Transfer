@@ -21,23 +21,24 @@ const apiSlice = createSlice({
     // Handle GET request
     builder
       .addCase(fetchData.pending, (state) => {
-        state.action = false;
         state.loading = true;
         state.error = null;
         state.status = null;
         state.message = null;
         state.data = [];
+        state.action = false;
       })
       .addCase(fetchData.fulfilled, (state, action) => {
-        const data = action.payload.data;
+        const data = action.payload.data ;
         state.data = data;
         state.loading = false;
       })
       .addCase(fetchData.rejected, (state, action) => {
         state.loading = false;
-        state.message = action.payload.message;
-        state.status = action.payload.status;
-        state.error = true;
+        state.message = action.payload.message || "Terjadi kesalahan pada server.";
+        state.status = action.payload.status || "Error";
+        state.action = true;
+        state.data = [];
       })
 
       // Handle POST request
@@ -62,10 +63,10 @@ const apiSlice = createSlice({
       .addCase(postData.rejected, (state, action) => {
         state.action = true;
         state.loading = false;
-        state.message = action.payload.message;
-        state.status = action.payload.status;
+        state.message = action.payload.message || "Terjadi kesalahan pada server.";
+        state.status = action.payload.status || "Error";
         state.error = true;
-        const data = action.payload.data;
+        const data = action.payload.data || [];
         state.data = data;
       })
 
@@ -80,8 +81,8 @@ const apiSlice = createSlice({
       .addCase(updateData.fulfilled, (state, action) => {
         state.action = true;
         state.loading = false;
-        state.message = action.payload.message;
-        state.status = action.payload.status;
+        state.message = action.payload.message 
+        state.status = action.payload.status 
         const data = action.payload.data;
         console.log(data);
         state.data = data;
@@ -89,10 +90,10 @@ const apiSlice = createSlice({
       .addCase(updateData.rejected, (state, action) => {
         state.action = true;
         state.loading = false;
-        state.message = action.payload.message;
-        state.status = action.payload.status;
+        state.message = action.payload.message || "Terjadi kesalahan pada server.";
+        state.status = action.payload.status || "Error";
         state.error = true;
-        const data = action.payload.data;
+        const data = action.payload.data || [];
         state.data = data;
       })
 
@@ -115,10 +116,10 @@ const apiSlice = createSlice({
       .addCase(patchData.rejected, (state, action) => {
         state.action = true;
         state.loading = false;
-        state.message = action.payload.message;
-        state.status = action.payload.status;
+        state.message = action.payload.message || "Terjadi kesalahan pada server.";
+        state.status = action.payload.status || "Error";
         state.error = true;
-        const data = action.payload.data;
+        const data = action.payload.data || [];
         state.data = data;
       })
 
@@ -140,10 +141,10 @@ const apiSlice = createSlice({
       .addCase(deleteData.rejected, (state, action) => {
         state.action = true;
         state.loading = false;
-        state.message = action.payload.message;
-        state.status = action.payload.status;
+        state.message = action.payload.message || "Terjadi kesalahan pada server.";
+        state.status = action.payload.status || "Error";
         state.error = true;
-        const data = action.payload.data;
+        const data = action.payload.data || [];
         state.data = data;
       });
   },

@@ -21,9 +21,11 @@ export const postData = createAsyncThunk(
     try {
       axios.defaults.withCredentials = true;
       const url = `http://localhost:3000/${endpoint}`;
+      const csrf = await axios.get(`http://localhost:3000/csrf-token`);
       const response = await axios.post(url, data, {
         headers: {
-          'Content-Type': !contentType ? 'application/json' : contentType,
+          'Content-Type': contentType || 'application/json',
+          'CSRF-Token': csrf.data.csrfToken
         },
       });
       return response.data;
@@ -39,9 +41,11 @@ export const patchData = createAsyncThunk(
     try {
       axios.defaults.withCredentials = true;
       const url = `http://localhost:3000/${endpoint}`;
+      const csrf = await axios.get(`http://localhost:3000/csrf-token`);
       const response = await axios.patch(url, data, {
         headers: {
-          'Content-Type': !contentType ? 'application/json' : contentType,
+          'Content-Type': contentType || 'application/json',
+          'CSRF-Token': csrf.data.csrfToken
         },
       });
       return response.data;
@@ -57,9 +61,11 @@ export const updateData = createAsyncThunk(
     try {
       axios.defaults.withCredentials = true;
       const url = `http://localhost:3000/${endpoint}`;
+      const csrf = await axios.get(`http://localhost:3000/csrf-token`);
       const response = await axios.put(url, data, {
         headers: {
-          'Content-Type': !contentType ? 'application/json' : contentType,
+          'Content-Type': contentType || 'application/json',
+          'CSRF-Token': csrf.data.csrfToken
         }
       });
       return response.data;
@@ -74,7 +80,12 @@ export const deleteData = createAsyncThunk(
   async ({ endpoint }, { rejectWithValue }) => {
     try {
       const url = `http://localhost:3000/${endpoint}`;
-      const response = await axios.delete(url);
+      const csrf = await axios.get(`http://localhost:3000/csrf-token`);
+      const response = await axios.delete(url, {
+        headers: {
+          'CSRF-Token': csrf.data.csrfToken
+        }
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response ? error.response.data : error.message);
@@ -102,9 +113,11 @@ export const postKonversiData = createAsyncThunk(
     try {
       axios.defaults.withCredentials = true;
       const url = `http://localhost:3000/${endpoint}`;
+      const csrf = await axios.get(`http://localhost:3000/csrf-token`);
       const response = await axios.post(url, data, {
         headers: {
-          'Content-Type': !contentType ? 'application/json' : contentType,
+          'Content-Type': contentType || 'application/json',
+          'CSRF-Token': csrf.data.csrfToken
         },
       });
       return response.data;
@@ -119,7 +132,12 @@ export const deleteKonversiData = createAsyncThunk(
   async ({ endpoint }, { rejectWithValue }) => {
     try {
       const url = `http://localhost:3000/${endpoint}`;
-      const response = await axios.delete(url);
+      const csrf = await axios.get(`http://localhost:3000/csrf-token`);
+      const response = await axios.delete(url, {
+        headers: {
+          'CSRF-Token': csrf.data.csrfToken
+        }
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response ? error.response.data : error.message);
@@ -132,9 +150,11 @@ export const updateKonversiData = createAsyncThunk(
     try {
       axios.defaults.withCredentials = true;
       const url = `http://localhost:3000/${endpoint}`;
+      const csrf = await axios.get(`http://localhost:3000/csrf-token`);
       const response = await axios.put(url, data, {
         headers: {
-          'Content-Type': !contentType ? 'application/json' : contentType,
+          'Content-Type': contentType || 'application/json',
+          'CSRF-Token': csrf.data.csrfToken
         },
       });
       return response.data;

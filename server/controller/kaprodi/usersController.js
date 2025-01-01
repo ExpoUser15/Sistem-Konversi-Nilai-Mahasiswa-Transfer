@@ -27,6 +27,8 @@ const addUsersController = async (req, res) => {
     try {
         const { id, username, password, user } = req.body;
 
+        console.log(req.csrfToken())
+
         let users = await userQueries.findAll();
         if (!username || !password || !user) {
 

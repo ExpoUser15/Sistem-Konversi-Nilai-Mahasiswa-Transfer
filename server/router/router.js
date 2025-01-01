@@ -5,7 +5,7 @@ const { usersController, addUsersController, deleteController, updateController,
 const { addMahasiswaController, mahasiswaController, deleteMahasiswaController, updateMahasiswaController, updateBerkasController, searchingMahasiswa } = require('../controller/akademik/mahasiswaController');
 const { mataKuliahController, addMataKuliahController, deleteMataKuliahController, updateMataKuliahController, searchingMK } = require('../controller/kaprodi/mataKuliahController');
 const { notFound } = require('../controller/notFound');
-const {berkasUpload, docUpload} = require('../middleware/fileHandler');
+const { berkasUpload, docUpload } = require('../middleware/fileHandler');
 const fileController = require('../controller/fileResponse/filleController');
 const { konversiController, addKonversiController, updateKonversiController, deleteKonversiController, detailKonversiController, konversiReportController, penempatanController, penempatanMKController, semesterPostController, deleteSpesifikKonversiController, deleteMKPenempatanController, deletePenempatanController, recapController, generatePDFContoller, updateDateController } = require('../controller/kaprodi/konversiController');
 const logoutController = require('../controller/logoutController');
@@ -78,6 +78,27 @@ router.get('/file/report/:id', handlingCookie, generatePDFContoller);
 router.get('/file/report/:id/all', handlingCookie, generatePDFContoller2);
 router.get('/file/upload/:filename', handlingCookie, fileController);
 
+
+// CSRF Token router
+router.get('/csrf-token', handlingCookie,
+    (req, res) => {
+        try {
+            if(req.data.status === "Success"){
+                res.json({
+                    csrfToken: req.csrfToken()
+                });
+            }else{
+                res.json({
+                    csrfToken: null
+                });
+            }
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({
+                message: "Server Error"
+            });
+        }
+    });
 
 // routes not found
 router.get('*', notFound);

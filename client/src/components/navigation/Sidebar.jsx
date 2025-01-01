@@ -23,6 +23,8 @@ export default function Sidebar({ children }) {
   const handleLogout = (e) => {
     dispatch(fetchData({ endpoint: 'logout' }));
     Cookies.remove('token');
+    Cookies.remove('PHPSESSID');
+    Cookies.remove('_csrf');
     dispatch(logout(true));
     navigate('/login');
   }

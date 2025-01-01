@@ -120,7 +120,7 @@ function Riwayat() {
                                             style={{ borderBottom: "1px solid #CCCCCC" }}
                                             key={item.id_mahasiswa}
                                         >
-                                            <div className='overflow-auto'>{index + 1}</div>
+                                            <div className='overflow-auto'>{startIndex + index + 1}</div>
                                             <div>{item.nama}</div>
                                             <div>{formattedDate(item.tanggal_recap)}</div>
                                             <div>
@@ -181,7 +181,7 @@ function Riwayat() {
                 <Modal.ModalBerkas src={berkasName} onClose={closeModal} nama={nama} file={jenisFile} setSpesifikBerkas={setSpesifikBerkas} review={true} />
             </Modal>
             <Modal open={isDeleteModal}>
-                <Modal.ModalCustom onClose={() => { closeModal('hapus') }} title={`Apakah anda yakin ingin menghapus  hasil konversi'${dataMahasiswa.nama}'?`} formClass={'flex gap-2'}>
+                <Modal.ModalCustom onClose={() => { closeModal('hapus') }} title={`Apakah anda yakin ingin menghapus  hasil konversi '${dataMahasiswa.nama}'?`} formClass={'flex gap-2'}>
                     <Button text={"Hapus"} className={"mt-2 ms-auto w-full justify-center"} onClick={(e) => { handleAction(e, 'hapus'); }} />
                     <Button text={"Batal"} className={"mt-2 ms-auto  bg-red-500 border-red-600 w-full text-center justify-center"} onClick={(e) => { e.preventDefault(); closeModal('hapus') }} />
                 </Modal.ModalCustom>

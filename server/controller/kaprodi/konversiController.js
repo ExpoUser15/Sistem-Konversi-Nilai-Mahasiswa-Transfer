@@ -648,19 +648,11 @@ const deleteKonversiController = async (req, res) => {
             });
         }
 
-        const semester = await semesterQueries.findAll({
-            id_mahasiswa: id
-        });
-
         await konveriQueries.delete({
             id_mahasiswa: id
         });
 
         await recapQueries.delete({
-            id_mahasiswa: id
-        });
-
-        await documentQueries.delete({
             id_mahasiswa: id
         });
 
@@ -1030,8 +1022,6 @@ const deletePenempatanController = async (req, res) => {
             }, []);
     
             result = groupedData.map(group => group.courses);
-    
-            console.log(result);
     
             const mkData = await sequelize.query(`
                 SELECT tb_courses.* 

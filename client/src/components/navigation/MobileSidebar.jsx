@@ -28,6 +28,8 @@ export default function MobileSidebar({ children }) {
     dispatch(fetchData({ endpoint: 'logout' }));
     setExpanded(curr => !curr);
     Cookies.remove('token');
+    Cookies.remove('PHPSESSID');
+    Cookies.remove('_csrf');
     dispatch(logout(true));
     navigate('/login');
   }

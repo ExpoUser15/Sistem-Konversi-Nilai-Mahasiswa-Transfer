@@ -11,6 +11,19 @@ import Modal from '../../components/ModalBox/Modal';
 import Input from '../../components/Inputs/Input';
 import Notification from '../../components/Notifications/Notification';
 import { useSelectedProperties } from '../../hooks/useGetSelectedProperty';
+import RcPagination from 'rc-pagination';
+import 'rc-pagination/assets/index.css';
+
+const locale = {
+    prev_page: 'Previous',
+    next_page: 'Next',
+    jump_to: 'Go to',
+    jump_to_confirm: 'Confirm',
+    page: 'Page',
+    items_per_page: 'items/page',
+};
+
+const ITEMS_PER_PAGE = 5;
 
 function Pengguna() {
     const dispatch = useDispatch();
@@ -29,6 +42,16 @@ function Pengguna() {
     const [isModalTambah, setIsModalTambah] = useState(false);
     const [isModalEdit, setIsModalEdit] = useState(false);
     const [isDeleteModal, setIsDeleteModal] = useState(false);
+
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    const currentData = users.slice(startIndex, endIndex);
+
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+    };
 
     const openModal = (item, data) => {
         if (item === 'tambah') {
@@ -121,14 +144,14 @@ function Pengguna() {
                 <Tables fields={["No", "ID Pengguna", "Username", "Role", ""]} gap={"1"}>
                     {
                         !loading ? (
-                            users.length > 0 ? (
-                                users.map((item, index) => (
+                            currentData.length > 0 ? (
+                                currentData.map((item, index) => (
                                     <div
                                         className="min-w-[700px] sm:max-h-fit grid grid-cols-5 mb-7 text-sm-3 pb-2"
                                         style={{ borderBottom: "1px solid #CCCCCC" }}
                                         key={item.id_pengguna}
                                     >
-                                        <div className="overflow-x-auto">{index + 1}</div>
+                                        <div className="overflow-x-auto">{startIndex + index + 1}</div>
                                         <div className="overflow-x-auto">{item.id_pengguna}</div>
                                         <div className="overflow-auto">{item.username}</div>
                                         <div className="overflow-auto">{item.user}</div>
@@ -158,6 +181,16 @@ function Pengguna() {
                         )
                     }
                 </Tables>
+                <RcPagination
+                    current={currentPage}
+                    total={users.length}
+                    pageSize={ITEMS_PER_PAGE}
+                    onChange={handlePageChange}
+                    showQuickJumper
+                    locale={locale}
+                    showLessItems={true}
+                    hideOnSinglePage={false}
+                />
                 <Button text={"Tambah"} onClick={() => { openModal('tambah') }} className={"mt-2 ms-auto"}>
                     <Plus size={20} />
                 </Button>

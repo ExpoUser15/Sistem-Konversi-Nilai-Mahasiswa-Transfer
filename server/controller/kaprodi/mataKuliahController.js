@@ -29,11 +29,18 @@ const addMataKuliahController = async (req, res) => {
     try {
         const { id_mk, mata_kuliah, sks, semester } = req.body;
 
+        let mkData = await mkQueries.findAll({}, {
+            order: [
+                ['semester', 'ASC'] // Sort by the 'createdAt' column in descending order
+            ]
+        });
+
         if (!id_mk || !mata_kuliah || !sks || !semester) {
 
             return res.status(422).json({
-                status: "Error",
-                message: "Silahkan mengisikan form terlebih dahulu!"
+                status: "Warning",
+                message: "Silahkan mengisikan form terlebih dahulu!",
+                data: mkData
             });
         }
 
@@ -49,14 +56,22 @@ const addMataKuliahController = async (req, res) => {
             }
         }
 
-        await mkQueries.create({
-            id_mk: !id_mk ? idUser : id_mk,
-            mata_kuliah,
-            sks,
-            semester
-        });
+        try {
+            await mkQueries.create({
+                id_mk: !id_mk ? idUser : id_mk,
+                mata_kuliah,
+                sks,
+                semester
+            }); 
+        } catch (error) {
+            return res.status(422).json({
+                status: "Warning",
+                message: "Kode mata kuliah sudah ada!",
+                data: mkData
+            });
+        }
 
-        const mkData = await mkQueries.findAll({}, {
+        mkData = await mkQueries.findAll({}, {
             order: [
                 ['semester', 'ASC'] // Sort by the 'createdAt' column in descending order
             ]

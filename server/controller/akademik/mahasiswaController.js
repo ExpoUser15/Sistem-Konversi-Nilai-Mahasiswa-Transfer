@@ -88,7 +88,7 @@ const addMahasiswaController = async (req, res) => {
             replacements: { nim }
         });
 
-        if(nimExist.length === 1){
+        if (nimExist.length === 1) {
             return res.status(422).json({
                 status: 'Warning',
                 message: `NIM sudah ada silahkan masukan NIM yang baru`,
@@ -173,46 +173,46 @@ const deleteMahasiswaController = async (req, res) => {
         const kon = await sequelize.query("SELECT * FROM tb_conversions WHERE id_mahasiswa = :id", {
             replacements: { id },
             type: QueryTypes.SELECT
-        }); 
+        });
 
         const recap = await sequelize.query("SELECT * FROM tb_recapitulations WHERE id_mahasiswa = :id", {
             replacements: { id },
             type: QueryTypes.SELECT
-        }); 
+        });
 
         const detail = await sequelize.query("SELECT * FROM tb_semesters WHERE id_mahasiswa = :id", {
             replacements: { id },
             type: QueryTypes.SELECT
-        }); 
+        });
 
-        if(kon.length !== 0){
+        if (kon.length !== 0) {
             await konveriQueries.delete({
                 id_mahasiswa: id
             });
         }
 
-        if(recap.length !== 0){
-            if(recap[0].report){
+        if (recap.length !== 0) {
+            if (recap[0].report) {
                 const filePath = path.join(process.cwd(), `tmp/laporan`, recap[0].report);
                 console.log(filePath);
-                await fs.promises.unlink(filePath); 
+                await fs.promises.unlink(filePath);
             }
-            if(recap[0].formulir){
+            if (recap[0].formulir) {
                 const filePath = path.join(process.cwd(), `tmp/formulir`, recap[0].formulir);
-                await fs.promises.unlink(filePath); 
+                await fs.promises.unlink(filePath);
             }
 
-            if(recap[0].upload){
+            if (recap[0].upload) {
                 const filePath = path.join(process.cwd(), `tmp/form`, recap[0].upload);
                 console.log(filePath);
-                await fs.promises.unlink(filePath); 
+                await fs.promises.unlink(filePath);
             }
             await recapQueries.delete({
                 id_mahasiswa: id
             });
         }
 
-        if(detail.length !== 0){
+        if (detail.length !== 0) {
             await semestersQueries.delete({
                 id_mahasiswa: id
             });
@@ -325,6 +325,23 @@ const updateBerkasController = async (req, res) => {
         }
 
         const berkas = {};
+
+        let berkasSpesifik = await sequelize.query("SELECT * FROM tb_files WHERE id_mahasiswa = :id LIMIT 1", {
+            replacements: { 
+                id
+            },
+            type: QueryTypes.SELECT
+        });
+
+        berkasSpesifik = berkasSpesifik[0][keysName[0] === 'transkrip' ? 'transkrip_nilai' : keysName[0]].split("/");
+        berkasSpesifik = berkasSpesifik[berkasSpesifik.length - 1];
+        
+        const filePath = path.join(process.cwd(), `tmp/${keysName[0]}`, berkasSpesifik);
+        if (fs.existsSync(filePath)) {
+            console.log("Ok berhasil!");
+            await fs.promises.unlink(filePath);
+        }
+        
         berkas[keysName[0] === 'transkrip' ? 'transkrip_nilai' : keysName[0]] = `${process.env.FILE_URL}${req.files[keysName[0]][0].filename}`;
 
         if (!id || !fileID) {

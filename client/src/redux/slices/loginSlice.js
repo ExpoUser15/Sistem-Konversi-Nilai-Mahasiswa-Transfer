@@ -5,22 +5,23 @@ const loginSlice = createSlice({
   name: 'loginData',
   initialState: {
     data: {},
-    hasNavigated: false,
     status: null,
     message: null,
     action: false,
-    tokenExpired: {},
     logOut: false
   },
   reducers: {
     logout: function(state, action){
       state.logOut = action.payload;
-      state.hasNavigated = action.payload;
+      state.data = {};
+      state.message = null;
+      state.action = false;
+      state.status = null;
     },
-    changeNavigated: (state, action) => {
-      state.status = action.payload.status;
-      state.action = action.payload.action;
-      state.message = action.payload.message;
+    rateLimitterStatus: (state) => {
+      state.status = "Error";
+      state.message = "Terjadi kesalahan pada server.";
+      state.action = true;
     }
   },
   extraReducers: (builder) => {
@@ -33,8 +34,7 @@ const loginSlice = createSlice({
       .addCase(postData.fulfilled, (state, action) => {
         state.loading = false;
         const payload = action.payload;
-        state.status = payload.status;
-        state.action = true;
+        state.status = payload.status || null;
         if(!payload.message){
             state.user = payload.user;
             state.token = payload.token;
@@ -53,28 +53,24 @@ const loginSlice = createSlice({
       .addCase(fetchData.pending, (state) => {
         state.action = false;
         state.loading = true;
-        state.hasNavigated = false;
       })
       .addCase(fetchData.fulfilled, (state, action) => {
         state.loading = false;
         const payload = action.payload;
         if (!payload.auth.message) {
           state.data = payload.auth; 
-        } else {
-          state.action = true;
-          state.status = payload.auth.status;
-          state.message = payload.auth.message;
-        }
+        } 
       })
       .addCase(fetchData.rejected, (state, action) => {
         state.loading = false;
         const payload = action.payload.auth;
-        state.status = payload.status;
-        state.message = payload.message;
+        state.status = payload?.status || "Error";
+        state.message = payload?.message || "Terjadi kesalahan pada server.";
+        state.action = true;
       })  
   },
 });
 
-export const { logout, changeNavigated } = loginSlice.actions;
+export const { logout, rateLimitterStatus } = loginSlice.actions;
 export default loginSlice.reducer;
 

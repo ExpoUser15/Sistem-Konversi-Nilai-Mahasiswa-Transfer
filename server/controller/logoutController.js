@@ -3,14 +3,15 @@ const logoutController = async (req, res) => {
         const cookie = req.cookies;
 
         if(!cookie.token){
-            return res.status(401).json({
-                auth: "Unauthenticated!",
+            return res.json({
                 status: 'Error',
                 message: "Terjadi Kesalahan!"
             });
         }
         
         res.clearCookie('token');
+        res.clearCookie('PHPSESSID');
+        res.clearCookie('_csrf');
     } catch (error) {
         console.log(error);
         res.status(500).json({
