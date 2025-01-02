@@ -12,6 +12,8 @@ require('dotenv').config();
 const csrfProtection = csrf({ cookie: true, headerName: 'CSRF-Token'  });
 const port = process.env.PORT || '3001';
 
+app.set('trust proxy', true);
+
 app.use(helmet({
   crossOriginResourcePolicy: false,
 }));
