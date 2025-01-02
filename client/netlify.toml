@@ -1,0 +1,6 @@
+[build]
+  command = "npm run build"   # Perintah build untuk menghasilkan file yang dapat dipublikasikan
+  publish = "client/dist" 
+
+[[plugins]]
+  package = "@babel/plugin-transform-private-property-in-object"
