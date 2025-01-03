@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const Queries = require("../queries/queries");
 
-const loginController =  async(req, res) => {
+const loginController = async (req, res) => {
     try {
         res.json({
             auth: req.data,
@@ -14,14 +14,14 @@ const loginController =  async(req, res) => {
             message: "Server Error"
         });
     }
-    
+
 }
 
 const postLoginController = async (req, res) => {
     try {
         const { username, password } = req.body;
 
-        if(!username || !password){
+        if (!username || !password) {
             return res.status(422).json({
                 status: "Warning",
                 message: "Silahkan masukan Username atau Password terlebih dahulu!"
@@ -50,17 +50,25 @@ const postLoginController = async (req, res) => {
                     });
                 }
 
-                const token = jwt.sign({ 
-                    username: dataValues.username, 
-                    user: dataValues.user, 
-                    id: dataValues.id_pengguna 
+                const token = jwt.sign({
+                    username: dataValues.username,
+                    user: dataValues.user,
+                    id: dataValues.id_pengguna
                 }, process.env.SECRET_KEY, { expiresIn: '1d' });
-            
-                res.cookie("token", token);
+
+
+                // dev cookie
+                // res.cookie("token", token);
+
+                res.cookie('token', token, {
+                    httpOnly: true, 
+                    secure: true, 
+                    sameSite: 'None'
+                });
 
                 res.json({
                     status: "Success",
-                    user: dataValues.user, 
+                    user: dataValues.user,
                 });
             })
             .catch(err => {
