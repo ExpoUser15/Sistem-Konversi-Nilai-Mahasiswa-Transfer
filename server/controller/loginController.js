@@ -65,7 +65,7 @@ const postLoginController = async (req, res) => {
                 res.cookie('token', token, {
                     // httpOnly: false, 
                     secure: process.env.NODE_ENV === "production" ? true : false, 
-                    // sameSite: 'None'
+                    sameSite: 'None'
                 });
 
                 res.json({

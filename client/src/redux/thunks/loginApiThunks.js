@@ -1,6 +1,8 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
+
+axios.defaults.baseURL = process.env.VITE_API_URL
 export const postData = createAsyncThunk(
     'loginData/postData',
     async ({ endpoint, data }, { rejectWithValue }) => {
