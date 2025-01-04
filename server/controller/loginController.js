@@ -59,7 +59,7 @@ const postLoginController = async (req, res) => {
 
                 // dev cookie
                 // res.cookie("token", token);
-
+                console.log(token);
                 // prod cookie
                 res.cookie('token', token, {
                     httpOnly: true, 
