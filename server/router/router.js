@@ -56,7 +56,6 @@ router.put('/konversi/update/date/:id', updateDateController);
 router.get('/mahasiswa/:type/:page', handlingCookie, mahasiswaController);
 router.get('/mahasiswa/laporan', handlingCookie, laporanController);
 
-
 router.post('/mahasiswa/add', berkasUpload, addMahasiswaController);
 router.post('/mahasiswa/upload/:id', docUpload, laporanPostController);
 router.post('/mahasiswa/search', searchingMahasiswa);

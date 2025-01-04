@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import Notification from "./Notifications/Notification";
 import useAuth from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import Cookies from "js-cookie";
 
 const Divcontainer = ({ className = "" }) => {
   const dispatch = useDispatch();
@@ -20,27 +20,14 @@ const Divcontainer = ({ className = "" }) => {
 
   const notifRef = useRef();
 
-  const data = useSelector(state => state.loginData.data);
-
-  useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_URL}csrf-token`)
-    .then(res => {
-      console.log(res);
-    })
-    .catch(err => console.log(err));
-  }, [])
-
   useEffect(() => {
     if (otentikasi) {
       navigate(`/${otentikasi.user.toLowerCase()}`);
     } else {
       navigate(`/login`);
     }
-
-    
-    if(data.status === "Error"){
-      console.log(data);
-    }
+    const tokenFromCookie = Cookies.get('token');
+    console.log("Token ", tokenFromCookie);
   }, [auth]);
 
   const handleLogin = (e) => {
