@@ -63,7 +63,7 @@ const postLoginController = async (req, res) => {
                 // prod cookie
                 res.cookie('token', token, {
                     httpOnly: true, 
-                    secure: true, 
+                    secure: process.env.NODE_ENV === "production" ? true : false, 
                     sameSite: 'None'
                 });
 
