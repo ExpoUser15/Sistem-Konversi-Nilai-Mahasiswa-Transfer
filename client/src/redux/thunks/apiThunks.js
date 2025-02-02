@@ -2,7 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 export const fetchData = createAsyncThunk(
-  'apiData/fectData',
+  'apiData/fetchData',
   async ({ endpoint }, { rejectWithValue }) => {
     try {
       axios.defaults.withCredentials = true;
@@ -60,7 +60,7 @@ export const updateData = createAsyncThunk(
   async ({ endpoint, data, contentType }, { rejectWithValue }) => {
     try {
       axios.defaults.withCredentials = true;
-      const url = `$${import.meta.env.VITE_API_URL}${endpoint}`;
+      const url = `${import.meta.env.VITE_API_URL}${endpoint}`;
       const csrf = await axios.get(`${import.meta.env.VITE_API_URL}csrf-token`);
       const response = await axios.put(url, data, {
         headers: {

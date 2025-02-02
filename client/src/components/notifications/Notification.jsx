@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-const Notification = ({ className = "", text, status, notifRef, state }) => {
+const Notification = ({ className = "", text, status, notifRef, state, setAction }) => {
 
     useEffect(() => {
         if (state) {
@@ -9,7 +9,11 @@ const Notification = ({ className = "", text, status, notifRef, state }) => {
 
             const timer = setTimeout(() => {
                 notifRef.current.classList.replace("translate-x-[0]", "translate-x-[1000px]");
+                if(setAction){
+                    setAction(false);
+                }
             }, 6000);
+
 
             return () => clearTimeout(timer);
         }

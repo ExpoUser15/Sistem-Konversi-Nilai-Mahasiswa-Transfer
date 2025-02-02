@@ -25,7 +25,7 @@ app.use(cors({
 }));
 
 app.use(express.urlencoded({ extended: false }));
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '100mb' }));
 
 app.disable('x-powered-by');
 

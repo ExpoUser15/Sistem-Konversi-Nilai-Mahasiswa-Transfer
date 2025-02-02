@@ -52,7 +52,7 @@ function Mahasiswa() {
     const [isDeleteModal, setIsDeleteModal] = useState(false);
 
     useEffect(() => {
-        dispatch(fetchData({ endpoint: 'mahasiswa/all/akademik' }));
+        dispatch(fetchData({ endpoint: 'mahasiswa/all' }));
     }, [dispatch]);
 
     const [currentPage, setCurrentPage] = useState(1);

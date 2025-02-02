@@ -191,7 +191,7 @@ const updateController = async (req, res) => {
 
         const { id } = req.params;
 
-        if (!username || !user || !id_pengguna) {
+        if (!username || !user) {
             const userData = await userQueries.findAll();
 
             return res.json({
@@ -201,9 +201,21 @@ const updateController = async (req, res) => {
             });
         }
 
+        let idUser;
+
+        if (!id_pengguna) {
+            let userId = await userQueries.findAll();
+            if (userId.length === 0) {
+                idUser = generateId(0, 'K');
+            } else {
+                userId = Number(userId[userId.length - 1].id_pengguna.substring(1));
+                idUser = generateId(userId, 'K');
+            }
+        }
+
         if (!password) {
             await userQueries.update({
-                id_pengguna,
+                id_pengguna: idUser,
                 username,
                 user
             }, {

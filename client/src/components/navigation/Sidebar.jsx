@@ -4,8 +4,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { ModeContext } from "../../context/ModeContext";
 import { useDispatch } from "react-redux";
 import { fetchData } from "../../redux/thunks/loginApiThunks";
-import { logout } from "../../redux/slices/loginSlice";
-import Cookies from "js-cookie";
+import { addLoginData, logout } from "../../redux/slices/loginSlice";
 
 const SidebarContext = createContext()
 
@@ -22,9 +21,7 @@ export default function Sidebar({ children }) {
 
   const handleLogout = (e) => {
     dispatch(fetchData({ endpoint: 'logout' }));
-    Cookies.remove('token');
-    Cookies.remove('PHPSESSID');
-    Cookies.remove('_csrf');
+    dispatch(addLoginData({}));
     dispatch(logout(true));
     navigate('/login');
   }

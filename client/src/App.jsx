@@ -23,8 +23,8 @@ function App() {
     <>
       <BrowserRouter>
         <Routes>
-          {/* Route untuk Akademik */}
           <Route path='/' element={<Navigate to="/login" replace />} />
+          {/* Route untuk Akademik */}
           <Route element={<PrivateRoutes allowedRole="Akademik" />}>
             <Route element={<AkademikLayout />}>
               <Route path="/akademik" element={<DashboardAkademik />} />

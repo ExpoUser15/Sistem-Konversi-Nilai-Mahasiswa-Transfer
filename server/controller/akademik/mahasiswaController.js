@@ -22,24 +22,22 @@ const semestersQueries = new Queries(semesterSchema);
 const mahasiswaController = async (req, res) => {
     try {
         const { type } = req.params;
-
         if (type === 'all') {
             const mahasiswaData = await sequelize.query("SELECT * FROM tb_students JOIN tb_files ON tb_files.id_mahasiswa = tb_students.id_mahasiswa ORDER BY tanggal ASC");
-
+            
             return res.json({
                 auth: req.data.status,
                 data: mahasiswaData[0]
             });
         }
-
+        
         if (type === 'recent') {
-            const mahasiswaData = await sequelize.query("SELECT * FROM tb_students JOIN tb_files ON tb_files.id_mahasiswa = tb_students.id_mahasiswa ORDER BY tanggal DESC LIMIT 10");
-
+            const mahasiswaData = await sequelize.query("SELECT * FROM tb_students JOIN tb_files ON tb_files.id_mahasiswa = tb_students.id_mahasiswa WHERE status = 'Pending' ORDER BY tanggal DESC LIMIT 10");
+            
             return res.json({
                 data: mahasiswaData[0]
             });
         }
-
     } catch (error) {
         console.log(error);
         res.status(500).json({

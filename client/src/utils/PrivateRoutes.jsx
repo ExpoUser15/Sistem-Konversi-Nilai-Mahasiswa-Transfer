@@ -1,31 +1,44 @@
-import { useEffect } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
-import useAuth from '../hooks/useAuth';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchData } from '../redux/thunks/loginApiThunks';
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigate, Outlet } from "react-router-dom";
+import axios from "axios";
+import { addLoginData } from "../redux/slices/loginSlice";
 
 const PrivateRoutes = ({ allowedRole }) => {
-    const dispatch = useDispatch();
-    const validasi = useAuth();
-    const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [data, setData] = useState(null);
+  const url = import.meta.env.VITE_API_URL;
 
-    useEffect(() => {
-        dispatch(fetchData({ endpoint: 'login' }));
-    }, [dispatch]);
+  useEffect(() => {
+    const handleAuth = async () => {
+      try {
+        const res = await axios.get(`${url}login`, { withCredentials: true });
+        const auth = res?.data?.auth;
 
-    const data = useSelector(state => state.loginData.data);
+        dispatch(addLoginData(auth));
+        
+        setData(auth);
 
-    useEffect(() => {
-        if (!validasi) {
-            navigate('/login');
+        if (!auth || auth?.status !== "Success") {
+          return navigate("/login");
         }
 
-        if (validasi.user !== allowedRole) {
-            navigate('/unauthorized');
+        if (auth?.data?.user !== allowedRole) {
+          return navigate("/unauthorized");
         }
-    }, [validasi]);
+      } catch (error) {
+        console.log("Authentication Error:", error);
+        navigate("/login");
+      }
+    };
 
-    return <Outlet />;
-}
+    handleAuth();
+  }, [dispatch, navigate, allowedRole, url]);
+
+  if (data === null) return <div>Loading...</div>;
+
+  return <Outlet />;
+};
 
 export default PrivateRoutes;

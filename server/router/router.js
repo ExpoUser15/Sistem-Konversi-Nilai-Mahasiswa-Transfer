@@ -31,8 +31,12 @@ router.get('/konversi/recap/:id', handlingCookie, recapController);
 router.get('/pimpinan', handlingCookie, pimpinanController);
 router.get('/analisis', handlingCookie, analyticsController);
 
+// akademik router
+router.get('/mahasiswa/:type', handlingCookie, mahasiswaController);
+router.get('/laporan', handlingCookie, laporanController);
+
 router.post('/auth', postLoginController);
-router.post('/users/add', handlingCookie, addUsersController);
+router.post('/users/add', addUsersController);
 router.post('/konversi/semester/add/:id', semesterPostController);
 router.post('/matakuliah/add', addMataKuliahController);
 router.post('/konversi/add/:id', handleDuplicateData, addKonversiController);
@@ -51,10 +55,6 @@ router.put('/matakuliah/update/:id', updateMataKuliahController);
 router.put('/konversi/detail/:id', updateKonversiController);
 router.put('/pimpinan/update/:id', updatePimpinanController);
 router.put('/konversi/update/date/:id', updateDateController);
-
-// akademik router
-router.get('/mahasiswa/:type/:page', handlingCookie, mahasiswaController);
-router.get('/mahasiswa/laporan', handlingCookie, laporanController);
 
 router.post('/mahasiswa/add', berkasUpload, addMahasiswaController);
 router.post('/mahasiswa/upload/:id', docUpload, laporanPostController);

@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { fetchData, postData } from '../thunks/loginApiThunks';
+import { fetchData } from '../thunks/loginApiThunks';
 
 const loginSlice = createSlice({
   name: 'loginData',
@@ -11,12 +11,16 @@ const loginSlice = createSlice({
     logOut: false
   },
   reducers: {
-    logout: function(state, action){
+    logout: function (state, action) {
       state.logOut = action.payload;
       state.data = {};
       state.message = null;
       state.action = false;
       state.status = null;
+    },
+    addLoginData: (state, action) => {
+      const payload = action.payload;
+      state.data = payload;
     },
     rateLimitterStatus: (state) => {
       state.status = "Error";
@@ -26,30 +30,6 @@ const loginSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Handle POST request
-      .addCase(postData.pending, (state) => {
-        state.action = false
-        state.loading = true;
-      })
-      .addCase(postData.fulfilled, (state, action) => {
-        state.loading = false;
-        const payload = action.payload;
-        state.status = payload.status || null;
-        if(!payload.message){
-            state.user = payload.user;
-            state.token = payload.token;
-            return;
-        }
-        state.message = payload.message;
-      })
-      .addCase(postData.rejected, (state, action) => {
-        state.loading = false;
-        const payload = action.payload;
-        state.status = payload.status || "Error";
-        state.message = payload.message || "Terjadi kesalahan pada server.";
-        state.action = true;
-      })  
-
       .addCase(fetchData.pending, (state) => {
         state.action = false;
         state.loading = true;
@@ -57,9 +37,7 @@ const loginSlice = createSlice({
       .addCase(fetchData.fulfilled, (state, action) => {
         state.loading = false;
         const payload = action.payload;
-        if (!payload.auth.message) {
-          state.data = payload.auth; 
-        } 
+        state.data = payload.auth;
       })
       .addCase(fetchData.rejected, (state, action) => {
         state.loading = false;
@@ -67,10 +45,10 @@ const loginSlice = createSlice({
         state.status = payload?.status || "Error";
         state.message = payload?.message || "Terjadi kesalahan pada server.";
         state.action = true;
-      })  
+      })
   },
 });
 
-export const { logout, rateLimitterStatus } = loginSlice.actions;
+export const { logout, rateLimitterStatus, addLoginData } = loginSlice.actions;
 export default loginSlice.reducer;
 

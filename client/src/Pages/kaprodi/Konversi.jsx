@@ -37,7 +37,7 @@ function Konversi() {
     const [isModalKonversi, setIsModalKonversi] = useState(false);
 
     useEffect(() => {
-        dispatch(fetchData({ endpoint: 'mahasiswa/all/akademik' }));
+        dispatch(fetchData({ endpoint: 'mahasiswa/all' }));
     }, [dispatch]);
 
     const closeModal = () => {

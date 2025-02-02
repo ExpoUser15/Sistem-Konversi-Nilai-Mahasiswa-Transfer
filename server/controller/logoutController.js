@@ -1,6 +1,7 @@
 const logoutController = async (req, res) => {
     try {
         const cookie = req.cookies;
+        console.log("Logout: ", cookie);
 
         if(!cookie.token){
             return res.json({

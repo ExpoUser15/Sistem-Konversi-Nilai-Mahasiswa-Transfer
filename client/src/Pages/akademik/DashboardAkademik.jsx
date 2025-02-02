@@ -1,20 +1,17 @@
-import { ArrowDownToLine, Eye } from "lucide-react";
 import ActionButton from "../../components/Buttons/ActionButton";
 import Loading from "../../components/Loader/Loading";
-import SearchField from "../../components/Inputs/SearchingInput";
 import { useDispatch, useSelector } from "react-redux";
 import Tables from "../../components/Tables/Tables";
 import { fetchData } from "../../redux/thunks/apiThunks";
 import { useEffect, useState } from "react";
 import Modal from "../../components/ModalBox/Modal";
 import Input from "../../components/Inputs/Input";
-import useAuth from "../../hooks/useAuth";
 import Greeting from "../../utils/Greeting";
 import { formattedDate } from "../../utils/formattedDate";
+import { Eye } from "lucide-react";
 
 function DashboardAkademik() {
   const dispatch = useDispatch();
-  const token = useAuth();
   const students = useSelector(state => state.apiData.data);
   const loading = useSelector(state => state.apiData.loading);
 
@@ -26,8 +23,11 @@ function DashboardAkademik() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalDetail, setIsModalDetail] = useState(false);
 
+  const data = useSelector((state) => state.loginData.data);
+
   useEffect(() => {
-    dispatch(fetchData({ endpoint: 'mahasiswa/laporan' }));
+    dispatch(fetchData({ endpoint: 'laporan' }));
+    console.log(loading);
   }, [dispatch]);
 
   const openModal = (item, item2, file) => {
@@ -50,7 +50,7 @@ function DashboardAkademik() {
   return (
     <>
       <div className="pb-1" style={{ borderBottom: "1px solid #CCCCCC" }}>
-        <Greeting name={token.username} />
+          <Greeting name={data?.data?.username} />
       </div>
       <main className="my-16">
         <div>
@@ -75,7 +75,7 @@ function DashboardAkademik() {
                       <div>{formattedDate(item.tanggal)}</div>
                       <div
                         className="cursor-pointer"
-                        onClick={() => { openModal([item.ktp, item.kk, item.ijazah], item.nama, ["KTP", "KK", "Ijazah"]); setDataMahasiswa(students[index]); }}
+                        onClick={() => { openModal([item.ktp, item.kk, item.ijazah], item.nama, ["KTP", "KK", "Ijazah"]); setDataMahasiswa(item); }}
                       >
                         <ActionButton text={"Lihat Berkas"}>
                           <Eye className='cursor-pointer' />
@@ -83,7 +83,7 @@ function DashboardAkademik() {
                       </div>
                       <div
                         className="cursor-pointer"
-                        onClick={() => { openModal(item.transkrip_nilai, item.nama, "Transkrip Nilai"); setDataMahasiswa(students[index]); }}
+                        onClick={() => { openModal(item.transkrip_nilai, item.nama, "Transkrip Nilai"); setDataMahasiswa(item); }}
                       >
                         <ActionButton text={"Lihat Transkrip"}>
                           <Eye className='cursor-pointer' />
@@ -92,13 +92,13 @@ function DashboardAkademik() {
                       <div
                         className="cursor-pointer"
                       >
-                        <ActionButton text={"Lihat Surat Pindah"} onClick={() => { openModal(item.surat_pindah, item.nama, "Surat Pindah"); setDataMahasiswa(students[index]); }}>
+                        <ActionButton text={"Lihat Surat Pindah"} onClick={() => { openModal(item.surat_pindah, item.nama, "Surat Pindah"); setDataMahasiswa(item); }}>
                           <Eye className='cursor-pointer' />
                         </ActionButton>
                       </div>
                       <div
                         className="cursor-pointer"
-                        onClick={() => { openModal('detail', students[index]); setDataMahasiswa(students[index]); }}
+                        onClick={() => { openModal('detail', item); setDataMahasiswa(item); }}
                       >
                         <ActionButton text={"Lihat Detail"}>
                           <Eye className='cursor-pointer' />

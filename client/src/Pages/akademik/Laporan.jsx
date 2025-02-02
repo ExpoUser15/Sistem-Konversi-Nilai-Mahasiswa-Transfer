@@ -35,7 +35,7 @@ function Laporan() {
     const [isModalUploadOpen, setIsModalUploadOpen] = useState(false);
 
     useEffect(() => {
-        dispatch(fetchData({ endpoint: 'mahasiswa/laporan' }));
+        dispatch(fetchData({ endpoint: 'laporan' }));
     }, [dispatch]);
 
     const openModal = (item, item2, file) => {

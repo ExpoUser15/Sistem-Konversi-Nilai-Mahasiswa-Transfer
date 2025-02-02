@@ -29,9 +29,10 @@ const apiSlice = createSlice({
         state.action = false;
       })
       .addCase(fetchData.fulfilled, (state, action) => {
-        const data = action.payload.data ;
-        state.data = data;
         state.loading = false;
+        const data = action.payload.data ;
+        state.data = {};
+        console.log(data);
       })
       .addCase(fetchData.rejected, (state, action) => {
         state.loading = false;
